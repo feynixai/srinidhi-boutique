@@ -29,9 +29,18 @@ export default function OrdersPage() {
     <div className="space-y-6 pb-10">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Orders</h1>
-        <button onClick={() => refetch()} className="btn-action bg-gray-100 text-gray-700 px-4 py-2 text-sm">
-          🔄 Refresh
-        </button>
+        <div className="flex gap-2">
+          <a
+            href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/admin/orders/export`}
+            download
+            className="btn-action bg-green-50 text-green-700 border border-green-200 px-4 py-2 text-sm hover:bg-green-100 transition-colors"
+          >
+            📥 Export CSV
+          </a>
+          <button onClick={() => refetch()} className="btn-action bg-gray-100 text-gray-700 px-4 py-2 text-sm">
+            🔄 Refresh
+          </button>
+        </div>
       </div>
 
       {/* Tabs */}

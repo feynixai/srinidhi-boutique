@@ -97,6 +97,15 @@ const productSchema = z.object({
   active: z.boolean().default(true),
 });
 
+adminRoutes.get('/products/:id', async (req: Request, res: Response) => {
+  const product = await prisma.product.findUnique({
+    where: { id: req.params.id },
+    include: { category: true },
+  });
+  if (!product) throw new AppError(404, 'Product not found');
+  res.json(product);
+});
+
 adminRoutes.post('/products', async (req: Request, res: Response) => {
   const data = productSchema.parse(req.body);
   const slug = slugify(data.name, { lower: true, strict: true });
@@ -162,6 +171,46 @@ adminRoutes.get('/orders', async (req: Request, res: Response) => {
   res.json({ orders, total, page: pageNum, totalPages: Math.ceil(total / limitNum) });
 });
 
+adminRoutes.get('/orders/export', async (_req: Request, res: Response) => {
+  const orders = await prisma.order.findMany({
+    orderBy: { createdAt: 'desc' },
+    include: { items: true },
+  });
+
+  const rows = [
+    ['Order Number', 'Customer', 'Phone', 'Email', 'Status', 'Payment', 'Total', 'Shipping', 'Discount', 'Date', 'Items'].join(','),
+    ...orders.map((o) => [
+      o.orderNumber,
+      `"${o.customerName}"`,
+      o.customerPhone,
+      o.customerEmail || '',
+      o.status,
+      o.paymentMethod,
+      Number(o.total).toFixed(2),
+      Number(o.shipping).toFixed(2),
+      Number(o.discount).toFixed(2),
+      new Date(o.createdAt).toLocaleDateString('en-IN'),
+      o.items.length,
+    ].join(',')),
+  ].join('\n');
+
+  res.setHeader('Content-Type', 'text/csv');
+  res.setHeader('Content-Disposition', `attachment; filename="orders-${Date.now()}.csv"`);
+  res.send(rows);
+});
+
+adminRoutes.patch('/products/:id/stock', async (req: Request, res: Response) => {
+  const { stock } = z.object({ stock: z.number().int().min(0) }).parse(req.body);
+  const existing = await prisma.product.findUnique({ where: { id: req.params.id } });
+  if (!existing) throw new AppError(404, 'Product not found');
+
+  const updated = await prisma.product.update({
+    where: { id: req.params.id },
+    data: { stock },
+  });
+  res.json(updated);
+});
+
 adminRoutes.put('/orders/:id/status', async (req: Request, res: Response) => {
   const { status, trackingId } = z
     .object({
@@ -222,6 +271,143 @@ adminRoutes.delete('/coupons/:id', async (req: Request, res: Response) => {
 
   await prisma.coupon.delete({ where: { id: req.params.id } });
   res.json({ success: true });
+});
+
+// Order detail
+adminRoutes.get('/orders/:id', async (req: Request, res: Response) => {
+  const order = await prisma.order.findUnique({
+    where: { id: req.params.id },
+    include: { items: { include: { product: { include: { category: true } } } } },
+  });
+  if (!order) throw new AppError(404, 'Order not found');
+  res.json(order);
+});
+
+// Customers
+adminRoutes.get('/customers', async (req: Request, res: Response) => {
+  const { page = '1', limit = '20', search } = req.query;
+  const pageNum = parseInt(page as string, 10);
+  const limitNum = parseInt(limit as string, 10);
+
+  const where: Record<string, unknown> = {};
+  if (search) {
+    where.OR = [
+      { customerName: { contains: search, mode: 'insensitive' } },
+      { customerPhone: { contains: search as string } },
+      { customerEmail: { contains: search, mode: 'insensitive' } },
+    ];
+  }
+
+  const orders = await prisma.order.findMany({
+    where,
+    orderBy: { createdAt: 'desc' },
+    select: {
+      id: true, customerName: true, customerPhone: true, customerEmail: true,
+      total: true, status: true, createdAt: true, orderNumber: true,
+    },
+  });
+
+  // Group by phone to get unique customers
+  const customerMap = new Map<string, {
+    phone: string; name: string; email?: string | null;
+    totalSpend: number; orderCount: number; lastOrder: Date; firstOrder: Date;
+  }>();
+
+  for (const o of orders) {
+    const existing = customerMap.get(o.customerPhone);
+    if (existing) {
+      existing.totalSpend += Number(o.total);
+      existing.orderCount += 1;
+      if (new Date(o.createdAt) > existing.lastOrder) existing.lastOrder = new Date(o.createdAt);
+      if (new Date(o.createdAt) < existing.firstOrder) existing.firstOrder = new Date(o.createdAt);
+    } else {
+      customerMap.set(o.customerPhone, {
+        phone: o.customerPhone,
+        name: o.customerName,
+        email: o.customerEmail,
+        totalSpend: Number(o.total),
+        orderCount: 1,
+        lastOrder: new Date(o.createdAt),
+        firstOrder: new Date(o.createdAt),
+      });
+    }
+  }
+
+  const customers = Array.from(customerMap.values())
+    .sort((a, b) => b.totalSpend - a.totalSpend);
+
+  const total = customers.length;
+  const paginated = customers.slice((pageNum - 1) * limitNum, pageNum * limitNum);
+
+  res.json({ customers: paginated, total, page: pageNum, totalPages: Math.ceil(total / limitNum) });
+});
+
+adminRoutes.get('/customers/:phone', async (req: Request, res: Response) => {
+  const phone = req.params.phone;
+  const orders = await prisma.order.findMany({
+    where: { customerPhone: phone },
+    include: { items: { include: { product: true } } },
+    orderBy: { createdAt: 'desc' },
+  });
+  if (orders.length === 0) throw new AppError(404, 'Customer not found');
+  res.json({
+    name: orders[0].customerName,
+    phone: orders[0].customerPhone,
+    email: orders[0].customerEmail,
+    orders,
+    totalSpend: orders.reduce((sum, o) => sum + Number(o.total), 0),
+  });
+});
+
+// Analytics
+adminRoutes.get('/analytics', async (req: Request, res: Response) => {
+  const { period = '30' } = req.query;
+  const days = parseInt(period as string, 10);
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+
+  const [orders, topProducts, revenueByPayment] = await Promise.all([
+    prisma.order.findMany({
+      where: { createdAt: { gte: since }, paymentStatus: 'paid' },
+      select: { total: true, createdAt: true, paymentMethod: true },
+      orderBy: { createdAt: 'asc' },
+    }),
+    prisma.orderItem.groupBy({
+      by: ['productId', 'name'],
+      _sum: { quantity: true },
+      _count: true,
+      orderBy: { _sum: { quantity: 'desc' } },
+      take: 10,
+    }),
+    prisma.order.groupBy({
+      by: ['paymentMethod'],
+      where: { paymentStatus: 'paid' },
+      _sum: { total: true },
+      _count: true,
+    }),
+  ]);
+
+  // Daily revenue chart
+  const dailyMap = new Map<string, number>();
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    dailyMap.set(d.toISOString().slice(0, 10), 0);
+  }
+  for (const o of orders) {
+    const key = new Date(o.createdAt).toISOString().slice(0, 10);
+    dailyMap.set(key, (dailyMap.get(key) || 0) + Number(o.total));
+  }
+  const dailyRevenue = Array.from(dailyMap.entries()).map(([date, revenue]) => ({ date, revenue }));
+
+  res.json({
+    totalRevenue: orders.reduce((sum, o) => sum + Number(o.total), 0),
+    totalOrders: orders.length,
+    avgOrderValue: orders.length > 0 ? orders.reduce((sum, o) => sum + Number(o.total), 0) / orders.length : 0,
+    dailyRevenue,
+    topProducts,
+    revenueByPayment,
+  });
 });
 
 // Categories

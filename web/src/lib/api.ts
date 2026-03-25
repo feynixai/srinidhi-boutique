@@ -138,3 +138,29 @@ export const getOrder = (id: string) =>
 // Coupons
 export const validateCoupon = (code: string, orderAmount: number) =>
   api.post('/api/coupons/validate', { code, orderAmount }).then((r) => r.data);
+
+// Reviews
+export interface Review {
+  id: string;
+  productId: string;
+  customerName: string;
+  rating: number;
+  title?: string;
+  body?: string;
+  approved: boolean;
+  createdAt: string;
+}
+
+export const getReviews = (productId: string) =>
+  api.get(`/api/reviews/${productId}`).then((r) => r.data as { reviews: Review[]; total: number; avgRating: number; distribution: { star: number; count: number }[] });
+
+export const submitReview = (productId: string, data: { customerName: string; rating: number; title?: string; body?: string }) =>
+  api.post(`/api/reviews/${productId}`, data).then((r) => r.data as Review);
+
+// Orders by phone
+export const getOrdersByPhone = (phone: string) =>
+  api.get(`/api/orders/by-phone/${phone}`).then((r) => r.data);
+
+// Pincode check
+export const checkPincode = (pincode: string) =>
+  api.get(`/api/pincode/${pincode}`).then((r) => r.data);

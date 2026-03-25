@@ -56,12 +56,45 @@ export async function createTestCoupon(overrides: Record<string, unknown> = {}) 
   });
 }
 
+export async function createTestReview(productId: string, overrides: Record<string, unknown> = {}) {
+  return testPrisma.review.create({
+    data: {
+      productId,
+      customerName: 'Test Customer',
+      rating: 5,
+      title: 'Great product',
+      body: 'Really loved this product!',
+      approved: true,
+      ...(overrides as Record<string, unknown>),
+    },
+  });
+}
+
+export async function createTestPincodeZone(overrides: Record<string, unknown> = {}) {
+  const pincode = (overrides.pincode as string) || `50000${Math.floor(Math.random() * 9)}`;
+  return testPrisma.pincodeZone.upsert({
+    where: { pincode },
+    update: {},
+    create: {
+      pincode,
+      zone: 'south',
+      city: 'Hyderabad',
+      state: 'Telangana',
+      deliveryDays: 2,
+      available: true,
+      ...(overrides as Record<string, unknown>),
+    },
+  });
+}
+
 export async function cleanupTest() {
   // Delete in FK-safe order
+  await testPrisma.review.deleteMany({});
   await testPrisma.orderItem.deleteMany({});
   await testPrisma.cartItem.deleteMany({});
   await testPrisma.order.deleteMany({});
   await testPrisma.coupon.deleteMany({});
   await testPrisma.product.deleteMany({});
   await testPrisma.category.deleteMany({});
+  await testPrisma.pincodeZone.deleteMany({});
 }

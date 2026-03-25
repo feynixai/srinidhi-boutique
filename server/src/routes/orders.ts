@@ -140,6 +140,30 @@ orderRoutes.post('/', async (req: Request, res: Response) => {
   res.status(201).json(order);
 });
 
+// Lookup orders by phone number
+orderRoutes.get('/by-phone/:phone', async (req: Request, res: Response) => {
+  const orders = await prisma.order.findMany({
+    where: { customerPhone: req.params.phone },
+    include: { items: { include: { product: { select: { name: true, images: true, slug: true } } } } },
+    orderBy: { createdAt: 'desc' },
+  });
+  res.json(orders);
+});
+
+orderRoutes.get('/track', async (req: Request, res: Response) => {
+  const { orderNumber, phone } = req.query as { orderNumber?: string; phone?: string };
+  if (!orderNumber || !phone) throw new AppError(400, 'orderNumber and phone are required');
+
+  const order = await prisma.order.findFirst({
+    where: { orderNumber: orderNumber.toUpperCase(), customerPhone: phone },
+    include: { items: true },
+  });
+
+  if (!order) throw new AppError(404, 'Order not found');
+
+  res.json(order);
+});
+
 orderRoutes.get('/:id', async (req: Request, res: Response) => {
   const order = await prisma.order.findUnique({
     where: { id: req.params.id },

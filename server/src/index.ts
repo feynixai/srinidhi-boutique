@@ -8,6 +8,8 @@ import { cartRoutes } from './routes/cart';
 import { orderRoutes } from './routes/orders';
 import { couponRoutes } from './routes/coupons';
 import { adminRoutes } from './routes/admin';
+import { reviewRoutes } from './routes/reviews';
+import { pincodeRoutes } from './routes/pincode';
 import { errorHandler } from './middleware/errorHandler';
 
 dotenv.config();
@@ -24,6 +26,8 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/pincode', pincodeRoutes);
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

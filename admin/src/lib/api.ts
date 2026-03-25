@@ -103,6 +103,9 @@ export const updateProduct = (id: string, data: Record<string, unknown>) =>
 export const deleteProduct = (id: string) =>
   api.delete(`/api/admin/products/${id}`).then((r) => r.data);
 
+export const updateProductStock = (id: string, stock: number) =>
+  api.patch(`/api/admin/products/${id}/stock`, { stock }).then((r) => r.data as Product);
+
 export const getAdminOrders = (params?: Record<string, string>) =>
   api.get('/api/admin/orders', { params }).then((r) => r.data as { orders: Order[]; total: number; page: number; totalPages: number });
 
@@ -123,3 +126,37 @@ export const deleteCoupon = (id: string) =>
 
 export const getCategories = () =>
   api.get('/api/categories').then((r) => r.data as Category[]);
+
+export const getAdminOrder = (id: string) =>
+  api.get(`/api/admin/orders/${id}`).then((r) => r.data as Order & { items: (OrderItem & { product: Product })[] });
+
+export interface Customer {
+  phone: string;
+  name: string;
+  email?: string | null;
+  totalSpend: number;
+  orderCount: number;
+  lastOrder: string;
+  firstOrder: string;
+}
+
+export const getAdminCustomers = (params?: Record<string, string>) =>
+  api.get('/api/admin/customers', { params }).then((r) => r.data as { customers: Customer[]; total: number; page: number; totalPages: number });
+
+export const getAdminCustomer = (phone: string) =>
+  api.get(`/api/admin/customers/${phone}`).then((r) => r.data);
+
+export interface Analytics {
+  totalRevenue: number;
+  totalOrders: number;
+  avgOrderValue: number;
+  dailyRevenue: { date: string; revenue: number }[];
+  topProducts: { productId: string; name: string; _sum: { quantity: number | null } }[];
+  revenueByPayment: { paymentMethod: string; _sum: { total: number | null }; _count: number }[];
+}
+
+export const getAnalytics = (period = '30') =>
+  api.get('/api/admin/analytics', { params: { period } }).then((r) => r.data as Analytics);
+
+export const getAdminProduct = (id: string) =>
+  api.get(`/api/admin/products/${id}`).then((r) => r.data as Product);

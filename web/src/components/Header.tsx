@@ -132,6 +132,9 @@ export function Header() {
                   {link.label}
                 </Link>
               ))}
+              <Link href="/orders" className="block py-3 text-base font-medium text-charcoal hover:text-rose-gold border-b border-gray-50" onClick={() => setMobileOpen(false)}>My Orders</Link>
+              <Link href="/wishlist" className="block py-3 text-base font-medium text-charcoal hover:text-rose-gold border-b border-gray-50" onClick={() => setMobileOpen(false)}>Wishlist</Link>
+              <Link href="/blog" className="block py-3 text-base font-medium text-charcoal hover:text-rose-gold" onClick={() => setMobileOpen(false)}>Blog</Link>
             </div>
           </div>
         )}

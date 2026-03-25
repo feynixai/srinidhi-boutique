@@ -1,14 +1,19 @@
 'use client';
 import Image from 'next/image';
-import { useState, use } from 'react';
+import Link from 'next/link';
+import { useState, use, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { FaWhatsapp } from 'react-icons/fa';
-import { FiShare2, FiHeart, FiChevronDown, FiChevronUp } from 'react-icons/fi';
-import { getProduct, addToCart } from '@/lib/api';
+import { FiShare2, FiHeart, FiChevronDown, FiChevronUp, FiCopy } from 'react-icons/fi';
+import { getProduct, addToCart, getProducts } from '@/lib/api';
 import { useCartStore } from '@/lib/cart-store';
+import { useWishlistStore } from '@/lib/wishlist-store';
 import { SizeGuideModal } from '@/components/SizeGuideModal';
 import { ProductReviews } from '@/components/ProductReviews';
+import { ProductCard } from '@/components/ProductCard';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 function Accordion({ title, children }: { title: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -26,19 +31,107 @@ function Accordion({ title, children }: { title: string; children: React.ReactNo
   );
 }
 
+function PincodeChecker() {
+  const [pincode, setPincode] = useState('');
+  const [result, setResult] = useState<{ available: boolean; deliveryDate?: string; deliveryDays?: number } | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  async function check() {
+    if (pincode.length !== 6) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/api/pincode/${pincode}`);
+      setResult(await res.json());
+    } catch {
+      setResult({ available: false });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="bg-cream p-4">
+      <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-charcoal/60">Check Delivery</p>
+      <div className="flex gap-2">
+        <input
+          value={pincode}
+          onChange={(e) => { setPincode(e.target.value.replace(/\D/g, '').slice(0, 6)); setResult(null); }}
+          onKeyDown={(e) => e.key === 'Enter' && check()}
+          placeholder="Enter pincode"
+          maxLength={6}
+          className="flex-1 border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-rose-gold bg-white"
+        />
+        <button onClick={check} disabled={loading || pincode.length < 6} className="btn-outline px-3 py-2 text-xs disabled:opacity-50">
+          {loading ? '...' : 'Check'}
+        </button>
+      </div>
+      {result && (
+        <p className={`text-xs mt-2 font-medium ${result.available ? 'text-green-600' : 'text-red-500'}`}>
+          {result.available
+            ? `Delivers by ${result.deliveryDate} (${result.deliveryDays} days)`
+            : 'Delivery not available to this pincode'}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function EMICalculator({ price }: { price: number }) {
+  if (price < 5000) return null;
+  const emi3 = Math.ceil(price / 3);
+  const emi6 = Math.ceil(price * 1.03 / 6);
+  const emi12 = Math.ceil(price * 1.06 / 12);
+  return (
+    <div className="bg-blue-50 border border-blue-100 p-4 text-sm">
+      <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-blue-700">EMI Options Available</p>
+      <div className="grid grid-cols-3 gap-2 text-center">
+        {[
+          { months: 3, emi: emi3, label: 'No Cost' },
+          { months: 6, emi: emi6, label: 'Low Cost' },
+          { months: 12, emi: emi12, label: 'Flexible' },
+        ].map((opt) => (
+          <div key={opt.months} className="bg-white rounded p-2 border border-blue-100">
+            <p className="font-bold text-blue-800">₹{opt.emi.toLocaleString('en-IN')}</p>
+            <p className="text-xs text-blue-600">{opt.months} months</p>
+            <p className="text-xs text-green-600 font-medium">{opt.label}</p>
+          </div>
+        ))}
+      </div>
+      <p className="text-xs text-blue-500 mt-2">Via credit/debit cards & Razorpay at checkout</p>
+    </div>
+  );
+}
+
 export default function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState<string>('');
   const [selectedImage, setSelectedImage] = useState(0);
   const [adding, setAdding] = useState(false);
-  const [wishlisted, setWishlisted] = useState(false);
   const { sessionId, itemCount, setItemCount, openCart } = useCartStore();
+  const { toggle: toggleWishlist, has: inWishlist } = useWishlistStore();
 
   const { data: product, isLoading } = useQuery({
     queryKey: ['product', slug],
     queryFn: () => getProduct(slug),
   });
+
+  const { data: relatedData } = useQuery({
+    queryKey: ['related', product?.categoryId],
+    queryFn: () => getProducts({ category: product!.category?.slug || '', limit: '5' }),
+    enabled: !!product?.category?.slug,
+  });
+
+  // Track recently viewed
+  useEffect(() => {
+    if (!product) return;
+    try {
+      const key = 'sb-recently-viewed';
+      const existing: string[] = JSON.parse(localStorage.getItem(key) || '[]');
+      const updated = [product.id, ...existing.filter((id) => id !== product.id)].slice(0, 10);
+      localStorage.setItem(key, JSON.stringify(updated));
+    } catch {}
+  }, [product]);
 
   if (isLoading) return (
     <div className="max-w-7xl mx-auto px-4 py-10">
@@ -99,12 +192,26 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
     }
   }
 
+  function handleShare() {
+    if (navigator.share) {
+      navigator.share({ title: product!.name, url: window.location.href });
+    } else {
+      navigator.clipboard?.writeText(window.location.href).then(() => toast.success('Link copied!'));
+    }
+  }
+
+  const relatedProducts = (relatedData?.products || []).filter((p) => p.id !== product.id).slice(0, 4);
+
   return (
     <div className="bg-white">
       {/* Breadcrumb */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
         <p className="text-xs text-charcoal/40 tracking-wide">
-          Home &nbsp;/&nbsp; {product.category?.name || 'Shop'} &nbsp;/&nbsp;
+          <Link href="/" className="hover:text-rose-gold">Home</Link>
+          &nbsp;/&nbsp;
+          {product.category && (
+            <><Link href={`/category/${product.category.slug}`} className="hover:text-rose-gold">{product.category.name}</Link>&nbsp;/&nbsp;</>
+          )}
           <span className="text-charcoal/70">{product.name}</span>
         </p>
       </div>
@@ -112,9 +219,8 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
 
-          {/* Image Gallery — thumbnails left, main image right */}
+          {/* Image Gallery */}
           <div className="flex gap-3">
-            {/* Thumbnail column */}
             {product.images.length > 1 && (
               <div className="flex flex-col gap-2 w-[72px] flex-shrink-0">
                 {product.images.map((img, i) => (
@@ -122,9 +228,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                     key={i}
                     onClick={() => setSelectedImage(i)}
                     className={`relative w-[72px] h-[88px] border-2 overflow-hidden transition-all ${
-                      selectedImage === i
-                        ? 'border-rose-gold shadow-md'
-                        : 'border-transparent hover:border-gold/50'
+                      selectedImage === i ? 'border-rose-gold shadow-md' : 'border-transparent hover:border-gold/50'
                     }`}
                   >
                     <Image src={img} alt={`${product.name} ${i + 1}`} fill className="object-cover" sizes="72px" />
@@ -132,8 +236,6 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 ))}
               </div>
             )}
-
-            {/* Main image */}
             <div className="flex-1 relative">
               <div className="relative aspect-[3/4] overflow-hidden bg-cream">
                 {product.images[selectedImage] && (
@@ -179,6 +281,12 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 <span className="bg-emerald/10 text-emerald font-semibold text-sm px-2 py-0.5">{discountPct}% off</span>
               )}
             </div>
+
+            {product.comparePrice && Number(product.comparePrice) > Number(product.price) && (
+              <p className="text-green-600 text-sm font-medium">
+                You save ₹{(Number(product.comparePrice) - Number(product.price)).toLocaleString('en-IN')}!
+              </p>
+            )}
 
             {product.stock <= 5 && product.stock > 0 && (
               <p className="text-orange-500 text-sm font-medium">
@@ -248,11 +356,14 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                   {product.stock === 0 ? 'OUT OF STOCK' : adding ? 'ADDING...' : 'ADD TO BAG'}
                 </button>
                 <button
-                  onClick={() => { setWishlisted(!wishlisted); toast.success(wishlisted ? 'Removed from wishlist' : 'Added to wishlist!'); }}
-                  className={`border p-4 transition-colors ${wishlisted ? 'border-rose-gold text-rose-gold bg-rose-gold/5' : 'border-gray-200 text-charcoal/40 hover:border-rose-gold hover:text-rose-gold'}`}
+                  onClick={() => {
+                    toggleWishlist({ id: product.id, name: product.name, slug: product.slug, price: Number(product.price), comparePrice: product.comparePrice ? Number(product.comparePrice) : undefined, images: product.images });
+                    toast(inWishlist(product.id) ? 'Removed from wishlist' : 'Saved to wishlist!');
+                  }}
+                  className={`border p-4 transition-colors ${inWishlist(product.id) ? 'border-rose-gold text-rose-gold bg-rose-gold/5' : 'border-gray-200 text-charcoal/40 hover:border-rose-gold hover:text-rose-gold'}`}
                   aria-label="Add to wishlist"
                 >
-                  <FiHeart size={18} fill={wishlisted ? '#8B1A4A' : 'none'} />
+                  <FiHeart size={18} fill={inWishlist(product.id) ? '#8B1A4A' : 'none'} />
                 </button>
               </div>
 
@@ -267,11 +378,18 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               </a>
             </div>
 
-            {/* Delivery Info */}
+            {/* Pincode Checker */}
+            <PincodeChecker />
+
+            {/* EMI Calculator */}
+            <EMICalculator price={Number(product.price)} />
+
+            {/* Trust Badges */}
             <div className="bg-cream p-4 space-y-1.5 text-sm">
               <p className="flex items-center gap-2 text-charcoal/70"><span className="text-emerald font-bold">✓</span> Free shipping on orders above ₹999</p>
               <p className="flex items-center gap-2 text-charcoal/70"><span className="text-emerald font-bold">✓</span> Easy 7-day returns & exchanges</p>
               <p className="flex items-center gap-2 text-charcoal/70"><span className="text-emerald font-bold">✓</span> Secure payment — UPI, Cards & COD</p>
+              <p className="flex items-center gap-2 text-charcoal/70"><span className="text-emerald font-bold">✓</span> Genuine products, curated in Hyderabad</p>
             </div>
 
             {/* Accordions */}
@@ -291,25 +409,52 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                   <p>Orders are processed within 1–2 business days.</p>
                   <p>Standard delivery: 4–7 business days across India.</p>
                   <p>Free returns within 7 days of delivery.</p>
+                  <Link href="/shipping" className="text-rose-gold hover:underline text-xs">Check delivery to your pincode →</Link>
                 </div>
               </Accordion>
             </div>
 
-            {/* Share */}
-            <button
-              onClick={() => {
-                navigator.share?.({ title: product.name, url: window.location.href })
-                  || navigator.clipboard?.writeText(window.location.href).then(() => toast.success('Link copied!'));
-              }}
-              className="flex items-center gap-1.5 text-sm text-charcoal/40 hover:text-rose-gold transition-colors"
-            >
-              <FiShare2 size={14} /> Share this product
-            </button>
+            {/* Share Buttons */}
+            <div className="flex items-center gap-3 pt-2">
+              <span className="text-xs text-charcoal/40 uppercase tracking-wider">Share:</span>
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(product.name + ' — ' + (typeof window !== 'undefined' ? window.location.href : ''))}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 flex items-center justify-center bg-green-100 text-green-600 rounded-full hover:bg-green-200 transition-colors"
+                aria-label="Share on WhatsApp"
+              >
+                <FaWhatsapp size={14} />
+              </a>
+              <button
+                onClick={handleShare}
+                className="w-8 h-8 flex items-center justify-center bg-gray-100 text-gray-500 rounded-full hover:bg-gray-200 transition-colors"
+                aria-label="Copy link"
+              >
+                <FiCopy size={12} />
+              </button>
+              <button
+                onClick={handleShare}
+                className="flex items-center gap-1.5 text-xs text-charcoal/40 hover:text-rose-gold transition-colors ml-1"
+              >
+                <FiShare2 size={12} /> More
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       <ProductReviews productId={product.id} />
+
+      {/* Related Products */}
+      {relatedProducts.length > 0 && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
+          <h2 className="font-serif text-2xl mb-6">You May Also Like</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {relatedProducts.map((p) => <ProductCard key={p.id} product={p} />)}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

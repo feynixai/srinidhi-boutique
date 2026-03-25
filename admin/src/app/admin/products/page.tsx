@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
-import { getAdminProducts, deleteProduct } from '@/lib/api';
+import { getAdminProducts, deleteProduct, updateProductStock } from '@/lib/api';
 
 export default function ProductsPage() {
   const [search, setSearch] = useState('');

@@ -89,7 +89,11 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
 
         <button
-          onClick={(e) => { e.preventDefault(); toggleWishlist(product.id); }}
+          onClick={(e) => {
+            e.preventDefault();
+            toggleWishlist({ id: product.id, name: product.name, slug: product.slug, price: Number(product.price), comparePrice: product.comparePrice ? Number(product.comparePrice) : undefined, images: product.images });
+            toast(inWishlist(product.id) ? 'Removed from wishlist' : 'Added to wishlist');
+          }}
           className="absolute top-2 right-2 p-2 bg-white/80 rounded-full hover:bg-white transition-colors"
           aria-label="Add to wishlist"
         >

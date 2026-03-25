@@ -50,9 +50,13 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-gray-400">
               <li><a href={waLink} target="_blank" rel="noopener noreferrer"
                 className="hover:text-white transition-colors">WhatsApp Us</a></li>
-              <li><Link href="/track" className="hover:text-white transition-colors">Track Order</Link></li>
+              <li><Link href="/track-order" className="hover:text-white transition-colors">Track Order</Link></li>
+              <li><Link href="/orders" className="hover:text-white transition-colors">My Orders</Link></li>
               <li><Link href="/returns" className="hover:text-white transition-colors">Returns & Exchanges</Link></li>
-              <li><Link href="/size-guide" className="hover:text-white transition-colors">Size Guide</Link></li>
+              <li><Link href="/shipping" className="hover:text-white transition-colors">Shipping Info</Link></li>
+              <li><Link href="/blog" className="hover:text-white transition-colors">Style Blog</Link></li>
+              <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
+              <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
             </ul>
             <div className="mt-4 text-sm text-gray-400">
               <p>📍 Hyderabad, Telangana</p>

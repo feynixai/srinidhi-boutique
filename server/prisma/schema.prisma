@@ -31,6 +31,7 @@ model Product {
   updatedAt    DateTime @updatedAt
   orderItems   OrderItem[]
   cartItems    CartItem[]
+  reviews      Review[]
 }
 
 model Category {
@@ -101,4 +102,26 @@ model Coupon {
   active     Boolean   @default(true)
   expiresAt  DateTime?
   createdAt  DateTime  @default(now())
+}
+
+model Review {
+  id            String   @id @default(cuid())
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id])
+  customerName  String
+  customerPhone String?
+  rating        Int
+  title         String?
+  body          String?
+  approved      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+}
+
+model PincodeZone {
+  pincode      String   @id
+  zone         String
+  city         String
+  state        String
+  deliveryDays Int      @default(5)
+  available    Boolean  @default(true)
 }

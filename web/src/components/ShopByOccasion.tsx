@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FiPlay } from 'react-icons/fi';
+
 
 const OCCASIONS = [
   {
@@ -66,7 +66,7 @@ export function ShopByOccasion() {
           <Link
             key={occ.slug}
             href={`/shop?occasion=${occ.slug}`}
-            className="group relative flex-shrink-0 w-[55vw] sm:w-[40vw] md:w-auto snap-center rounded-3xl overflow-hidden aspect-[9/16]"
+            className="group relative flex-shrink-0 w-[55vw] sm:w-[40vw] md:w-auto snap-center rounded-3xl overflow-hidden aspect-[9/16] transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl"
             data-testid={`occasion-${occ.slug}`}
           >
             {/* Background image */}
@@ -85,13 +85,6 @@ export function ShopByOccasion() {
             {/* Reel count badge */}
             <div className="absolute top-3 right-3 bg-black/40 backdrop-blur-md text-white text-[10px] font-semibold px-2.5 py-1 rounded-full tracking-wide">
               {occ.looks} Looks
-            </div>
-
-            {/* Play button — glass morphism */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:animate-pulse">
-                <FiPlay className="text-white ml-0.5" size={22} />
-              </div>
             </div>
 
             {/* Bottom text */}

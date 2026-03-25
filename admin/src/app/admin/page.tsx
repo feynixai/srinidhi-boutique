@@ -1,8 +1,25 @@
 'use client';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getDashboard, getDashboardWidgets, getLowStockProducts } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
+
+function useCounter(target: number, duration = 900) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (target === 0) { setCount(0); return; }
+    let frame = 0;
+    const totalFrames = Math.round(duration / 16);
+    const timer = setInterval(() => {
+      frame++;
+      setCount(Math.round(target * (frame / totalFrames)));
+      if (frame >= totalFrames) clearInterval(timer);
+    }, 16);
+    return () => clearInterval(timer);
+  }, [target, duration]);
+  return count;
+}
 
 function getLast7Days() {
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -47,6 +64,11 @@ function WeeklyChart({ totalOrders }: { totalOrders: number }) {
       </div>
     </div>
   );
+}
+
+function AnimatedNumber({ value, prefix = '', className = '' }: { value: number; prefix?: string; className?: string }) {
+  const count = useCounter(value);
+  return <span className={className}>{prefix}{count.toLocaleString('en-IN')}</span>;
 }
 
 function SkeletonBento() {
@@ -125,7 +147,7 @@ export default function DashboardPage() {
               <span className="text-xl">📦</span>
             </div>
           </div>
-          <p className="text-4xl font-bold text-[#c5a55a]">{stats.todayOrders}</p>
+          <AnimatedNumber value={stats.todayOrders} className="text-4xl font-bold text-[#c5a55a]" />
           <p className="text-xs text-gray-400">Today · updates every 30s</p>
         </div>
 
@@ -134,9 +156,7 @@ export default function DashboardPage() {
             <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold">Revenue</p>
             <span className="text-xl">💰</span>
           </div>
-          <p className="text-2xl font-bold text-emerald-600">
-            &#x20B9;{Number(stats.todayRevenue).toLocaleString('en-IN')}
-          </p>
+          <AnimatedNumber value={Number(stats.todayRevenue)} prefix="&#x20B9;" className="text-2xl font-bold text-emerald-600" />
           <p className="text-xs text-gray-400">Today</p>
         </div>
 
@@ -145,9 +165,7 @@ export default function DashboardPage() {
             <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold">Low Stock</p>
             <span className="text-xl">⚠️</span>
           </div>
-          <p className={`text-4xl font-bold ${stats.lowStockProducts > 0 ? 'text-red-500' : 'text-gray-400'}`}>
-            {stats.lowStockProducts}
-          </p>
+          <AnimatedNumber value={stats.lowStockProducts} className={`text-4xl font-bold ${stats.lowStockProducts > 0 ? 'text-red-500' : 'text-gray-400'}`} />
           <p className="text-xs text-gray-400">{stats.lowStockProducts > 0 ? 'Items need restocking' : 'All stocked up'}</p>
         </div>
 
@@ -156,9 +174,7 @@ export default function DashboardPage() {
             <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold">Pending</p>
             <span className="text-xl">⏳</span>
           </div>
-          <p className={`text-4xl font-bold ${stats.pendingOrders > 0 ? 'text-orange-500' : 'text-gray-400'}`}>
-            {stats.pendingOrders}
-          </p>
+          <AnimatedNumber value={stats.pendingOrders} className={`text-4xl font-bold ${stats.pendingOrders > 0 ? 'text-orange-500' : 'text-gray-400'}`} />
           <p className="text-xs text-gray-400">Orders need action</p>
         </div>
       </div>
@@ -218,19 +234,17 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="glass-card p-5">
           <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-2">Total Orders</p>
-          <p className="text-3xl font-bold text-[#1a1a2e]">{stats.totalOrders}</p>
+          <AnimatedNumber value={stats.totalOrders} className="text-3xl font-bold text-[#1a1a2e]" />
           <p className="text-xs text-gray-400 mt-1">All time</p>
         </div>
         <div className="glass-card p-5">
           <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-2">Total Revenue</p>
-          <p className="text-2xl font-bold text-emerald-600">
-            &#x20B9;{Number(stats.totalRevenue).toLocaleString('en-IN')}
-          </p>
+          <AnimatedNumber value={Number(stats.totalRevenue)} prefix="&#x20B9;" className="text-2xl font-bold text-emerald-600" />
           <p className="text-xs text-gray-400 mt-1">All time</p>
         </div>
         <div className="glass-card p-5">
           <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-2">Active Products</p>
-          <p className="text-3xl font-bold text-[#1a1a2e]">{stats.totalProducts}</p>
+          <AnimatedNumber value={stats.totalProducts} className="text-3xl font-bold text-[#1a1a2e]" />
           <p className="text-xs text-gray-400 mt-1">In catalogue</p>
         </div>
       </div>

@@ -13,7 +13,7 @@ async function ProductGrid({ searchParams }: { searchParams: Record<string, stri
 
   return (
     <>
-      <ShopSortBar total={data.total} searchParams={searchParams} />
+      <ShopSortBar total={data.total} shown={data.products.length} searchParams={searchParams} />
       {data.products.length === 0 ? (
         <div className="col-span-full text-center py-16 text-gray-400">
           No products found. Try adjusting your filters.

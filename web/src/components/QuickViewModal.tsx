@@ -1,5 +1,6 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FiX, FiHeart, FiShoppingBag } from 'react-icons/fi';
@@ -18,8 +19,18 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
   const [selectedColor, setSelectedColor] = useState(product.colors[0] || '');
   const [selectedImage, setSelectedImage] = useState(0);
   const [adding, setAdding] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { sessionId, itemCount, setItemCount, openCart } = useCartStore();
   const { toggle: toggleWishlist, has: inWishlist } = useWishlistStore();
+
+  useEffect(() => {
+    setMounted(true);
+    // Close on ESC
+    function onKey(e: KeyboardEvent) { if (e.key === 'Escape') onClose(); }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const displayPrice = product.salePrice ?? Number(product.price);
   const originalPrice = Number(product.price);
@@ -55,7 +66,9 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
     }
   }
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <div
       className="fixed inset-0 z-[150] flex items-center justify-center p-4"
       onClick={(e) => { e.preventDefault(); e.stopPropagation(); onClose(); }}
@@ -216,6 +229,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

@@ -9,6 +9,7 @@ import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { BackToTop } from '@/components/BackToTop';
 import { MobileBottomNav } from '@/components/MobileBottomNav';
 import { CompareBar } from '@/components/CompareBar';
+import { PageTransition } from '@/components/PageTransition';
 import { Toaster } from 'react-hot-toast';
 
 const playfair = Playfair_Display({
@@ -59,7 +60,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             Skip to main content
           </a>
           <Header />
-          <main id="main-content" className="flex-1">{children}</main>
+          <main id="main-content" className="flex-1">
+            <PageTransition>{children}</PageTransition>
+          </main>
           <Footer />
           <CartDrawer />
           <WhatsAppButton />

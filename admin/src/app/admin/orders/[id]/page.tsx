@@ -1,10 +1,20 @@
 'use client';
-import { use, useState } from 'react';
+import { use, useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { FaWhatsapp } from 'react-icons/fa';
 import { api, updateOrderStatus } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
+
+const STATUS_TIMELINE_STEPS = ['placed', 'confirmed', 'packed', 'shipped', 'delivered'];
+const STATUS_TIMELINE_META: Record<string, { label: string; icon: string }> = {
+  placed:    { label: 'Order Placed',  icon: '🛒' },
+  confirmed: { label: 'Confirmed',     icon: '✅' },
+  packed:    { label: 'Packed',        icon: '📦' },
+  shipped:   { label: 'Shipped',       icon: '🚚' },
+  delivered: { label: 'Delivered',     icon: '🎉' },
+  cancelled: { label: 'Cancelled',     icon: '❌' },
+};
 
 const STATUS_FLOW = [
   { value: 'confirmed', label: '✅ Confirm Order', color: 'bg-purple-500' },
@@ -18,6 +28,19 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const { id } = use(params);
   const queryClient = useQueryClient();
   const [trackingId, setTrackingId] = useState('');
+  const [notes, setNotes] = useState('');
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(`order-notes-${id}`);
+      if (saved) setNotes(saved);
+    } catch {}
+  }, [id]);
+
+  function saveNotes() {
+    try { localStorage.setItem(`order-notes-${id}`, notes); } catch {}
+    toast.success('Notes saved');
+  }
 
   const { data: order, isLoading } = useQuery({
     queryKey: ['admin-order', id],
@@ -297,6 +320,68 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             <p className="font-semibold">{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
           </div>
         </div>
+      </div>
+
+      {/* Order Timeline */}
+      {!['cancelled', 'returned'].includes(order.status) && (
+        <div className="card">
+          <h2 className="text-lg font-bold mb-5">Order Timeline</h2>
+          <div className="relative space-y-0">
+            {STATUS_TIMELINE_STEPS.map((step, i) => {
+              const currentIdx = STATUS_TIMELINE_STEPS.indexOf(order.status);
+              const done = i <= currentIdx;
+              const active = i === currentIdx;
+              const meta = STATUS_TIMELINE_META[step];
+              return (
+                <div key={step} className="flex items-start gap-4 pb-6 last:pb-0 relative">
+                  {i < STATUS_TIMELINE_STEPS.length - 1 && (
+                    <div className={`absolute left-5 top-10 w-0.5 h-full -translate-x-1/2 ${done ? 'bg-green-300' : 'bg-gray-200'}`} />
+                  )}
+                  <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center text-lg flex-shrink-0 border-2 transition-all ${
+                    done ? 'bg-green-50 border-green-400' : 'bg-gray-50 border-gray-200'
+                  }`}>
+                    {meta.icon}
+                  </div>
+                  <div className="flex-1 pt-2">
+                    <p className={`font-semibold text-sm ${active ? 'text-green-700' : done ? 'text-gray-700' : 'text-gray-400'}`}>
+                      {meta.label}
+                      {active && <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Current</span>}
+                    </p>
+                    {step === 'placed' && (
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {new Date(order.createdAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    )}
+                    {active && step !== 'placed' && order.updatedAt && (
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {new Date(order.updatedAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Internal Notes */}
+      <div className="card">
+        <h2 className="text-lg font-bold mb-1">Internal Notes</h2>
+        <p className="text-xs text-gray-400 mb-3">Saved locally in your browser. Not visible to the customer.</p>
+        <textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="e.g. Customer called about exchange, requested gift wrapping, special size notes..."
+          rows={4}
+          className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-rose-gold resize-none"
+        />
+        <button
+          onClick={saveNotes}
+          className="mt-3 bg-[#1a1a2e] text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity"
+        >
+          Save Notes
+        </button>
       </div>
     </div>
   );

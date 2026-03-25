@@ -32,10 +32,12 @@ export default async function HomePage() {
 
   return (
     <div className="bg-[#f5f5f0]">
-      {/* Announcement Bar */}
-      <div className="bg-[#1a1a2e] text-[#c5a55a] text-center py-2.5 text-xs tracking-[0.15em] uppercase font-medium">
-        Free Shipping Above &#x20B9;999 &nbsp;&middot;&nbsp; New Festival Collection Live
-        &nbsp;&middot;&nbsp; Easy 7-Day Returns
+      {/* Announcement Bar — scrolling marquee */}
+      <div className="bg-[#1a1a2e] text-[#c5a55a] py-2.5 overflow-hidden whitespace-nowrap">
+        <div className="animate-marquee inline-block text-xs tracking-[0.15em] uppercase font-medium">
+          Free Shipping Above &#x20B9;999 &nbsp;&middot;&nbsp; New Festival Collection Live &nbsp;&middot;&nbsp; Easy 7-Day Returns &nbsp;&middot;&nbsp; Use Code WELCOME10 for 10% Off &nbsp;&middot;&nbsp; Curated in Hyderabad &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          Free Shipping Above &#x20B9;999 &nbsp;&middot;&nbsp; New Festival Collection Live &nbsp;&middot;&nbsp; Easy 7-Day Returns &nbsp;&middot;&nbsp; Use Code WELCOME10 for 10% Off &nbsp;&middot;&nbsp; Curated in Hyderabad &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </div>
       </div>
 
       {/* Hero Carousel */}

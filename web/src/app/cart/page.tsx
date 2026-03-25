@@ -354,6 +354,18 @@ export default function CartPage() {
                 <span>&#x20B9;{total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</span>
               </div>
             </div>
+            {/* Estimated delivery */}
+            {(() => {
+              const start = new Date(Date.now() + 3 * 864e5);
+              const end = new Date(Date.now() + 5 * 864e5);
+              const fmt = (d: Date) => d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+              return (
+                <div className="flex items-center gap-2 text-xs text-[#1a1a2e]/60 bg-blue-50/80 border border-blue-100 rounded-xl px-3 py-2.5 mb-3">
+                  <span>🚚</span>
+                  <span>Est. delivery: <strong className="text-[#1a1a2e]/80">{fmt(start)} – {fmt(end)}</strong></span>
+                </div>
+              );
+            })()}
             <Link
               href={`/checkout${appliedCoupon ? `?coupon=${appliedCoupon.code}` : ''}`}
               className="btn-primary w-full text-center block text-sm tracking-widest"

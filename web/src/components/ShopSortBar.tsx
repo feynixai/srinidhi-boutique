@@ -10,10 +10,11 @@ const SORT_OPTIONS = [
 
 interface ShopSortBarProps {
   total: number;
+  shown: number;
   searchParams: Record<string, string>;
 }
 
-export function ShopSortBar({ total, searchParams }: ShopSortBarProps) {
+export function ShopSortBar({ total, shown, searchParams }: ShopSortBarProps) {
   const router = useRouter();
   const activeSort = searchParams.sort || 'newest';
 
@@ -27,7 +28,9 @@ export function ShopSortBar({ total, searchParams }: ShopSortBarProps) {
 
   return (
     <div className="flex items-center justify-between mb-6 gap-4">
-      <p className="text-sm text-gray-500 flex-shrink-0">{total} products</p>
+      <p className="text-sm text-gray-500 flex-shrink-0">
+        {shown < total ? `Showing ${shown} of ${total} products` : `${total} product${total !== 1 ? 's' : ''}`}
+      </p>
       <div className="flex items-center gap-2">
         <span className="text-xs text-gray-400 hidden sm:block">Sort:</span>
         <select

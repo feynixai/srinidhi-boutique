@@ -53,7 +53,55 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
       {/* Success Header */}
       <div className="text-center mb-8">
-        <div className="text-5xl mb-4">{order.status === 'cancelled' ? '❌' : '🎉'}</div>
+        {order.status === 'cancelled' ? (
+          <div className="text-5xl mb-4">❌</div>
+        ) : (
+          <div className="flex justify-center mb-4">
+            <div className="relative w-20 h-20">
+              <svg viewBox="0 0 80 80" className="w-20 h-20">
+                <circle
+                  cx="40" cy="40" r="36"
+                  fill="none"
+                  stroke="#e8f5e9"
+                  strokeWidth="4"
+                />
+                <circle
+                  cx="40" cy="40" r="36"
+                  fill="none"
+                  stroke="#22c55e"
+                  strokeWidth="4"
+                  strokeDasharray="226"
+                  strokeDashoffset="0"
+                  strokeLinecap="round"
+                  style={{
+                    animation: 'dash 0.6s ease-out forwards',
+                    transformOrigin: 'center',
+                    transform: 'rotate(-90deg)',
+                  }}
+                />
+                <polyline
+                  points="24,42 36,54 56,30"
+                  fill="none"
+                  stroke="#22c55e"
+                  strokeWidth="4.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ animation: 'checkmark 0.4s 0.5s ease-out both' }}
+                />
+              </svg>
+            </div>
+          </div>
+        )}
+        <style>{`
+          @keyframes dash {
+            from { stroke-dashoffset: 226; }
+            to { stroke-dashoffset: 0; }
+          }
+          @keyframes checkmark {
+            from { stroke-dashoffset: 60; stroke-dasharray: 60; opacity: 0; }
+            to { stroke-dashoffset: 0; stroke-dasharray: 60; opacity: 1; }
+          }
+        `}</style>
         <h1 className="font-serif text-3xl mb-2">
           {order.status === 'placed' ? 'Order Placed!' : `Order ${STATUS_LABELS[order.status] || order.status}`}
         </h1>

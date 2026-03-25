@@ -32,7 +32,7 @@ export default function CartPage() {
 
   const { data: recommendedData } = useQuery({
     queryKey: ['recommended-cart'],
-    queryFn: () => getProducts({ featured: 'true', limit: '4' }),
+    queryFn: () => getProducts({ featured: 'true', limit: '6' }),
     enabled: !isLoading,
   });
 
@@ -102,6 +102,17 @@ export default function CartPage() {
   const total = subtotal + shipping - discount;
   const amountForFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
   const freeShippingProgress = Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
+
+  // Smart category-based suggestions
+  const cartCategories = items.map((i) => (i.product as unknown as { category?: { slug?: string } }).category?.slug?.toLowerCase() || '');
+  const hasSaree = cartCategories.some((c) => c.includes('saree') || c.includes('sari'));
+  const hasLehenga = cartCategories.some((c) => c.includes('lehenga') || c.includes('ghagra'));
+  const hasHeavyEthnic = hasSaree || hasLehenga;
+  const suggestLabel = hasSaree
+    ? 'Complete Your Look — Blouses'
+    : hasHeavyEthnic
+    ? 'Complete Your Look — Accessories'
+    : 'You Might Also Like';
 
   const recommendedProducts = (recommendedData?.products || [])
     .filter((p) => !items.some((item) => item.product.id === p.id))
@@ -382,12 +393,19 @@ export default function CartPage() {
         </div>
       </div>
 
-      {/* You might also like */}
+      {/* Smart suggestions */}
       {recommendedProducts.length > 0 && (
         <div className="mt-16">
           <h2 className="font-serif text-2xl mb-2 text-[#1a1a2e] font-bold">
-            You Might Also Like
+            {suggestLabel}
           </h2>
+          {hasHeavyEthnic && (
+            <p className="text-sm text-[#1a1a2e]/50 mb-2">
+              {hasSaree
+                ? 'A perfect blouse makes all the difference — here are some that pair beautifully.'
+                : 'Accessories that pair beautifully with your selection.'}
+            </p>
+          )}
           <div className="divider-gold mb-6" />
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {recommendedProducts.map((p) => (

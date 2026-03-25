@@ -66,6 +66,75 @@ function PincodeChecker() {
   );
 }
 
+// Size up/down mapping based on typical Indian ethnic wear sizing
+const SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', 'Free Size'];
+const USUAL_TO_REC: Record<string, { rec: string; note: string }> = {
+  XS:  { rec: 'XS', note: 'This product runs true to size.' },
+  S:   { rec: 'S',  note: 'This product runs true to size.' },
+  M:   { rec: 'M',  note: 'This product runs true to size. Our M fits a standard M.' },
+  L:   { rec: 'L',  note: 'Our L fits like a typical L. If you prefer a relaxed fit, go up one size.' },
+  XL:  { rec: 'XL', note: 'Our XL fits a standard XL. For ethnic draping comfort, consider XXL.' },
+  XXL: { rec: 'XXL', note: 'Our XXL fits true. For blouses, we recommend going one size up for draping ease.' },
+};
+
+function SizeQuiz({ sizes, categoryName }: { sizes: string[]; categoryName: string }) {
+  const [usual, setUsual] = useState('');
+  const isBlouse = categoryName.toLowerCase().includes('blouse');
+  const isSaree = categoryName.toLowerCase().includes('saree') || categoryName.toLowerCase().includes('sari');
+
+  const getRec = () => {
+    if (!usual) return null;
+    const base = USUAL_TO_REC[usual];
+    if (!base) return { rec: usual, note: 'This product runs true to size.' };
+    // For blouses/sarees suggest going one size up
+    if (isBlouse || isSaree) {
+      const idx = SIZE_ORDER.indexOf(base.rec);
+      const upSize = idx >= 0 && idx < SIZE_ORDER.length - 1 ? SIZE_ORDER[idx + 1] : base.rec;
+      const available = sizes.includes(upSize) ? upSize : (sizes.includes(base.rec) ? base.rec : null);
+      return {
+        rec: available,
+        note: isBlouse
+          ? `For blouses we recommend going one size up for draping ease. ${available ? `Try ${available}.` : ''}`
+          : `For saree blouse fits, slightly larger gives a comfortable drape. ${available ? `Try ${available}.` : ''}`,
+      };
+    }
+    const available = sizes.includes(base.rec) ? base.rec : sizes.find((s) => SIZE_ORDER.indexOf(s) >= SIZE_ORDER.indexOf(base.rec));
+    return { rec: available || null, note: base.note };
+  };
+
+  const rec = getRec();
+
+  return (
+    <div className="bg-white/50 backdrop-blur-sm border border-white/40 rounded-2xl p-4">
+      <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-[#1a1a2e]/60">Find Your Size</p>
+      <div className="flex items-center gap-3 flex-wrap">
+        <select
+          value={usual}
+          onChange={(e) => setUsual(e.target.value)}
+          className="flex-1 min-w-[140px] border border-white/50 bg-white/70 px-3 py-2 rounded-full text-sm focus:outline-none focus:border-[#c5a55a]"
+        >
+          <option value="">What size do you usually wear?</option>
+          {['XS', 'S', 'M', 'L', 'XL', 'XXL'].map((s) => (
+            <option key={s} value={s}>{s}</option>
+          ))}
+        </select>
+      </div>
+      {rec && (
+        <div className="mt-3 bg-[#c5a55a]/10 border border-[#c5a55a]/20 rounded-xl px-4 py-2.5">
+          {rec.rec ? (
+            <p className="text-sm text-[#1a1a2e]">
+              We recommend: <span className="font-bold text-[#c5a55a]">{rec.rec}</span>
+            </p>
+          ) : (
+            <p className="text-sm text-[#1a1a2e]/60">Your size may not be available. Check available sizes above.</p>
+          )}
+          <p className="text-xs text-[#1a1a2e]/50 mt-1">{rec.note}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function EMICalculator({ price }: { price: number }) {
   if (price < 5000) return null;
   const emi3 = Math.ceil(price / 3);
@@ -512,11 +581,9 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               </div>
             </div>
 
-            {/* Size recommendation */}
-            {recommendedSize && product.sizes.length > 1 && (
-              <p className="text-xs text-[#1a1a2e]/60 bg-white/40 rounded-full px-4 py-2 border border-white/30 text-center">
-                Most customers order <span className="font-semibold text-[#1a1a2e]">{recommendedSize}</span> for this product
-              </p>
+            {/* Size Recommendation Quiz */}
+            {product.sizes.length > 1 && (
+              <SizeQuiz sizes={product.sizes} categoryName={product.category?.name || ''} />
             )}
 
             {/* Delivery & Return Mini-cards */}
@@ -800,22 +867,22 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
         </div>
       )}
 
-      {/* Sticky Add-to-Cart Bar — glass effect */}
+      {/* Sticky Add-to-Cart Bar — slides down from top on scroll */}
       {showStickyBar && product.stock > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl bg-white/85 border-t border-white/40 shadow-[0_-4px_30px_rgba(0,0,0,0.08)] px-4 py-3 flex items-center gap-3 md:hidden animate-slide-up">
+        <div className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-white/92 border-b border-white/40 shadow-[0_4px_30px_rgba(0,0,0,0.10)] px-4 py-2.5 flex items-center gap-3 animate-slide-down">
           {product.images[0] && (
-            <div className="relative w-12 h-14 flex-shrink-0 overflow-hidden rounded-xl">
-              <Image src={product.images[0]} alt={product.name} fill className="object-cover" sizes="48px" />
+            <div className="relative w-10 h-12 flex-shrink-0 overflow-hidden rounded-lg">
+              <Image src={product.images[0]} alt={product.name} fill className="object-cover" sizes="40px" />
             </div>
           )}
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-[#1a1a2e] truncate">{product.name}</p>
-            <span className="bg-blue-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-full">₹{displayPrice.toLocaleString('en-IN')}</span>
+            <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">₹{displayPrice.toLocaleString('en-IN')}</span>
           </div>
           <button
             onClick={handleAddToCart}
             disabled={adding}
-            className="flex items-center gap-2 bg-[#1a1a2e] text-white px-5 py-3 rounded-full text-sm font-semibold tracking-wide flex-shrink-0 disabled:opacity-70 hover:bg-[#2d2d4e] transition-colors"
+            className="flex items-center gap-2 bg-[#1a1a2e] text-white px-5 py-2.5 rounded-full text-sm font-semibold tracking-wide flex-shrink-0 disabled:opacity-70 hover:bg-[#2d2d4e] transition-colors"
           >
             <FiShoppingBag size={16} />
             {adding ? 'Adding...' : 'Add to Bag'}

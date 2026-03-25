@@ -31,7 +31,8 @@ export function ProductReviews({ productId }: { productId: string }) {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [showAll, setShowAll] = useState(false);
-  const [form, setForm] = useState({ customerName: '', rating: 5, title: '', body: '' });
+  const [showPhotos, setShowPhotos] = useState(false);
+  const [form, setForm] = useState({ customerName: '', rating: 5, title: '', body: '', imageUrl: '' });
 
   const { data, isLoading } = useQuery({
     queryKey: ['reviews', productId],
@@ -44,7 +45,7 @@ export function ProductReviews({ productId }: { productId: string }) {
       queryClient.invalidateQueries({ queryKey: ['reviews', productId] });
       toast.success('Review submitted! Thank you.');
       setShowForm(false);
-      setForm({ customerName: '', rating: 5, title: '', body: '' });
+      setForm({ customerName: '', rating: 5, title: '', body: '', imageUrl: '' });
     },
     onError: () => toast.error('Could not submit review. Please try again.'),
   });
@@ -52,6 +53,7 @@ export function ProductReviews({ productId }: { productId: string }) {
   const reviews = data?.reviews || [];
   const avgRating = data?.avgRating || 0;
   const displayed = showAll ? reviews : reviews.slice(0, 3);
+  const photoReviews = reviews.filter((r) => r.imageUrl);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
@@ -91,6 +93,34 @@ export function ProductReviews({ productId }: { productId: string }) {
                 <span className="text-xs text-gray-400 w-5">{d.count}</span>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Customer Photos Grid */}
+        {photoReviews.length > 0 && (
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-semibold text-gray-700">Customer Photos ({photoReviews.length})</p>
+              {photoReviews.length > 4 && (
+                <button onClick={() => setShowPhotos(!showPhotos)} className="text-xs text-rose-gold hover:underline">
+                  {showPhotos ? 'Show less' : 'View All Photos'}
+                </button>
+              )}
+            </div>
+            <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+              {(showPhotos ? photoReviews : photoReviews.slice(0, 4)).map((r) => (
+                <a
+                  key={r.id}
+                  href={r.imageUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="relative aspect-square overflow-hidden rounded-lg bg-gray-100 hover:opacity-90 transition-opacity"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={r.imageUrl} alt={`Review photo by ${r.customerName}`} className="w-full h-full object-cover" />
+                </a>
+              ))}
+            </div>
           </div>
         )}
 
@@ -136,6 +166,16 @@ export function ProductReviews({ productId }: { productId: string }) {
                 className="w-full border border-gray-200 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-rose-gold resize-none"
               />
             </div>
+            <div>
+              <label className="block text-xs font-medium mb-1">Photo URL <span className="text-gray-400 font-normal">(optional — share your photo!)</span></label>
+              <input
+                value={form.imageUrl}
+                onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+                placeholder="https://... (link to your photo)"
+                className="w-full border border-gray-200 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-rose-gold"
+              />
+              <p className="text-[11px] text-gray-400 mt-1">Upload your photo to Imgur, Google Photos, or any image host and paste the link here.</p>
+            </div>
             <button type="submit" disabled={mutation.isPending} className="btn-primary px-6 py-2.5 text-sm disabled:opacity-50">
               {mutation.isPending ? 'Submitting...' : 'Submit Review'}
             </button>
@@ -164,6 +204,12 @@ export function ProductReviews({ productId }: { productId: string }) {
                 <StarRating rating={review.rating} />
                 {review.title && <p className="text-sm font-medium mt-2">{review.title}</p>}
                 {review.body && <p className="text-sm text-gray-600 mt-1 leading-relaxed">{review.body}</p>}
+                {review.imageUrl && (
+                  <a href={review.imageUrl} target="_blank" rel="noopener noreferrer" className="inline-block mt-2">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={review.imageUrl} alt="Customer photo" className="w-20 h-20 object-cover rounded-lg hover:opacity-90 transition-opacity" />
+                  </a>
+                )}
               </div>
             ))}
           </div>

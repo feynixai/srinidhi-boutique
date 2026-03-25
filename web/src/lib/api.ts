@@ -162,6 +162,7 @@ export interface Review {
   rating: number;
   title?: string;
   body?: string;
+  imageUrl?: string;
   approved: boolean;
   createdAt: string;
 }
@@ -169,7 +170,7 @@ export interface Review {
 export const getReviews = (productId: string) =>
   api.get(`/api/reviews/${productId}`).then((r) => r.data as { reviews: Review[]; total: number; avgRating: number; distribution: { star: number; count: number }[] });
 
-export const submitReview = (productId: string, data: { customerName: string; rating: number; title?: string; body?: string }) =>
+export const submitReview = (productId: string, data: { customerName: string; rating: number; title?: string; body?: string; imageUrl?: string }) =>
   api.post(`/api/reviews/${productId}`, data).then((r) => r.data as Review);
 
 // Orders by phone

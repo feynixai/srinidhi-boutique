@@ -224,42 +224,37 @@ export default function DashboardPage() {
         <div className="glass-card p-6 flex flex-col gap-3">
           <h2 className="text-sm font-bold text-[#1a1a2e] mb-1">Quick Actions</h2>
           {[
-            { href: '/admin/products/new', label: '+ Add Product', color: 'bg-[#c5a55a] text-[#1a1a2e]' },
-            { href: '/admin/coupons', label: '% Create Coupon', color: 'bg-purple-500 text-white' },
-            { href: latestOrder ? `/admin/orders/${latestOrder.id}` : '/admin/orders', label: 'View Latest Order', color: 'bg-blue-500 text-white' },
-            { href: '/admin/orders?status=placed', label: 'New Orders', color: 'bg-orange-500 text-white' },
+            { href: '/admin/orders?status=placed', label: '⏳ View Pending Orders', color: 'bg-orange-500 text-white', badge: stats.pendingOrders > 0 ? stats.pendingOrders : null },
+            { href: '/admin/products?stock=low', label: '⚠️ Low Stock Items', color: stats.lowStockProducts > 0 ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-600', badge: stats.lowStockProducts > 0 ? stats.lowStockProducts : null },
+            { href: '/admin/reports', label: `💰 Today's Revenue`, color: 'bg-emerald-500 text-white', badge: null },
+            { href: '/admin/qa', label: '⭐ New Reviews to Approve', color: 'bg-amber-400 text-[#1a1a2e]', badge: (widgets?.pendingReviewsCount ?? 0) > 0 ? widgets!.pendingReviewsCount : null },
           ].map((action) => (
             <Link
               key={action.href}
               href={action.href}
-              className={`${action.color} rounded-2xl px-4 py-3 text-sm font-semibold hover:opacity-90 transition-all active:scale-[0.98] text-center`}
+              className={`${action.color} rounded-2xl px-4 py-3 text-sm font-semibold hover:opacity-90 transition-all active:scale-[0.98] flex items-center justify-between`}
             >
-              {action.label}
+              <span>{action.label}</span>
+              {action.badge !== null && (
+                <span className="bg-white/30 text-current rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                  {action.badge}
+                </span>
+              )}
             </Link>
           ))}
-          {/* Attention items */}
-          {widgets && (widgets.pendingReviewsCount > 0 || widgets.pendingReturnsCount > 0) && (
-            <div className="border-t border-black/5 pt-2 space-y-2">
-              <p className="text-xs text-gray-400 font-semibold uppercase tracking-widest">Needs Attention</p>
-              {widgets.pendingReviewsCount > 0 && (
-                <Link
-                  href="/admin/qa"
-                  className="flex items-center justify-between bg-amber-50 border border-amber-200 text-amber-700 rounded-2xl px-4 py-2.5 text-xs font-semibold hover:bg-amber-100 transition-all"
-                >
-                  <span>⭐ Reviews pending approval</span>
-                  <span className="bg-amber-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px]">{widgets.pendingReviewsCount}</span>
-                </Link>
-              )}
-              {widgets.pendingReturnsCount > 0 && (
-                <Link
-                  href="/admin/returns"
-                  className="flex items-center justify-between bg-red-50 border border-red-200 text-red-700 rounded-2xl px-4 py-2.5 text-xs font-semibold hover:bg-red-100 transition-all"
-                >
-                  <span>↩️ Returns pending</span>
-                  <span className="bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px]">{widgets.pendingReturnsCount}</span>
-                </Link>
-              )}
-            </div>
+          <div className="border-t border-black/5 pt-2 flex gap-2">
+            <Link href="/admin/products/new" className="flex-1 bg-[#c5a55a] text-[#1a1a2e] rounded-2xl px-3 py-2.5 text-xs font-semibold hover:opacity-90 transition-all text-center">+ Add Product</Link>
+            <Link href="/admin/coupons" className="flex-1 bg-purple-500 text-white rounded-2xl px-3 py-2.5 text-xs font-semibold hover:opacity-90 transition-all text-center">% Coupon</Link>
+          </div>
+          {/* Returns alert */}
+          {widgets && widgets.pendingReturnsCount > 0 && (
+            <Link
+              href="/admin/returns"
+              className="flex items-center justify-between bg-red-50 border border-red-200 text-red-700 rounded-2xl px-4 py-2.5 text-xs font-semibold hover:bg-red-100 transition-all"
+            >
+              <span>↩️ Returns pending</span>
+              <span className="bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px]">{widgets.pendingReturnsCount}</span>
+            </Link>
           )}
           <div className="border-t border-black/5 pt-2 space-y-2">
             <p className="text-xs text-gray-400 font-semibold uppercase tracking-widest">Export Data</p>

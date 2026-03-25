@@ -18,10 +18,35 @@ type Order = {
   customerName: string;
   customerPhone: string;
   trackingId?: string;
+  awbNumber?: string;
+  courierName?: string;
   total: number;
   createdAt: string;
+  updatedAt: string;
   items: Array<{ id: string; name: string; quantity: number; price: number }>;
 };
+
+// Estimate step timestamp based on order creation date
+function getStepDate(createdAt: string, stepIndex: number, currentStepIndex: number): string | null {
+  if (stepIndex > currentStepIndex) return null;
+  const base = new Date(createdAt).getTime();
+  // Offsets: placed=0, confirmed=2h, packed=1d, shipped=2d, delivered=5d
+  const offsets = [0, 2 * 3600_000, 86_400_000, 2 * 86_400_000, 5 * 86_400_000];
+  const ts = new Date(base + (offsets[stepIndex] || 0));
+  return ts.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+// Generate tracking URL for common Indian couriers
+function getTrackingUrl(courierName: string, trackingId: string): string | null {
+  const c = courierName.toLowerCase();
+  if (c.includes('shiprocket')) return `https://shiprocket.co/tracking/${trackingId}`;
+  if (c.includes('delhivery')) return `https://www.delhivery.com/track/package/${trackingId}`;
+  if (c.includes('bluedart')) return `https://www.bluedart.com/tracking?trackFor=0&trackField=ShipmentNumber&trackFieldValue=${trackingId}`;
+  if (c.includes('ekart') || c.includes('flipkart')) return `https://ekartlogistics.com/shipmenttrack/${trackingId}`;
+  if (c.includes('xpressbees')) return `https://www.xpressbees.com/shipment/tracking?shipmentNo=${trackingId}`;
+  if (c.includes('dtdc')) return `https://www.dtdc.in/tracking.asp?Ttype=T&TNo=${trackingId}`;
+  return null;
+}
 
 export default function TrackOrderPage() {
   const [orderNumber, setOrderNumber] = useState('');
@@ -135,6 +160,7 @@ export default function TrackOrderPage() {
                     {STATUS_STEPS.map((step, i) => {
                       const done = i <= currentStepIndex;
                       const current = i === currentStepIndex;
+                      const stepDate = getStepDate(order.createdAt, i, currentStepIndex);
                       return (
                         <div key={step.key} className="flex gap-4 relative">
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-sm z-10 border-2 transition-colors ${
@@ -143,10 +169,13 @@ export default function TrackOrderPage() {
                             {done ? (current ? <span>{step.icon}</span> : <span className="text-gold text-xs font-bold">✓</span>) : <span className="text-gray-300">{step.icon}</span>}
                           </div>
                           <div className={`pt-1 ${done ? '' : 'opacity-40'}`}>
-                            <p className={`font-medium text-sm ${current ? 'text-charcoal' : done ? 'text-charcoal' : 'text-charcoal/40'}`}>
-                              {step.label}
-                              {current && <span className="ml-2 text-xs bg-gold text-charcoal px-2 py-0.5 rounded-sm font-normal">Current</span>}
-                            </p>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className={`font-medium text-sm ${current ? 'text-charcoal' : done ? 'text-charcoal' : 'text-charcoal/40'}`}>
+                                {step.label}
+                              </p>
+                              {current && <span className="text-xs bg-gold text-charcoal px-2 py-0.5 rounded-sm font-normal">Current</span>}
+                              {stepDate && <span className="text-xs text-charcoal/40">{stepDate}</span>}
+                            </div>
                             {current && <p className="text-charcoal/60 text-xs mt-0.5">{step.desc}</p>}
                           </div>
                         </div>
@@ -154,10 +183,31 @@ export default function TrackOrderPage() {
                     })}
                   </div>
                 </div>
-                {order.trackingId && (
-                  <div className="mt-5 bg-cream p-4 rounded-sm">
-                    <p className="text-xs text-charcoal/50 uppercase tracking-wide mb-0.5">Tracking ID</p>
-                    <p className="font-semibold text-charcoal">{order.trackingId}</p>
+                {(order.trackingId || order.awbNumber) && (
+                  <div className="mt-5 bg-cream p-4 rounded-sm space-y-2">
+                    {order.courierName && (
+                      <div>
+                        <p className="text-xs text-charcoal/50 uppercase tracking-wide mb-0.5">Courier</p>
+                        <p className="font-semibold text-charcoal">{order.courierName}</p>
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-xs text-charcoal/50 uppercase tracking-wide mb-0.5">Tracking ID / AWB</p>
+                      <p className="font-semibold text-charcoal">{order.awbNumber || order.trackingId}</p>
+                    </div>
+                    {order.courierName && (order.awbNumber || order.trackingId) && (() => {
+                      const url = getTrackingUrl(order.courierName!, order.awbNumber || order.trackingId!);
+                      return url ? (
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-charcoal bg-gold/20 border border-gold/30 px-3 py-1.5 rounded-sm hover:bg-gold/30 transition-colors"
+                        >
+                          Track on {order.courierName} →
+                        </a>
+                      ) : null;
+                    })()}
                   </div>
                 )}
               </div>

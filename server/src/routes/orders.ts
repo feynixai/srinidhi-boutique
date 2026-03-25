@@ -253,6 +253,20 @@ orderRoutes.get('/track', async (req: Request, res: Response) => {
   const order = await prisma.order.findFirst({
     where: { orderNumber: orderNumber.toUpperCase(), customerPhone: phone },
     include: { items: true },
+    select: {
+      id: true,
+      orderNumber: true,
+      status: true,
+      customerName: true,
+      customerPhone: true,
+      trackingId: true,
+      awbNumber: true,
+      courierName: true,
+      total: true,
+      createdAt: true,
+      updatedAt: true,
+      items: { select: { id: true, name: true, quantity: true, price: true } },
+    },
   });
 
   if (!order) throw new AppError(404, 'Order not found');

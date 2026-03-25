@@ -224,6 +224,7 @@ model Review {
   rating        Int
   title         String?
   body          String?
+  imageUrl      String?
   approved      Boolean  @default(true)
   createdAt     DateTime @default(now())
 }

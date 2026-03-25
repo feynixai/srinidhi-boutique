@@ -8,15 +8,19 @@ import { FadeInSection } from '@/components/FadeInSection';
 import { CountdownTimer } from '@/components/CountdownTimer';
 import { ShopByOccasion } from '@/components/ShopByOccasion';
 import RecentlyViewed from '@/components/RecentlyViewed';
+import FlashSaleBanner from '@/components/FlashSaleBanner';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 async function getData() {
-  const [featured, bestSellers, offers, categories] = await Promise.all([
+  const [featured, bestSellers, offers, categories, flashSalesRes] = await Promise.all([
     getFeaturedProducts().catch(() => []),
     getBestSellers().catch(() => []),
     getOffers().catch(() => []),
     getCategories().catch(() => []),
+    fetch(`${API_URL}/api/flash-sales/active`, { next: { revalidate: 60 } }).then((r) => r.json()).catch(() => ({ sales: [] })),
   ]);
-  return { featured, bestSellers, offers, categories };
+  return { featured, bestSellers, offers, categories, activeSale: flashSalesRes.sales?.[0] || null };
 }
 
 // Flash sale ends at midnight today
@@ -27,11 +31,14 @@ function getFlashSaleEnd(): Date {
 }
 
 export default async function HomePage() {
-  const { featured, bestSellers, offers, categories } = await getData();
+  const { featured, bestSellers, offers, categories, activeSale } = await getData();
   const flashSaleEnd = getFlashSaleEnd();
 
   return (
     <div className="bg-[#f5f5f0]">
+      {/* Dynamic Flash Sale Countdown Banner */}
+      {activeSale && <FlashSaleBanner sale={activeSale} />}
+
       {/* Announcement Bar — scrolling marquee */}
       <div className="bg-[#1a1a2e] text-[#c5a55a] py-2.5 overflow-hidden whitespace-nowrap">
         <div className="animate-marquee inline-block text-xs tracking-[0.15em] uppercase font-medium">

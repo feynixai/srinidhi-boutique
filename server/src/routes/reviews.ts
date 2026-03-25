@@ -11,6 +11,7 @@ const reviewSchema = z.object({
   rating: z.number().int().min(1).max(5),
   title: z.string().max(200).optional(),
   body: z.string().max(2000).optional(),
+  imageUrl: z.string().url().optional().or(z.literal('')).transform((v) => v || undefined),
 });
 
 reviewRoutes.get('/:productId', async (req: Request, res: Response) => {

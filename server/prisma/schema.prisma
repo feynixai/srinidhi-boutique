@@ -54,7 +54,9 @@ model Category {
   name     String
   slug     String    @unique
   image    String?
+  gstRate  Float     @default(5)   // GST % applicable to products in this category
   products Product[]
+  coupons  Coupon[]
 }
 
 model User {
@@ -144,7 +146,10 @@ model Order {
   awbNumber     String?
   courierName   String?
   notes         String?
+  adminNotes    String?
   couponCode    String?
+  deliverySlot  String?     // morning, afternoon, evening
+  gstAmount     Decimal?    @db.Decimal(10, 2)
   country       String      @default("IN")
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
@@ -185,15 +190,21 @@ model CartItem {
 }
 
 model Coupon {
-  id         String    @id @default(cuid())
-  code       String    @unique
-  discount   Int
-  minOrder   Decimal?  @db.Decimal(10, 2)
-  maxUses    Int?
-  usedCount  Int       @default(0)
-  active     Boolean   @default(true)
-  expiresAt  DateTime?
-  createdAt  DateTime  @default(now())
+  id             String    @id @default(cuid())
+  code           String    @unique
+  discount       Int
+  minOrder       Decimal?  @db.Decimal(10, 2)
+  maxUses        Int?
+  usedCount      Int       @default(0)
+  active         Boolean   @default(true)
+  expiresAt      DateTime?
+  // Build 12 enhancements
+  categoryId     String?   // if set: coupon only valid for products in this category
+  category       Category? @relation(fields: [categoryId], references: [id])
+  firstOrderOnly Boolean   @default(false)
+  userId         String?   // if set: coupon only valid for this specific user
+  type           String    @default("percentage")  // percentage | flat
+  createdAt      DateTime  @default(now())
 }
 
 model Review {

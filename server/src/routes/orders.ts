@@ -44,6 +44,7 @@ const placeOrderSchema = z.object({
   sessionId: z.string().optional(),
   country: z.string().optional().default('IN'),
   userId: z.string().optional(),
+  deliverySlot: z.enum(['morning', 'afternoon', 'evening']).optional(),
 });
 
 async function generateOrderNumber(): Promise<string> {
@@ -136,6 +137,7 @@ orderRoutes.post('/', async (req: Request, res: Response) => {
       couponCode,
       notes: data.notes,
       country,
+      deliverySlot: data.deliverySlot,
       status: 'placed',
       paymentStatus: data.paymentMethod === 'cod' ? 'pending' : 'paid',
       ...(data.userId ? { userId: data.userId } : {}),
@@ -480,4 +482,73 @@ orderRoutes.get('/:id/invoice-pdf', async (req: Request, res: Response) => {
   doc.text('For returns/exchanges, WhatsApp us within 7 days of delivery.', 50, 772, { align: 'center', width: 495 });
 
   doc.end();
+});
+
+// ── Build 12: Order Cancellation ─────────────────────────────────────────────
+
+orderRoutes.post('/:id/cancel', async (req: Request, res: Response) => {
+  const order = await prisma.order.findUnique({
+    where: { id: req.params.id },
+  });
+  if (!order) throw new AppError(404, 'Order not found');
+
+  const cancellableStatuses = ['placed', 'confirmed'];
+  if (!cancellableStatuses.includes(order.status)) {
+    throw new AppError(400, `Cannot cancel order with status '${order.status}'. Only placed or confirmed orders can be cancelled.`);
+  }
+
+  // Cancel the order
+  const cancelled = await prisma.order.update({
+    where: { id: order.id },
+    data: { status: 'cancelled' },
+  });
+
+  // Restore stock
+  const items = await prisma.orderItem.findMany({ where: { orderId: order.id } });
+  for (const item of items) {
+    await prisma.product.update({
+      where: { id: item.productId },
+      data: { stock: { increment: item.quantity } },
+    });
+  }
+
+  // If paid online → issue store credit for the refund
+  let storeCredit = null;
+  if (order.paymentStatus === 'paid' && order.paymentMethod !== 'cod' && order.userId) {
+    storeCredit = await prisma.storeCredit.create({
+      data: {
+        userId: order.userId,
+        amount: order.total,
+        source: 'refund',
+        note: `Refund for cancelled order ${order.orderNumber}`,
+        orderId: order.id,
+      },
+    });
+  }
+
+  res.json({
+    success: true,
+    order: cancelled,
+    refund: storeCredit
+      ? { type: 'store_credit', amount: Number(storeCredit.amount), storeCreditId: storeCredit.id }
+      : order.paymentMethod === 'cod'
+        ? { type: 'none', message: 'COD order — no refund applicable' }
+        : { type: 'none', message: 'No refund issued (not paid or no user account)' },
+  });
+});
+
+// ── Build 12: Order Notes (customer add at checkout) ─────────────────────────
+// Notes are stored at order creation time via `notes` field.
+// This endpoint lets customer update notes on a pending order.
+
+orderRoutes.patch('/:id/notes', async (req: Request, res: Response) => {
+  const { notes } = z.object({ notes: z.string() }).parse(req.body);
+  const order = await prisma.order.findUnique({ where: { id: req.params.id } });
+  if (!order) throw new AppError(404, 'Order not found');
+  if (!['placed', 'confirmed'].includes(order.status)) {
+    throw new AppError(400, 'Cannot update notes for an order that has been processed');
+  }
+
+  const updated = await prisma.order.update({ where: { id: req.params.id }, data: { notes } });
+  res.json(updated);
 });

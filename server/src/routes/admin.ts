@@ -522,21 +522,33 @@ adminRoutes.get('/orders/:id/invoice', async (req: Request, res: Response) => {
 
   const address = order.address as { line1: string; line2?: string; city: string; state: string; pincode: string };
   const subtotal = Number(order.subtotal);
-  const gstRate = 0.05; // 5% GST on clothing
-  const gstAmount = subtotal * gstRate;
+  // Use per-item GST rates from category
+  let totalGst = 0;
+  const itemGstRates: number[] = order.items.map((item) => {
+    const rate = (item.product?.category?.gstRate ?? 5) / 100;
+    totalGst += Number(item.price) * item.quantity * rate;
+    return rate;
+  });
+  const gstAmount = totalGst;
+  const shippingState = address.state || '';
+  const isIntraState = shippingState.toLowerCase() === 'telangana';
+  const cgst = isIntraState ? gstAmount / 2 : 0;
+  const sgst = isIntraState ? gstAmount / 2 : 0;
+  const igst = isIntraState ? 0 : gstAmount;
   const formattedDate = new Date(order.createdAt).toLocaleDateString('en-IN', {
     day: '2-digit', month: 'long', year: 'numeric',
   });
 
-  const itemRows = order.items.map((item) => {
+  const itemRows = order.items.map((item, idx) => {
     const itemTotal = Number(item.price) * item.quantity;
-    const itemGst = itemTotal * gstRate;
+    const rate = itemGstRates[idx];
+    const itemGst = itemTotal * rate;
     return `
       <tr>
         <td style="padding:10px 12px;border-bottom:1px solid #f0e8e8;">${item.name}${item.size ? ` <span style="color:#999;font-size:12px;">(${item.size})</span>` : ''}</td>
         <td style="padding:10px 12px;border-bottom:1px solid #f0e8e8;text-align:center;">${item.quantity}</td>
         <td style="padding:10px 12px;border-bottom:1px solid #f0e8e8;text-align:right;">₹${Number(item.price).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-        <td style="padding:10px 12px;border-bottom:1px solid #f0e8e8;text-align:right;">₹${itemGst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #f0e8e8;text-align:right;">${(rate * 100).toFixed(0)}% — ₹${itemGst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
         <td style="padding:10px 12px;border-bottom:1px solid #f0e8e8;text-align:right;font-weight:600;">₹${itemTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
       </tr>`;
   }).join('');
@@ -625,7 +637,11 @@ adminRoutes.get('/orders/:id/invoice', async (req: Request, res: Response) => {
   <div class="totals">
     <table>
       <tr><td>Subtotal</td><td style="text-align:right;">₹${subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td></tr>
-      <tr><td>GST @ 5%</td><td style="text-align:right;">₹${gstAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td></tr>
+      ${isIntraState
+        ? `<tr><td>CGST</td><td style="text-align:right;">₹${cgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td></tr>
+           <tr><td>SGST</td><td style="text-align:right;">₹${sgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td></tr>`
+        : `<tr><td>IGST</td><td style="text-align:right;">₹${igst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td></tr>`
+      }
       <tr><td>Shipping</td><td style="text-align:right;">${Number(order.shipping) === 0 ? '<span style="color:green;">FREE</span>' : '₹' + Number(order.shipping).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td></tr>
       ${Number(order.discount) > 0 ? `<tr><td>Discount</td><td style="text-align:right;color:green;">-₹${Number(order.discount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td></tr>` : ''}
       ${order.paymentMethod === 'cod' ? `<tr><td>COD Charge</td><td style="text-align:right;">₹50.00</td></tr>` : ''}
@@ -839,4 +855,268 @@ adminRoutes.post('/products/import-csv', upload.single('file'), async (req: Requ
   }
 
   res.json({ created: created.length, errors, createdNames: created });
+});
+
+// ── Build 12: Bulk Product Operations ───────────────────────────────────────
+
+const bulkProductSchema = z.object({
+  ids: z.array(z.string()).min(1),
+  action: z.enum(['set_price', 'increase_price', 'decrease_price', 'set_category', 'toggle_active', 'apply_sale', 'set_stock']),
+  value: z.union([z.string(), z.number(), z.boolean()]).optional(),
+  isPercent: z.boolean().optional(),
+});
+
+adminRoutes.post('/products/bulk', async (req: Request, res: Response) => {
+  const { ids, action, value, isPercent } = bulkProductSchema.parse(req.body);
+
+  let updateData: Record<string, unknown> = {};
+  let updatedCount = 0;
+
+  if (action === 'toggle_active') {
+    // toggle each product individually
+    const products = await prisma.product.findMany({ where: { id: { in: ids } }, select: { id: true, active: true } });
+    for (const p of products) {
+      await prisma.product.update({ where: { id: p.id }, data: { active: !p.active } });
+    }
+    updatedCount = products.length;
+  } else if (action === 'set_price' && value !== undefined) {
+    updateData = { price: Number(value) };
+    const result = await prisma.product.updateMany({ where: { id: { in: ids } }, data: updateData });
+    updatedCount = result.count;
+  } else if ((action === 'increase_price' || action === 'decrease_price') && value !== undefined) {
+    const products = await prisma.product.findMany({ where: { id: { in: ids } }, select: { id: true, price: true } });
+    for (const p of products) {
+      const current = Number(p.price);
+      const delta = isPercent ? current * (Number(value) / 100) : Number(value);
+      const newPrice = action === 'increase_price' ? current + delta : Math.max(0, current - delta);
+      await prisma.product.update({ where: { id: p.id }, data: { price: newPrice } });
+    }
+    updatedCount = products.length;
+  } else if (action === 'set_category' && value !== undefined) {
+    const category = await prisma.category.findUnique({ where: { id: String(value) } });
+    if (!category) throw new AppError(404, 'Category not found');
+    const result = await prisma.product.updateMany({ where: { id: { in: ids } }, data: { categoryId: String(value) } });
+    updatedCount = result.count;
+  } else if (action === 'apply_sale' && value !== undefined) {
+    const percent = Number(value);
+    if (percent < 0 || percent > 100) throw new AppError(400, 'Sale percent must be 0-100');
+    const result = await prisma.product.updateMany({
+      where: { id: { in: ids } },
+      data: { onOffer: percent > 0, offerPercent: percent > 0 ? percent : null },
+    });
+    updatedCount = result.count;
+  } else if (action === 'set_stock' && value !== undefined) {
+    const result = await prisma.product.updateMany({ where: { id: { in: ids } }, data: { stock: Number(value) } });
+    updatedCount = result.count;
+  } else {
+    throw new AppError(400, 'Invalid action or missing value');
+  }
+
+  res.json({ success: true, updatedCount, action });
+});
+
+// ── Build 12: GST Category Rates ────────────────────────────────────────────
+
+adminRoutes.patch('/categories/:id/gst-rate', async (req: Request, res: Response) => {
+  const { gstRate } = z.object({ gstRate: z.number().min(0).max(100) }).parse(req.body);
+  const category = await prisma.category.findUnique({ where: { id: req.params.id } });
+  if (!category) throw new AppError(404, 'Category not found');
+  const updated = await prisma.category.update({ where: { id: req.params.id }, data: { gstRate } });
+  res.json(updated);
+});
+
+// GST calculation helper — used by cart and checkout
+// storeState = Telangana (36)
+const STORE_STATE = 'Telangana';
+
+export function calculateGST(subtotal: number, gstRate: number, shippingState: string) {
+  const isIntraState = shippingState?.toLowerCase() === STORE_STATE.toLowerCase();
+  const gstAmount = (subtotal * gstRate) / 100;
+  if (isIntraState) {
+    return { cgst: gstAmount / 2, sgst: gstAmount / 2, igst: 0, total: gstAmount, rate: gstRate, type: 'CGST+SGST' };
+  }
+  return { cgst: 0, sgst: 0, igst: gstAmount, total: gstAmount, rate: gstRate, type: 'IGST' };
+}
+
+// Cart GST breakdown — GET /api/admin/gst-preview?categoryId=xxx&subtotal=yyy&state=zzz
+adminRoutes.get('/gst-preview', async (req: Request, res: Response) => {
+  const { categoryId, subtotal, state } = req.query;
+  if (!categoryId || !subtotal) throw new AppError(400, 'categoryId and subtotal required');
+
+  const category = await prisma.category.findUnique({ where: { id: String(categoryId) } });
+  if (!category) throw new AppError(404, 'Category not found');
+
+  const gst = calculateGST(Number(subtotal), category.gstRate, String(state || ''));
+  res.json({ category: category.name, gstRate: category.gstRate, subtotal: Number(subtotal), ...gst });
+});
+
+// ── Build 12: Enhanced Coupon Admin ─────────────────────────────────────────
+
+const couponSchemaV2 = z.object({
+  code: z.string().min(1).toUpperCase(),
+  discount: z.number().int().min(1).max(100000), // flat discounts can exceed 100
+  type: z.enum(['percentage', 'flat']).default('percentage'),
+  minOrder: z.number().positive().optional(),
+  maxUses: z.number().int().positive().optional(),
+  active: z.boolean().default(true),
+  expiresAt: z.string().optional().transform((val) => (val ? new Date(val) : undefined)),
+  categoryId: z.string().optional(),
+  firstOrderOnly: z.boolean().default(false),
+  userId: z.string().optional(),
+});
+
+adminRoutes.post('/coupons/v2', async (req: Request, res: Response) => {
+  const data = couponSchemaV2.parse(req.body);
+  const existing = await prisma.coupon.findUnique({ where: { code: data.code } });
+  if (existing) throw new AppError(400, 'Coupon code already exists');
+
+  if (data.categoryId) {
+    const cat = await prisma.category.findUnique({ where: { id: data.categoryId } });
+    if (!cat) throw new AppError(404, 'Category not found');
+  }
+  if (data.userId) {
+    const user = await prisma.user.findUnique({ where: { id: data.userId } });
+    if (!user) throw new AppError(404, 'User not found');
+  }
+
+  const coupon = await prisma.coupon.create({ data });
+  res.status(201).json(coupon);
+});
+
+// ── Build 12: Admin Order Notes (internal) ──────────────────────────────────
+
+adminRoutes.patch('/orders/:id/admin-notes', async (req: Request, res: Response) => {
+  const { adminNotes } = z.object({ adminNotes: z.string() }).parse(req.body);
+  const order = await prisma.order.findUnique({ where: { id: req.params.id } });
+  if (!order) throw new AppError(404, 'Order not found');
+
+  const updated = await prisma.order.update({
+    where: { id: req.params.id },
+    data: { adminNotes },
+  });
+  res.json(updated);
+});
+
+// ── Build 12: Stock Notifications Admin View ─────────────────────────────────
+
+adminRoutes.get('/stock-notifications', async (req: Request, res: Response) => {
+  const { productId, notified } = req.query;
+  const where: Record<string, unknown> = {};
+  if (productId) where.productId = String(productId);
+  if (notified !== undefined) where.notified = notified === 'true';
+
+  const notifications = await prisma.backInStockNotification.findMany({
+    where,
+    include: { product: { select: { name: true, stock: true, images: true } } },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  res.json({ count: notifications.length, notifications });
+});
+
+adminRoutes.post('/stock-notifications/notify/:productId', async (req: Request, res: Response) => {
+  const { productId } = req.params;
+  const product = await prisma.product.findUnique({ where: { id: productId } });
+  if (!product) throw new AppError(404, 'Product not found');
+
+  const result = await prisma.backInStockNotification.updateMany({
+    where: { productId, notified: false },
+    data: { notified: true },
+  });
+
+  res.json({ success: true, notified: result.count, product: product.name });
+});
+
+// ── Build 12: Data Export CSV ────────────────────────────────────────────────
+
+adminRoutes.get('/export/:type', async (req: Request, res: Response) => {
+  const { type } = req.params;
+  const { from, to } = req.query;
+
+  const dateFilter: Record<string, Date> = {};
+  if (from) dateFilter.gte = new Date(String(from));
+  if (to) { const toDate = new Date(String(to)); toDate.setHours(23, 59, 59, 999); dateFilter.lte = toDate; }
+
+  const validTypes = ['products', 'orders', 'customers', 'reviews'];
+  if (!validTypes.includes(type)) throw new AppError(400, `Invalid export type. Valid: ${validTypes.join(', ')}`);
+
+  let csv = '';
+
+  if (type === 'products') {
+    const products = await prisma.product.findMany({
+      where: Object.keys(dateFilter).length ? { createdAt: dateFilter } : {},
+      include: { category: true },
+      orderBy: { createdAt: 'desc' },
+    });
+    csv = 'id,name,price,comparePrice,category,stock,active,featured,bestSeller,onOffer,offerPercent,sizes,colors,createdAt\n';
+    csv += products.map((p) => [
+      p.id, `"${p.name.replace(/"/g, '""')}"`, p.price, p.comparePrice || '',
+      `"${p.category?.name || ''}"`, p.stock, p.active, p.featured,
+      p.bestSeller, p.onOffer, p.offerPercent || '',
+      `"${p.sizes.join('|')}"`, `"${p.colors.join('|')}"`,
+      p.createdAt.toISOString(),
+    ].join(',')).join('\n');
+    res.setHeader('Content-Disposition', `attachment; filename="products-${Date.now()}.csv"`);
+  } else if (type === 'orders') {
+    const orders = await prisma.order.findMany({
+      where: Object.keys(dateFilter).length ? { createdAt: dateFilter } : {},
+      orderBy: { createdAt: 'desc' },
+    });
+    csv = 'orderNumber,customerName,customerPhone,customerEmail,subtotal,shipping,discount,gstAmount,total,paymentMethod,paymentStatus,status,deliverySlot,couponCode,country,createdAt\n';
+    csv += orders.map((o) => {
+      const addr = o.address as { city?: string; state?: string; pincode?: string };
+      return [
+        o.orderNumber, `"${o.customerName.replace(/"/g, '""')}"`,
+        o.customerPhone, o.customerEmail || '',
+        o.subtotal, o.shipping, o.discount, o.gstAmount || '',
+        o.total, o.paymentMethod, o.paymentStatus,
+        o.status, o.deliverySlot || '', o.couponCode || '',
+        o.country, o.createdAt.toISOString(),
+        `"${addr.city || ''}, ${addr.state || ''} ${addr.pincode || ''}"`,
+      ].join(',');
+    }).join('\n');
+    res.setHeader('Content-Disposition', `attachment; filename="orders-${Date.now()}.csv"`);
+  } else if (type === 'customers') {
+    const orders = await prisma.order.findMany({
+      where: Object.keys(dateFilter).length ? { createdAt: dateFilter } : {},
+      select: { customerName: true, customerPhone: true, customerEmail: true, total: true, createdAt: true },
+      orderBy: { createdAt: 'desc' },
+    });
+    const customerMap = new Map<string, { name: string; email?: string | null; total: number; count: number; first: Date; last: Date }>();
+    for (const o of orders) {
+      const ex = customerMap.get(o.customerPhone);
+      if (ex) {
+        ex.total += Number(o.total); ex.count += 1;
+        if (new Date(o.createdAt) > ex.last) ex.last = new Date(o.createdAt);
+        if (new Date(o.createdAt) < ex.first) ex.first = new Date(o.createdAt);
+      } else {
+        customerMap.set(o.customerPhone, { name: o.customerName, email: o.customerEmail, total: Number(o.total), count: 1, first: new Date(o.createdAt), last: new Date(o.createdAt) });
+      }
+    }
+    csv = 'phone,name,email,orderCount,totalSpend,firstOrder,lastOrder\n';
+    csv += Array.from(customerMap.entries()).map(([phone, c]) =>
+      [phone, `"${c.name.replace(/"/g, '""')}"`, c.email || '', c.count, c.total.toFixed(2), c.first.toISOString(), c.last.toISOString()].join(',')
+    ).join('\n');
+    res.setHeader('Content-Disposition', `attachment; filename="customers-${Date.now()}.csv"`);
+  } else if (type === 'reviews') {
+    const reviews = await prisma.review.findMany({
+      where: Object.keys(dateFilter).length ? { createdAt: dateFilter } : {},
+      include: { product: { select: { name: true } } },
+      orderBy: { createdAt: 'desc' },
+    });
+    csv = 'productName,customerName,rating,title,body,approved,createdAt\n';
+    csv += reviews.map((r) => [
+      `"${r.product.name.replace(/"/g, '""')}"`,
+      `"${r.customerName.replace(/"/g, '""')}"`,
+      r.rating,
+      `"${(r.title || '').replace(/"/g, '""')}"`,
+      `"${(r.body || '').replace(/"/g, '""')}"`,
+      r.approved,
+      r.createdAt.toISOString(),
+    ].join(',')).join('\n');
+    res.setHeader('Content-Disposition', `attachment; filename="reviews-${Date.now()}.csv"`);
+  }
+
+  res.setHeader('Content-Type', 'text/csv');
+  res.send(csv);
 });

@@ -129,7 +129,7 @@ server/
     routes/                Express route handlers
     lib/                   Prisma client, cache, email, WhatsApp, env validation
     middleware/            Error handler, rate limiter, admin auth
-    __tests__/             Vitest tests (525+)
+    __tests__/             Vitest tests (901+)
   prisma/
     schema.prisma          Database schema
 ```
@@ -204,24 +204,32 @@ NEXT_PUBLIC_WHATSAPP_NUMBER=+919876543210
 ## Tests
 
 ```bash
-npm test          # Run all 525+ tests
+npm test          # Run all 901+ tests
 ```
 
 Test coverage:
 - Products, categories, cart, orders, coupons
 - Payments (Razorpay verification, COD)
 - Auth (Google OAuth, Phone OTP)
-- Admin CRUD, bulk operations
-- International shipping
+- Admin CRUD, bulk operations, bulk product actions
+- International shipping + pincode zones
 - Returns flow
 - WhatsApp notification generation
 - Email template rendering
 - Analytics queries
-- Stock movement logging
+- Stock movement logging + back-in-stock notifications
 - Cache behavior
 - Health check
 - Environment validation
 - Inventory management
+- GST calculation (intra-state CGST/SGST vs inter-state IGST)
+- Delivery slot selection
+- Order cancellation + store credit refund
+- Enhanced coupons (category-specific, first-order, user-specific, countdown)
+- CSV data export (products, orders, customers, reviews)
+- Loyalty, referrals, flash sales, lookbook, chat
+- Bundles, gift cards, pre-orders, store credits
+- Abandoned cart recovery, webhooks
 
 ## API Endpoint Reference
 
@@ -298,5 +306,22 @@ _Coming soon — to be added after production launch_
 Mobile-first — 80%+ of Indian shoppers browse on phones.
 
 ---
+
+## Build Log
+
+| Build | Date | Features | Tests |
+|-------|------|----------|-------|
+| Build 1 | 2026-01-01 | Core product catalog, cart, orders, payments (Razorpay), admin | 100+ |
+| Build 2 | 2026-01-02 | Auth, pincode zones, WhatsApp/email notifications, SEO | 200+ |
+| Build 3 | 2026-01-03 | Inventory management, back-in-stock, returns, analytics | 300+ |
+| Build 4 | 2026-01-04 | Admin dashboard, shipping, international rates | 400+ |
+| Build 5 | 2026-01-05 | Bulk status, security, Razorpay everywhere | 475+ |
+| Build 6 | 2026-01-06 | WhatsApp/email notifications, pro analytics | 530+ |
+| Build 7 | 2026-01-07 | Loyalty, referrals, smart search, flash sales, chat | 628+ |
+| Build 8 | 2026-01-08 | Variants, invoice PDF, shipping prep, collections, Q&A | 726+ |
+| Build 9 | 2026-01-09 | Lookbook, customer segments, advanced reports | 826+ |
+| Build 10 | 2026-01-10 | Bundles, gift cards, pre-orders, store credits, webhooks | 825+ |
+| Build 11 | 2026-01-11 | Abandoned cart, bundles, gift cards, pre-orders, webhooks | 825+ |
+| Build 12 | 2026-03-25 | GST system, bulk product ops, delivery slots, order cancellation, coupon enhancements, stock alerts, data export | 901+ |
 
 Built with care for Srinidhi Boutique, Hyderabad.

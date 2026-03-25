@@ -3,7 +3,7 @@
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "env": {
-    "NEXT_PUBLIC_API_URL": "@srinidhi_api_url",
-    "NEXT_PUBLIC_WHATSAPP_NUMBER": "@srinidhi_whatsapp_number"
+    "NEXT_PUBLIC_API_URL": "https://srinidhi-boutique-server.vercel.app",
+    "NEXT_PUBLIC_WHATSAPP_NUMBER": "+919999999999"
   }
 }

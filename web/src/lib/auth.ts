@@ -1,9 +1,9 @@
-import { getServerSession } from 'next-auth';
+import { getServerSession, type NextAuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || '',
@@ -30,7 +30,7 @@ export const authOptions = {
       }
       return true;
     },
-    async session({ session, token }: { session: Record<string, unknown>; token: { sub?: string } }) {
+    async session({ session, token }) {
       if (session.user) {
         (session.user as Record<string, unknown>).id = token.sub;
       }
@@ -42,5 +42,5 @@ export const authOptions = {
 };
 
 export async function getSession() {
-  return getServerSession(authOptions as Parameters<typeof getServerSession>[0]);
+  return getServerSession(authOptions);
 }

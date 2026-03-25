@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   description: 'Discover premium sarees, kurtis, lehengas and more. Handpicked Indian ethnic wear from Hyderabad. Free shipping on orders above ₹999.',
   keywords: 'sarees, kurtis, lehengas, women ethnic fashion, Hyderabad boutique, Indian ethnic wear, festival collection',
   manifest: '/manifest.json',
-  themeColor: '#B76E79',
+  themeColor: '#f5f5f0',
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://srinidhiboutique.com'),
   alternates: { canonical: '/' },
   openGraph: {
@@ -48,7 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
-      <body className="min-h-screen flex flex-col bg-white pb-16 md:pb-0">
+      <body className="min-h-screen flex flex-col bg-[#f5f5f0] pb-16 md:pb-0">
         <Providers>
           <Header />
           <main className="flex-1">{children}</main>
@@ -61,7 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             position="bottom-center"
             toastOptions={{
               style: { fontFamily: 'var(--font-inter)', fontSize: '14px' },
-              success: { iconTheme: { primary: '#8B1A4A', secondary: '#fff' } },
+              success: { iconTheme: { primary: '#c5a55a', secondary: '#fff' } },
             }}
           />
         </Providers>

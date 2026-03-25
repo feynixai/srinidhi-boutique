@@ -54,7 +54,7 @@ export default function OrdersPage() {
 
   // Auto-load orders for logged-in users
   useEffect(() => {
-    const userId = (session?.user as typeof session.user & { id?: string })?.id;
+    const userId = (session?.user as ({ id?: string } | null | undefined))?.id;
     const phoneUser = (() => {
       try { return JSON.parse(localStorage.getItem('sb_user') || 'null'); } catch { return null; }
     })();

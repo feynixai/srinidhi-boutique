@@ -42,7 +42,7 @@ export default function AccountPage() {
   }, [status, phoneUser, router]);
 
   const user = session?.user || (phoneUser ? { name: phoneUser.name, email: null, image: null } : null);
-  const userId = (session?.user as typeof session.user & { id?: string })?.id || phoneUser?.id;
+  const userId = (session?.user as ({ id?: string } | null | undefined))?.id || phoneUser?.id;
 
   useEffect(() => {
     if (!userId) return;

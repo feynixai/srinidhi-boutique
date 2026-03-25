@@ -3,15 +3,31 @@
 @tailwind utilities;
 
 :root {
-  --rose-gold: #8B1A4A;
-  --maroon: #8B1A4A;
-  --gold: #D4A853;
-  --cream: #FFF8F0;
-  --ivory: #FFF8F0;
-  --warm-white: #FFF8F0;
-  --soft-pink: #D4A853;
-  --charcoal: #1A1A2E;
-  --emerald: #059669;
+  /* Liquid Glass Design System */
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --glass-blur: 20px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-pill: 9999px;
+  --shadow-soft: 0 4px 30px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --bg-main: #f5f5f0;
+  --bg-green: #e8f0e8;
+  --text-primary: #1a1a1a;
+  --text-secondary: #6b7280;
+  --accent-gold: #c5a55a;
+  --accent-blue: #2563eb;
+
+  /* Legacy aliases */
+  --rose-gold: #c5a55a;
+  --gold: #c5a55a;
+  --cream: #f5f5f0;
+  --ivory: #f5f5f0;
+  --warm-white: #f5f5f0;
+  --charcoal: #1a1a2e;
 }
 
 * {
@@ -20,8 +36,8 @@
 
 body {
   font-family: var(--font-inter), system-ui, sans-serif;
-  color: var(--charcoal);
-  background-color: #ffffff;
+  color: var(--text-primary);
+  background-color: #f5f5f0;
 }
 
 h1, h2, h3, h4 {
@@ -33,44 +49,90 @@ h1, h2, h3, h4 {
 }
 
 @layer components {
+  /* Core glass utility */
+  .glass {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  }
+
+  .glass-nav {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  /* Glass card utility — the core glassmorphism building block */
+  .glass-card {
+    @apply bg-white/60 backdrop-blur-xl border border-white/30 rounded-3xl shadow-card;
+  }
+
+  .glass-card-sm {
+    @apply bg-white/60 backdrop-blur-xl border border-white/30 rounded-2xl shadow-card;
+  }
+
+  /* Pill-shaped primary button — dark navy */
   .btn-primary {
-    @apply bg-emerald text-white px-6 py-3 font-semibold hover:bg-opacity-90 transition-all duration-200 tracking-wide;
+    @apply bg-[#1a1a2e] text-white px-6 py-3 rounded-full font-semibold hover:bg-[#2d2d4e] transition-all duration-200 tracking-wide;
   }
 
   .btn-maroon {
-    @apply bg-rose-gold text-white px-6 py-3 font-semibold hover:bg-opacity-90 transition-all duration-200 tracking-wide;
+    @apply bg-[#1a1a2e] text-white px-6 py-3 rounded-full font-semibold hover:bg-[#2d2d4e] transition-all duration-200 tracking-wide;
   }
 
   .btn-outline {
-    @apply border border-rose-gold text-rose-gold px-6 py-3 font-semibold hover:bg-rose-gold hover:text-white transition-all duration-200 tracking-wide;
+    @apply border border-[#1a1a2e] text-[#1a1a2e] px-6 py-3 rounded-full font-semibold hover:bg-[#1a1a2e] hover:text-white transition-all duration-200 tracking-wide;
   }
 
   .btn-gold {
-    @apply bg-gold text-charcoal px-6 py-3 font-semibold hover:bg-opacity-90 transition-all duration-200 tracking-wide;
+    @apply bg-[#c5a55a] text-[#1a1a2e] px-6 py-3 rounded-full font-semibold hover:opacity-90 transition-all duration-200 tracking-wide;
   }
 
   .product-card {
     @apply relative overflow-hidden cursor-pointer;
   }
 
+  /* Pill badges */
   .badge-offer {
-    @apply absolute top-2 left-2 bg-rose-gold text-white text-xs px-2 py-1 font-semibold z-10;
+    @apply absolute top-3 left-3 bg-blue-600 text-white text-xs px-3 py-1 rounded-full font-semibold z-10 shadow-sm;
   }
 
   .badge-bestseller {
-    @apply absolute top-2 right-2 bg-gold text-charcoal text-xs px-2 py-1 font-semibold z-10;
+    @apply absolute top-3 right-3 bg-[#c5a55a] text-[#1a1a2e] text-xs px-3 py-1 rounded-full font-semibold z-10;
   }
 
   .section-heading {
-    @apply font-serif text-3xl md:text-4xl text-charcoal;
+    @apply font-serif text-3xl md:text-4xl text-[#1a1a1a] font-bold tracking-tight;
   }
 
   .divider-gold {
-    @apply w-16 h-0.5 bg-gold mx-auto my-3;
+    @apply w-16 h-0.5 bg-[#c5a55a] my-3;
   }
 
   .safe-area-pb {
     padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .pill {
+    border-radius: 9999px;
+    padding: 8px 20px;
+  }
+
+  /* Price pill badge */
+  .price-pill {
+    @apply bg-blue-600 text-white text-sm font-bold px-3 py-1 rounded-full;
+  }
+
+  /* Category pill chip */
+  .category-chip {
+    @apply bg-white/60 backdrop-blur-lg border border-white/30 text-[#1a1a1a] px-4 py-2 rounded-full text-sm font-medium hover:bg-white/80 transition-all duration-200 cursor-pointer whitespace-nowrap;
+  }
+
+  .category-chip-active {
+    @apply bg-[#1a1a2e] text-white px-4 py-2 rounded-full text-sm font-medium cursor-pointer whitespace-nowrap;
   }
 }
 
@@ -91,4 +153,13 @@ h1, h2, h3, h4 {
 
 .animate-pull-refresh {
   animation: pull-refresh 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out forwards;
 }

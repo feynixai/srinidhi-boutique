@@ -21,15 +21,15 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 function Accordion({ title, children }: { title: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border-t border-gray-100">
+    <div className="border-t border-white/30">
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between py-4 text-left"
       >
-        <span className="text-sm font-semibold tracking-wider uppercase text-charcoal">{title}</span>
-        {open ? <FiChevronUp size={16} className="text-gold" /> : <FiChevronDown size={16} className="text-charcoal/40" />}
+        <span className="text-sm font-semibold tracking-wider uppercase text-[#1a1a2e]">{title}</span>
+        {open ? <FiChevronUp size={16} className="text-[#c5a55a]" /> : <FiChevronDown size={16} className="text-[#1a1a2e]/30" />}
       </button>
-      {open && <div className="pb-4 text-sm text-charcoal/60 leading-relaxed">{children}</div>}
+      {open && <div className="pb-4 text-sm text-[#1a1a2e]/60 leading-relaxed">{children}</div>}
     </div>
   );
 }
@@ -53,8 +53,8 @@ function PincodeChecker() {
   }
 
   return (
-    <div className="bg-cream p-4">
-      <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-charcoal/60">Check Delivery</p>
+    <div className="bg-white/50 backdrop-blur-sm border border-white/40 rounded-2xl p-4">
+      <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-[#1a1a2e]/60">Check Delivery</p>
       <div className="flex gap-2">
         <input
           value={pincode}
@@ -62,9 +62,9 @@ function PincodeChecker() {
           onKeyDown={(e) => e.key === 'Enter' && check()}
           placeholder="Enter pincode"
           maxLength={6}
-          className="flex-1 border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-rose-gold bg-white"
+          className="flex-1 border border-white/50 bg-white/70 px-4 py-2 rounded-full text-sm focus:outline-none focus:border-[#c5a55a]"
         />
-        <button onClick={check} disabled={loading || pincode.length < 6} className="btn-outline px-3 py-2 text-xs disabled:opacity-50">
+        <button onClick={check} disabled={loading || pincode.length < 6} className="btn-outline px-4 py-2 text-xs disabled:opacity-50">
           {loading ? '...' : 'Check'}
         </button>
       </div>
@@ -85,22 +85,22 @@ function EMICalculator({ price }: { price: number }) {
   const emi6 = Math.ceil(price * 1.03 / 6);
   const emi12 = Math.ceil(price * 1.06 / 12);
   return (
-    <div className="bg-blue-50 border border-blue-100 p-4 text-sm">
-      <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-blue-700">EMI Options Available</p>
+    <div className="bg-white/50 backdrop-blur-sm border border-white/40 rounded-2xl p-4 text-sm">
+      <p className="text-xs font-semibold uppercase tracking-wider mb-3 text-[#1a1a2e]/60">EMI Options Available</p>
       <div className="grid grid-cols-3 gap-2 text-center">
         {[
           { months: 3, emi: emi3, label: 'No Cost' },
           { months: 6, emi: emi6, label: 'Low Cost' },
           { months: 12, emi: emi12, label: 'Flexible' },
         ].map((opt) => (
-          <div key={opt.months} className="bg-white rounded p-2 border border-blue-100">
-            <p className="font-bold text-blue-800">₹{opt.emi.toLocaleString('en-IN')}</p>
-            <p className="text-xs text-blue-600">{opt.months} months</p>
+          <div key={opt.months} className="bg-white/70 rounded-xl p-2 border border-white/50">
+            <p className="font-bold text-[#1a1a2e]">₹{opt.emi.toLocaleString('en-IN')}</p>
+            <p className="text-xs text-[#6b7280]">{opt.months} months</p>
             <p className="text-xs text-green-600 font-medium">{opt.label}</p>
           </div>
         ))}
       </div>
-      <p className="text-xs text-blue-500 mt-2">Via credit/debit cards & Razorpay at checkout</p>
+      <p className="text-xs text-[#6b7280] mt-2">Via credit/debit cards & Razorpay at checkout</p>
     </div>
   );
 }
@@ -166,22 +166,22 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         <div className="flex gap-3">
           <div className="w-16 space-y-2">
-            {[1, 2, 3].map((i) => <div key={i} className="w-16 h-20 bg-cream animate-pulse" />)}
+            {[1, 2, 3].map((i) => <div key={i} className="w-16 h-20 bg-white/60 animate-pulse rounded-xl" />)}
           </div>
-          <div className="flex-1 aspect-[3/4] bg-cream animate-pulse" />
+          <div className="flex-1 aspect-[3/4] bg-white/60 animate-pulse rounded-2xl" />
         </div>
         <div className="space-y-4">
-          <div className="h-6 bg-cream animate-pulse w-1/3" />
-          <div className="h-8 bg-cream animate-pulse w-3/4" />
-          <div className="h-6 bg-cream animate-pulse w-1/4" />
-          <div className="h-32 bg-cream animate-pulse" />
+          <div className="h-6 bg-white/60 animate-pulse rounded-full w-1/3" />
+          <div className="h-8 bg-white/60 animate-pulse rounded-full w-3/4" />
+          <div className="h-6 bg-white/60 animate-pulse rounded-full w-1/4" />
+          <div className="h-32 bg-white/60 animate-pulse rounded-2xl" />
         </div>
       </div>
     </div>
   );
 
   if (!product) return (
-    <div className="text-center py-20 text-charcoal/40 font-serif text-xl">Product not found</div>
+    <div className="text-center py-20 text-[#6b7280] text-xl">Product not found</div>
   );
 
   // Sale price from store-wide sale or product-level offer
@@ -253,7 +253,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const relatedProducts = (relatedData?.products || []).filter((p) => p.id !== product.id).slice(0, 4);
 
   return (
-    <div className="bg-white">
+    <div className="bg-[#f5f5f0]">
       {/* JSON-LD Structured Data */}
       <script
         type="application/ld+json"
@@ -261,13 +261,13 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
       />
       {/* Breadcrumb */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-        <p className="text-xs text-charcoal/40 tracking-wide">
-          <Link href="/" className="hover:text-rose-gold">Home</Link>
+        <p className="text-xs text-[#1a1a2e]/40 tracking-wide">
+          <Link href="/" className="hover:text-[#c5a55a]">Home</Link>
           &nbsp;/&nbsp;
           {product.category && (
-            <><Link href={`/category/${product.category.slug}`} className="hover:text-rose-gold">{product.category.name}</Link>&nbsp;/&nbsp;</>
+            <><Link href={`/category/${product.category.slug}`} className="hover:text-[#c5a55a]">{product.category.name}</Link>&nbsp;/&nbsp;</>
           )}
-          <span className="text-charcoal/70">{product.name}</span>
+          <span className="text-[#1a1a2e]/70">{product.name}</span>
         </p>
       </div>
 
@@ -282,8 +282,8 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                   <button
                     key={i}
                     onClick={() => setSelectedImage(i)}
-                    className={`relative w-[72px] h-[88px] border-2 overflow-hidden transition-all ${
-                      selectedImage === i ? 'border-rose-gold shadow-md' : 'border-transparent hover:border-gold/50'
+                    className={`relative w-[72px] h-[88px] rounded-xl overflow-hidden border-2 transition-all ${
+                      selectedImage === i ? 'border-[#c5a55a] shadow-md' : 'border-transparent hover:border-[#c5a55a]/50'
                     }`}
                   >
                     <Image src={img} alt={`${product.name} ${i + 1}`} fill className="object-cover" sizes="72px" />
@@ -293,7 +293,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             )}
             <div className="flex-1 relative">
               <div
-                className="relative aspect-[3/4] overflow-hidden bg-cream cursor-zoom-in"
+                className="relative aspect-[3/4] overflow-hidden bg-gray-100 rounded-2xl cursor-zoom-in"
                 onMouseEnter={() => setZoomed(true)}
                 onMouseLeave={() => setZoomed(false)}
                 onMouseMove={(e) => {
@@ -328,12 +328,12 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                   />
                 )}
                 {discountPct && (
-                  <span className="absolute top-3 left-3 bg-rose-gold text-white text-xs px-3 py-1 font-semibold tracking-wide z-10">
+                  <span className="absolute top-3 left-3 bg-blue-500 text-white text-xs px-3 py-1 rounded-full font-semibold tracking-wide z-10">
                     {discountPct}% OFF
                   </span>
                 )}
                 {product.featured && (
-                  <span className="absolute top-3 right-3 bg-gold text-charcoal text-xs px-3 py-1 font-semibold tracking-wide z-10">
+                  <span className="absolute top-3 right-3 bg-[#c5a55a] text-[#1a1a2e] text-xs px-3 py-1 rounded-full font-semibold tracking-wide z-10">
                     FEATURED
                   </span>
                 )}
@@ -353,23 +353,23 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             </div>
           </div>
 
-          {/* Product Info */}
-          <div className="space-y-5">
+          {/* Product Info — glass card */}
+          <div className="space-y-5 bg-white/50 backdrop-blur-sm border border-white/40 rounded-3xl p-6 shadow-soft">
             {product.category && (
-              <p className="text-xs text-rose-gold uppercase tracking-[0.2em] font-semibold">{product.category.name}</p>
+              <p className="text-xs text-[#c5a55a] uppercase tracking-[0.2em] font-semibold">{product.category.name}</p>
             )}
-            <h1 className="font-serif text-2xl md:text-3xl lg:text-4xl leading-tight text-charcoal">{product.name}</h1>
+            <h1 className="font-serif text-2xl md:text-3xl lg:text-4xl leading-tight text-[#1a1a2e]">{product.name}</h1>
 
             {/* Price */}
-            <div className="flex items-center gap-4 flex-wrap">
-              <span className="text-3xl font-bold text-charcoal">₹{displayPrice.toLocaleString('en-IN')}</span>
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="bg-blue-500 text-white font-bold text-xl px-4 py-1.5 rounded-full">₹{displayPrice.toLocaleString('en-IN')}</span>
               {(displayPrice < originalPrice || product.comparePrice) && (
-                <span className="text-lg text-charcoal/40 line-through">
+                <span className="text-lg text-[#1a1a2e]/40 line-through">
                   ₹{(displayPrice < originalPrice ? originalPrice : Number(product.comparePrice)).toLocaleString('en-IN')}
                 </span>
               )}
               {discountPct && (
-                <span className="bg-emerald/10 text-emerald font-semibold text-sm px-2 py-0.5">{discountPct}% off</span>
+                <span className="bg-green-100 text-green-700 font-semibold text-sm px-3 py-1 rounded-full">{discountPct}% off</span>
               )}
             </div>
 
@@ -380,26 +380,26 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             )}
 
             {product.stock <= 5 && product.stock > 0 && (
-              <p className="text-orange-500 text-sm font-medium">
-                Only {product.stock} left in stock — order soon!
+              <p className="text-orange-500 text-sm font-medium bg-orange-50 px-3 py-1.5 rounded-full inline-block">
+                Only {product.stock} left — order soon!
               </p>
             )}
 
-            {/* Colors */}
+            {/* Colors — pill chips */}
             {product.colors.length > 0 && (
               <div>
-                <p className="text-xs uppercase tracking-[0.15em] font-semibold text-charcoal/60 mb-3">
-                  Colour: {selectedColor && <span className="text-charcoal normal-case tracking-normal font-normal">{selectedColor}</span>}
+                <p className="text-xs uppercase tracking-[0.15em] font-semibold text-[#1a1a2e]/60 mb-3">
+                  Colour: {selectedColor && <span className="text-[#1a1a2e] normal-case tracking-normal font-normal">{selectedColor}</span>}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {product.colors.map((color) => (
                     <button
                       key={color}
                       onClick={() => setSelectedColor(color)}
-                      className={`px-4 py-2 text-sm border transition-all ${
+                      className={`px-4 py-2 text-sm rounded-full border transition-all ${
                         selectedColor === color
-                          ? 'border-rose-gold bg-rose-gold text-white'
-                          : 'border-gray-200 hover:border-rose-gold text-charcoal'
+                          ? 'border-[#c5a55a] bg-[#c5a55a] text-[#1a1a2e] font-semibold'
+                          : 'border-white/50 bg-white/60 hover:border-[#c5a55a] text-[#1a1a2e]'
                       }`}
                     >
                       {color}
@@ -409,12 +409,12 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               </div>
             )}
 
-            {/* Sizes */}
+            {/* Sizes — pill chips */}
             {product.sizes.length > 0 && (
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs uppercase tracking-[0.15em] font-semibold text-charcoal/60">
-                    Size: {selectedSize && <span className="text-charcoal normal-case tracking-normal font-normal">{selectedSize}</span>}
+                  <p className="text-xs uppercase tracking-[0.15em] font-semibold text-[#1a1a2e]/60">
+                    Size: {selectedSize && <span className="text-[#1a1a2e] normal-case tracking-normal font-normal">{selectedSize}</span>}
                   </p>
                   <SizeGuideModal />
                 </div>
@@ -423,10 +423,10 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                     <button
                       key={size}
                       onClick={() => setSelectedSize(size)}
-                      className={`min-w-[48px] h-[48px] px-3 border text-sm font-medium transition-all ${
+                      className={`min-w-[48px] h-[48px] px-4 rounded-full border text-sm font-medium transition-all ${
                         selectedSize === size
-                          ? 'border-rose-gold bg-rose-gold text-white'
-                          : 'border-gray-200 hover:border-rose-gold text-charcoal'
+                          ? 'border-[#1a1a2e] bg-[#1a1a2e] text-white'
+                          : 'border-white/50 bg-white/60 hover:border-[#1a1a2e] text-[#1a1a2e]'
                       }`}
                     >
                       {size}
@@ -451,10 +451,10 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                     toggleWishlist({ id: product.id, name: product.name, slug: product.slug, price: Number(product.price), comparePrice: product.comparePrice ? Number(product.comparePrice) : undefined, images: product.images });
                     toast(inWishlist(product.id) ? 'Removed from wishlist' : 'Saved to wishlist!');
                   }}
-                  className={`border p-4 transition-colors ${inWishlist(product.id) ? 'border-rose-gold text-rose-gold bg-rose-gold/5' : 'border-gray-200 text-charcoal/40 hover:border-rose-gold hover:text-rose-gold'}`}
+                  className={`p-4 rounded-full border transition-all ${inWishlist(product.id) ? 'border-red-400 text-red-500 bg-red-50' : 'border-white/50 bg-white/60 text-[#1a1a2e]/50 hover:border-red-300 hover:text-red-400'}`}
                   aria-label="Add to wishlist"
                 >
-                  <FiHeart size={18} fill={inWishlist(product.id) ? '#8B1A4A' : 'none'} />
+                  <FiHeart size={18} fill={inWishlist(product.id) ? 'currentColor' : 'none'} />
                 </button>
               </div>
 
@@ -462,7 +462,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 href={waLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2.5 bg-green-500 text-white py-4 text-sm font-semibold tracking-wider hover:bg-green-600 transition-colors"
+                className="w-full flex items-center justify-center gap-2.5 bg-green-500 text-white py-4 rounded-full text-sm font-semibold tracking-wider hover:bg-green-600 transition-colors"
               >
                 <FaWhatsapp size={20} />
                 Order via WhatsApp
@@ -475,12 +475,12 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             {/* EMI Calculator */}
             <EMICalculator price={Number(product.price)} />
 
-            {/* Trust Badges */}
-            <div className="bg-cream p-4 space-y-1.5 text-sm">
-              <p className="flex items-center gap-2 text-charcoal/70"><span className="text-emerald font-bold">✓</span> Free shipping on orders above ₹999</p>
-              <p className="flex items-center gap-2 text-charcoal/70"><span className="text-emerald font-bold">✓</span> Easy 7-day returns & exchanges</p>
-              <p className="flex items-center gap-2 text-charcoal/70"><span className="text-emerald font-bold">✓</span> Secure payment — UPI, Cards & COD</p>
-              <p className="flex items-center gap-2 text-charcoal/70"><span className="text-emerald font-bold">✓</span> Genuine products, curated in Hyderabad</p>
+            {/* Trust Badges — glass list */}
+            <div className="bg-white/40 rounded-2xl p-4 space-y-1.5 text-sm">
+              <p className="flex items-center gap-2 text-[#1a1a2e]/70"><span className="text-green-500 font-bold">✓</span> Free shipping on orders above ₹999</p>
+              <p className="flex items-center gap-2 text-[#1a1a2e]/70"><span className="text-green-500 font-bold">✓</span> Easy 7-day returns & exchanges</p>
+              <p className="flex items-center gap-2 text-[#1a1a2e]/70"><span className="text-green-500 font-bold">✓</span> Secure payment — UPI, Cards & COD</p>
+              <p className="flex items-center gap-2 text-[#1a1a2e]/70"><span className="text-green-500 font-bold">✓</span> Genuine products, curated in Hyderabad</p>
             </div>
 
             {/* Accordions */}
@@ -500,14 +500,14 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                   <p>Orders are processed within 1–2 business days.</p>
                   <p>Standard delivery: 4–7 business days across India.</p>
                   <p>Free returns within 7 days of delivery.</p>
-                  <Link href="/shipping" className="text-rose-gold hover:underline text-xs">Check delivery to your pincode →</Link>
+                  <Link href="/shipping" className="text-[#c5a55a] hover:underline text-xs">Check delivery to your pincode →</Link>
                 </div>
               </Accordion>
             </div>
 
             {/* Share Buttons */}
             <div className="flex items-center gap-3 pt-2">
-              <span className="text-xs text-charcoal/40 uppercase tracking-wider">Share:</span>
+              <span className="text-xs text-[#6b7280] uppercase tracking-wider">Share:</span>
               <a
                 href={`https://wa.me/?text=${encodeURIComponent(product.name + ' — ' + (typeof window !== 'undefined' ? window.location.href : ''))}`}
                 target="_blank"
@@ -526,7 +526,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               </button>
               <button
                 onClick={handleShare}
-                className="flex items-center gap-1.5 text-xs text-charcoal/40 hover:text-rose-gold transition-colors ml-1"
+                className="flex items-center gap-1.5 text-xs text-[#6b7280] hover:text-[#c5a55a] transition-colors ml-1"
               >
                 <FiShare2 size={12} /> More
               </button>
@@ -545,9 +545,9 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
       {/* Customers Also Bought */}
       {alsoBought && alsoBought.length > 0 && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-12">
-          <h2 className="font-serif text-2xl mb-6">Customers Also Bought</h2>
+          <h2 className="font-bold text-2xl mb-6 text-[#1a1a2e] tracking-tight">Customers Also Bought</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {alsoBought.map((p: Record<string, unknown>) => <ProductCard key={p.id as string} product={p as Parameters<typeof ProductCard>[0]['product']} />)}
+            {alsoBought.map((p: Record<string, unknown>) => <ProductCard key={p.id as string} product={p as unknown as Parameters<typeof ProductCard>[0]['product']} />)}
           </div>
         </div>
       )}
@@ -555,29 +555,29 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
       {/* Related Products */}
       {relatedProducts.length > 0 && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
-          <h2 className="font-serif text-2xl mb-6">You May Also Like</h2>
+          <h2 className="font-bold text-2xl mb-6 text-[#1a1a2e] tracking-tight">You May Also Like</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {relatedProducts.map((p) => <ProductCard key={p.id} product={p} />)}
           </div>
         </div>
       )}
 
-      {/* Sticky Add-to-Cart Bar */}
+      {/* Sticky Add-to-Cart Bar — glass effect */}
       {showStickyBar && product.stock > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-xl px-4 py-3 flex items-center gap-3 md:hidden animate-slide-up">
+        <div className="fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl bg-white/85 border-t border-white/40 shadow-[0_-4px_30px_rgba(0,0,0,0.08)] px-4 py-3 flex items-center gap-3 md:hidden animate-slide-up">
           {product.images[0] && (
-            <div className="relative w-12 h-14 flex-shrink-0 overflow-hidden">
+            <div className="relative w-12 h-14 flex-shrink-0 overflow-hidden rounded-xl">
               <Image src={product.images[0]} alt={product.name} fill className="object-cover" sizes="48px" />
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-charcoal truncate">{product.name}</p>
-            <p className="text-rose-gold font-bold">₹{displayPrice.toLocaleString('en-IN')}</p>
+            <p className="text-sm font-semibold text-[#1a1a2e] truncate">{product.name}</p>
+            <span className="bg-blue-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-full">₹{displayPrice.toLocaleString('en-IN')}</span>
           </div>
           <button
             onClick={handleAddToCart}
             disabled={adding}
-            className="flex items-center gap-2 bg-rose-gold text-white px-5 py-3 text-sm font-semibold tracking-wide flex-shrink-0 disabled:opacity-70"
+            className="flex items-center gap-2 bg-[#1a1a2e] text-white px-5 py-3 rounded-full text-sm font-semibold tracking-wide flex-shrink-0 disabled:opacity-70 hover:bg-[#2d2d4e] transition-colors"
           >
             <FiShoppingBag size={16} />
             {adding ? 'Adding...' : 'Add to Bag'}

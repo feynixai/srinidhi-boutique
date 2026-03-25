@@ -79,7 +79,7 @@ export function HeroCarousel() {
   const slide = slides[current];
 
   return (
-    <section className="relative h-[85vh] min-h-[560px] overflow-hidden bg-charcoal">
+    <section className="relative h-[85vh] min-h-[560px] overflow-hidden bg-[#1a1a2e] md:rounded-3xl md:mx-4 md:mt-4">
       {/* Slides */}
       {slides.map((s, i) => (
         <div
@@ -129,7 +129,7 @@ export function HeroCarousel() {
             </Link>
             <Link
               href={slide.ctaSecondary.href}
-              className="border border-white/60 text-white px-8 py-4 text-sm tracking-widest hover:bg-white/10 transition-colors text-center inline-block"
+              className="border border-white/60 text-white px-8 py-4 text-sm tracking-widest hover:bg-white/10 transition-colors text-center inline-block rounded-full"
             >
               {slide.ctaSecondary.label}
             </Link>

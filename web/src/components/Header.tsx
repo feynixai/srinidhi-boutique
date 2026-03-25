@@ -121,7 +121,7 @@ export function Header() {
   const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
+    const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -146,15 +146,17 @@ export function Header() {
   return (
     <>
       <header
-        className={`sticky top-0 z-50 bg-white transition-all duration-300 ${
-          scrolled ? 'shadow-[0_2px_20px_rgba(0,0,0,0.08)]' : 'border-b border-gray-100'
+        className={`sticky top-0 z-50 transition-all duration-300 ${
+          scrolled
+            ? 'bg-white/85 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.06)] border-b border-white/30'
+            : 'bg-white/60 backdrop-blur-lg border-b border-white/20'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16 md:h-[72px]">
             {/* Mobile menu button */}
             <button
-              className="md:hidden p-2 text-charcoal"
+              className="md:hidden p-2 text-[#1a1a2e] rounded-full hover:bg-white/60 transition-colors"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label="Toggle menu"
             >
@@ -163,8 +165,8 @@ export function Header() {
 
             {/* Logo */}
             <Link href="/" className="flex-1 md:flex-none text-center md:text-left">
-              <span className="font-serif text-xl md:text-2xl text-charcoal tracking-wide">
-                Srinidhi <span className="text-rose-gold">Boutique</span>
+              <span className="font-serif text-xl md:text-2xl text-[#1a1a2e] tracking-wide">
+                Srinidhi <span className="text-[#c5a55a]">Boutique</span>
               </span>
             </Link>
 
@@ -179,10 +181,10 @@ export function Header() {
                 >
                   <Link
                     href={item.href}
-                    className={`flex items-center gap-0.5 text-sm tracking-wide font-medium transition-colors pb-0.5 ${
+                    className={`flex items-center gap-0.5 text-sm tracking-wide font-medium transition-colors ${
                       item.highlight
-                        ? 'text-rose-gold border-b border-rose-gold'
-                        : 'text-charcoal/80 hover:text-rose-gold border-b border-transparent hover:border-gold'
+                        ? 'text-[#c5a55a] font-semibold'
+                        : 'text-[#1a1a2e]/80 hover:text-[#1a1a2e]'
                     }`}
                   >
                     {item.label}
@@ -194,26 +196,26 @@ export function Header() {
                     )}
                   </Link>
 
-                  {/* Mega dropdown */}
+                  {/* Glass mega dropdown */}
                   {item.columns.length > 0 && activeMenu === item.label && (
                     <div
-                      className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white border border-gray-100 shadow-2xl rounded-sm z-50 min-w-[400px] animate-fade-in"
+                      className="absolute top-full left-1/2 -translate-x-1/2 mt-3 bg-white/90 backdrop-blur-xl border border-white/40 shadow-card rounded-2xl z-50 min-w-[400px] animate-fade-in overflow-hidden"
                       onMouseEnter={() => handleMouseEnter(item.label)}
                       onMouseLeave={handleMouseLeave}
                     >
                       <div className="p-6 grid gap-8" style={{ gridTemplateColumns: `repeat(${item.columns.length}, 1fr)` }}>
                         {item.columns.map((col) => (
                           <div key={col.heading}>
-                            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-rose-gold mb-3">{col.heading}</p>
+                            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#c5a55a] mb-3">{col.heading}</p>
                             <ul className="space-y-2">
                               {col.links.map((link) => (
                                 <li key={link.label}>
                                   <Link
                                     href={link.href}
-                                    className="text-sm text-charcoal/70 hover:text-rose-gold transition-colors flex items-center gap-1 group"
+                                    className="text-sm text-[#1a1a2e]/70 hover:text-[#1a1a2e] transition-colors flex items-center gap-1 group"
                                     onClick={() => setActiveMenu(null)}
                                   >
-                                    <FiChevronRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity text-gold" />
+                                    <FiChevronRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity text-[#c5a55a]" />
                                     {link.label}
                                   </Link>
                                 </li>
@@ -222,10 +224,10 @@ export function Header() {
                           </div>
                         ))}
                       </div>
-                      <div className="border-t border-gray-50 px-6 py-3 bg-cream/50">
+                      <div className="border-t border-black/5 px-6 py-3 bg-[#f5f5f0]/60">
                         <Link
                           href={item.href}
-                          className="text-xs text-rose-gold font-medium tracking-wide hover:underline"
+                          className="text-xs text-[#c5a55a] font-medium tracking-wide hover:underline"
                           onClick={() => setActiveMenu(null)}
                         >
                           View All {item.label} →
@@ -237,27 +239,35 @@ export function Header() {
               ))}
             </nav>
 
-            {/* Actions */}
+            {/* Action icons */}
             <div className="flex items-center space-x-1">
-              <Link href="/search" className="p-2 text-charcoal/70 hover:text-rose-gold transition-colors" aria-label="Search">
+              <Link
+                href="/search"
+                className="p-2 text-[#1a1a2e]/70 hover:text-[#1a1a2e] hover:bg-white/60 rounded-full transition-all"
+                aria-label="Search"
+              >
                 <FiSearch size={20} />
               </Link>
-              <Link href="/wishlist" className="relative p-2 text-charcoal/70 hover:text-rose-gold transition-colors" aria-label="Wishlist">
+              <Link
+                href="/wishlist"
+                className="relative p-2 text-[#1a1a2e]/70 hover:text-[#1a1a2e] hover:bg-white/60 rounded-full transition-all"
+                aria-label="Wishlist"
+              >
                 <FiHeart size={20} />
                 {wishlistCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-rose-gold text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-semibold">
+                  <span className="absolute -top-0.5 -right-0.5 bg-[#c5a55a] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-semibold">
                     {wishlistCount > 9 ? '9+' : wishlistCount}
                   </span>
                 )}
               </Link>
               <button
                 onClick={toggleCart}
-                className="p-2 text-charcoal/70 hover:text-rose-gold transition-colors relative"
+                className="p-2 text-[#1a1a2e]/70 hover:text-[#1a1a2e] hover:bg-white/60 rounded-full transition-all relative"
                 aria-label="Cart"
               >
                 <FiShoppingBag size={20} />
                 {itemCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-rose-gold text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-semibold">
+                  <span className="absolute -top-0.5 -right-0.5 bg-[#1a1a2e] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-semibold">
                     {itemCount > 9 ? '9+' : itemCount}
                   </span>
                 )}
@@ -266,9 +276,9 @@ export function Header() {
           </div>
         </div>
 
-        {/* Mobile Nav Drawer */}
+        {/* Mobile Nav Drawer — glass panel */}
         {mobileOpen && (
-          <div className="md:hidden bg-white border-t border-gray-100">
+          <div className="md:hidden bg-white/90 backdrop-blur-xl border-t border-white/30">
             <div className="max-w-7xl mx-auto px-4 py-2">
               {megaMenu.map((item) => (
                 <div key={item.label}>
@@ -276,26 +286,26 @@ export function Header() {
                     <>
                       <button
                         onClick={() => setMobileExpanded(mobileExpanded === item.label ? null : item.label)}
-                        className={`w-full flex items-center justify-between py-3.5 text-base font-medium tracking-wide border-b border-gray-50 ${
-                          item.highlight ? 'text-rose-gold' : 'text-charcoal'
+                        className={`w-full flex items-center justify-between py-3.5 text-base font-medium tracking-wide border-b border-black/5 ${
+                          item.highlight ? 'text-[#c5a55a]' : 'text-[#1a1a2e]'
                         }`}
                       >
                         {item.label}
                         <FiChevronDown
                           size={16}
-                          className={`transition-transform duration-200 text-gold ${mobileExpanded === item.label ? 'rotate-180' : ''}`}
+                          className={`transition-transform duration-200 text-[#c5a55a] ${mobileExpanded === item.label ? 'rotate-180' : ''}`}
                         />
                       </button>
                       {mobileExpanded === item.label && (
                         <div className="pl-4 pb-2 animate-fade-in">
                           {item.columns.map((col) => (
                             <div key={col.heading} className="mb-3">
-                              <p className="text-xs text-rose-gold font-semibold uppercase tracking-wider mb-1.5">{col.heading}</p>
+                              <p className="text-xs text-[#c5a55a] font-semibold uppercase tracking-wider mb-1.5">{col.heading}</p>
                               {col.links.map((link) => (
                                 <Link
                                   key={link.label}
                                   href={link.href}
-                                  className="block py-1.5 text-sm text-charcoal/70 hover:text-rose-gold"
+                                  className="block py-1.5 text-sm text-[#1a1a2e]/70 hover:text-[#1a1a2e]"
                                   onClick={() => setMobileOpen(false)}
                                 >
                                   {link.label}
@@ -305,7 +315,7 @@ export function Header() {
                           ))}
                           <Link
                             href={item.href}
-                            className="block py-2 text-sm font-medium text-rose-gold"
+                            className="block py-2 text-sm font-medium text-[#c5a55a]"
                             onClick={() => setMobileOpen(false)}
                           >
                             View All {item.label} →
@@ -316,8 +326,8 @@ export function Header() {
                   ) : (
                     <Link
                       href={item.href}
-                      className={`block py-3.5 text-base font-medium tracking-wide border-b border-gray-50 ${
-                        item.highlight ? 'text-rose-gold' : 'text-charcoal hover:text-rose-gold'
+                      className={`block py-3.5 text-base font-medium tracking-wide border-b border-black/5 ${
+                        item.highlight ? 'text-[#c5a55a]' : 'text-[#1a1a2e] hover:text-[#c5a55a]'
                       }`}
                       onClick={() => setMobileOpen(false)}
                     >
@@ -326,9 +336,9 @@ export function Header() {
                   )}
                 </div>
               ))}
-              <Link href="/orders" className="block py-3.5 text-base font-medium text-charcoal hover:text-rose-gold border-b border-gray-50" onClick={() => setMobileOpen(false)}>My Orders</Link>
-              <Link href="/wishlist" className="block py-3.5 text-base font-medium text-charcoal hover:text-rose-gold border-b border-gray-50" onClick={() => setMobileOpen(false)}>Wishlist</Link>
-              <Link href="/blog" className="block py-3.5 text-base font-medium text-charcoal hover:text-rose-gold" onClick={() => setMobileOpen(false)}>Blog</Link>
+              <Link href="/orders" className="block py-3.5 text-base font-medium text-[#1a1a2e] hover:text-[#c5a55a] border-b border-black/5" onClick={() => setMobileOpen(false)}>My Orders</Link>
+              <Link href="/wishlist" className="block py-3.5 text-base font-medium text-[#1a1a2e] hover:text-[#c5a55a] border-b border-black/5" onClick={() => setMobileOpen(false)}>Wishlist</Link>
+              <Link href="/blog" className="block py-3.5 text-base font-medium text-[#1a1a2e] hover:text-[#c5a55a]" onClick={() => setMobileOpen(false)}>Blog</Link>
             </div>
           </div>
         )}

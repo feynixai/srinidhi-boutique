@@ -25,6 +25,8 @@ export interface Product {
   featured: boolean;
   bestSeller: boolean;
   onOffer: boolean;
+  salePrice?: number;
+  salePct?: number;
   offerPercent?: number;
   active: boolean;
   createdAt: string;
@@ -65,6 +67,8 @@ export interface Order {
   paymentId?: string;
   status: string;
   trackingId?: string;
+  awbNumber?: string;
+  courierName?: string;
   notes?: string;
   couponCode?: string;
   createdAt: string;

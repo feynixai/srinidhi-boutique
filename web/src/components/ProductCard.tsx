@@ -17,9 +17,9 @@ export function ProductCard({ product }: ProductCardProps) {
   const { toggle: toggleWishlist, has: inWishlist } = useWishlistStore();
   const { sessionId, itemCount, setItemCount, openCart } = useCartStore();
 
-  const salePrice = (product as Record<string, unknown>).salePrice as number | undefined;
+  const salePrice = product.salePrice;
   const displayPrice = salePrice ?? Number(product.price);
-  const salePct = (product as Record<string, unknown>).salePct as number | undefined;
+  const salePct = product.salePct;
   const discountPct = salePct && salePct > 0
     ? salePct
     : product.onOffer && product.offerPercent
@@ -51,8 +51,12 @@ export function ProductCard({ product }: ProductCardProps) {
   }
 
   return (
-    <Link href={`/shop/${product.slug}`} className="product-card block group">
-      <div className="relative aspect-[3/4] overflow-hidden bg-gray-50">
+    <Link
+      href={`/shop/${product.slug}`}
+      className="block group bg-white/60 backdrop-blur-lg border border-white/30 rounded-3xl overflow-hidden shadow-card hover:-translate-y-1 hover:shadow-card-hover transition-all duration-300"
+    >
+      {/* Image area */}
+      <div className="relative aspect-[3/4] overflow-hidden bg-[#f5f0eb]">
         {product.images[0] ? (
           <Image
             src={product.images[0]}
@@ -60,68 +64,78 @@ export function ProductCard({ product }: ProductCardProps) {
             fill
             loading="lazy"
             placeholder="blur"
-            blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI0ZGRjBGMyIvPjwvc3ZnPg=="
+            blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2Y1ZjVmMCIvPjwvc3ZnPg=="
             className="object-cover group-hover:scale-105 transition-transform duration-500"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
         ) : (
-          <div className="w-full h-full bg-soft-pink/20 flex items-center justify-center">
-            <span className="text-rose-gold font-serif text-lg">SB</span>
+          <div className="w-full h-full bg-[#f5e8d8] flex items-center justify-center">
+            <span className="text-[#c5a55a] font-serif text-lg">SB</span>
           </div>
         )}
 
         {discountPct && (
-          <span className="badge-offer">{discountPct}% OFF</span>
+          <span className="absolute top-3 left-3 bg-blue-600 text-white text-xs px-3 py-1 rounded-full font-semibold z-10 shadow-sm">
+            {discountPct}% OFF
+          </span>
         )}
 
         {product.bestSeller && !discountPct && (
-          <span className="badge-bestseller">Best Seller</span>
+          <span className="absolute top-3 left-3 bg-[#c5a55a] text-[#1a1a2e] text-xs px-3 py-1 rounded-full font-semibold z-10">
+            Best Seller
+          </span>
         )}
 
         {product.stock === 0 && (
-          <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
-            <span className="text-charcoal font-medium text-sm">Out of Stock</span>
+          <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center">
+            <span className="bg-white/80 text-[#1a1a2e] font-medium text-sm px-4 py-1.5 rounded-full border border-black/10">
+              Out of Stock
+            </span>
           </div>
         )}
 
-        {/* Hover actions */}
-        <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 flex">
+        {/* Hover quick-add */}
+        <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
           <button
             onClick={handleQuickAdd}
             disabled={adding || product.stock === 0}
-            className="flex-1 bg-charcoal text-white py-3 text-xs font-medium tracking-wider hover:bg-rose-gold transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full bg-[#1a1a2e] text-white py-3 text-xs font-semibold tracking-wider hover:bg-[#2d2d4e] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
           >
             <FiShoppingBag size={14} />
             {adding ? 'Adding...' : 'Quick Add'}
           </button>
         </div>
 
+        {/* Wishlist heart button */}
         <button
           onClick={(e) => {
             e.preventDefault();
             toggleWishlist({ id: product.id, name: product.name, slug: product.slug, price: Number(product.price), comparePrice: product.comparePrice ? Number(product.comparePrice) : undefined, images: product.images });
             toast(inWishlist(product.id) ? 'Removed from wishlist' : 'Added to wishlist');
           }}
-          className="absolute top-2 right-2 p-2 bg-white/80 rounded-full hover:bg-white transition-colors"
+          className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition-all z-10"
           aria-label="Add to wishlist"
         >
           <FiHeart
             size={16}
-            className={inWishlist(product.id) ? 'fill-rose-gold text-rose-gold' : 'text-charcoal'}
+            className={inWishlist(product.id) ? 'fill-[#c5a55a] text-[#c5a55a]' : 'text-[#1a1a2e]'}
           />
         </button>
       </div>
 
-      <div className="pt-3 pb-1">
-        <p className="text-xs text-gray-500 mb-0.5 uppercase tracking-wider">
+      {/* Product info */}
+      <div className="p-3 pb-4">
+        <p className="text-xs text-gray-400 mb-0.5 uppercase tracking-wider">
           {product.category?.name || product.occasion[0]}
         </p>
-        <h3 className="text-sm font-medium text-charcoal line-clamp-2 leading-snug">{product.name}</h3>
-        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-          <span className="font-semibold text-charcoal">₹{displayPrice.toLocaleString('en-IN')}</span>
+        <h3 className="text-sm font-medium text-[#1a1a1a] line-clamp-2 leading-snug mb-2">{product.name}</h3>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="bg-blue-600 text-white text-sm font-bold px-3 py-1 rounded-full">
+            &#x20B9;{displayPrice.toLocaleString('en-IN')}
+          </span>
           {(displayPrice < Number(product.price) || product.comparePrice) && (
-            <span className="text-gray-400 text-sm line-through">
-              ₹{(displayPrice < Number(product.price) ? Number(product.price) : Number(product.comparePrice)).toLocaleString('en-IN')}
+            <span className="text-gray-400 text-xs line-through">
+              &#x20B9;{(displayPrice < Number(product.price) ? Number(product.price) : Number(product.comparePrice)).toLocaleString('en-IN')}
             </span>
           )}
         </div>

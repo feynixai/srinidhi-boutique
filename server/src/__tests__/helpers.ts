@@ -129,50 +129,47 @@ export async function createTestAdminUser(overrides: Record<string, unknown> = {
 }
 
 export async function cleanupTest() {
-  // Build 11 — delete first (FK references)
-  await testPrisma.webhookDelivery.deleteMany({});
-  await testPrisma.webhook.deleteMany({});
-  await testPrisma.giftCardTransaction.deleteMany({});
-  await testPrisma.giftCard.deleteMany({});
-  await testPrisma.preOrderBooking.deleteMany({});
-  await testPrisma.preOrder.deleteMany({});
-  await testPrisma.storeCredit.deleteMany({});
-  await testPrisma.bundle.deleteMany({});
-  await testPrisma.abandonedCart.deleteMany({});
-  // Delete in FK-safe order
-  await testPrisma.chatMessage.deleteMany({});
-  await testPrisma.lookbook.deleteMany({});
-  await testPrisma.flashSaleProduct.deleteMany({});
-  await testPrisma.flashSale.deleteMany({});
-  await testPrisma.loyaltyHistory.deleteMany({});
-  await testPrisma.loyaltyAccount.deleteMany({});
-  await testPrisma.referral.deleteMany({});
-  await testPrisma.backInStockNotification.deleteMany({});
-  await testPrisma.stockMovement.deleteMany({});
-  await testPrisma.recentlyViewed.deleteMany({});
-  await testPrisma.wishlistItem.deleteMany({});
-  await testPrisma.returnRequest.deleteMany({});
-  await testPrisma.review.deleteMany({});
-  await testPrisma.orderItem.deleteMany({});
-  await testPrisma.cartItem.deleteMany({});
-  await testPrisma.order.deleteMany({});
-  await testPrisma.coupon.deleteMany({});
-  // Build 10 models
-  await testPrisma.productQA.deleteMany({});
-  await testPrisma.productTag.deleteMany({});
-  await testPrisma.productVariant.deleteMany({});
-  await testPrisma.tag.deleteMany({});
-  await testPrisma.collection.deleteMany({});
-  await testPrisma.userNotification.deleteMany({});
-  await testPrisma.product.deleteMany({});
-  await testPrisma.category.deleteMany({});
-  await testPrisma.pincodeZone.deleteMany({});
-  await testPrisma.newsletter.deleteMany({});
-  await testPrisma.contactSubmission.deleteMany({});
-  await testPrisma.otpCode.deleteMany({});
-  await testPrisma.user.deleteMany({});
-  await testPrisma.adminUser.deleteMany({});
-  await testPrisma.storeSale.deleteMany({});
+  // Use TRUNCATE CASCADE to handle all FK constraints atomically
+  await testPrisma.$executeRawUnsafe(`
+    TRUNCATE TABLE
+      "WebhookDelivery", "Webhook",
+      "GiftCardTransaction", "GiftCard",
+      "PreOrderBooking", "PreOrder",
+      "StoreCredit",
+      "Bundle",
+      "AbandonedCart",
+      "ChatMessage",
+      "Lookbook",
+      "FlashSaleProduct", "FlashSale",
+      "LoyaltyHistory", "LoyaltyAccount",
+      "Referral",
+      "BackInStockNotification",
+      "StockMovement",
+      "RecentlyViewed",
+      "WishlistItem",
+      "ReturnRequest",
+      "Review",
+      "OrderItem",
+      "CartItem",
+      "Order",
+      "Coupon",
+      "ProductQA",
+      "ProductTag",
+      "ProductVariant",
+      "Tag",
+      "Collection",
+      "UserNotification",
+      "Product",
+      "Category",
+      "PincodeZone",
+      "Newsletter",
+      "ContactSubmission",
+      "OtpCode",
+      "User",
+      "AdminUser",
+      "StoreSale"
+    CASCADE
+  `);
 }
 
 export async function createTestNewsletter(email: string, overrides: Record<string, unknown> = {}) {

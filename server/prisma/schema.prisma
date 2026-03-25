@@ -32,6 +32,8 @@ model Product {
   orderItems   OrderItem[]
   cartItems    CartItem[]
   reviews      Review[]
+  wishlistItems  WishlistItem[]
+  recentlyViewed RecentlyViewed[]
 }
 
 model Category {
@@ -42,10 +44,73 @@ model Category {
   products Product[]
 }
 
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  email     String?  @unique
+  phone     String?  @unique
+  googleId  String?  @unique
+  avatar    String?
+  addresses Json     @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders         Order[]
+  reviews        Review[]
+  wishlistItems  WishlistItem[]
+  recentlyViewed RecentlyViewed[]
+}
+
+model AdminUser {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  googleId  String?  @unique
+  avatar    String?
+  role      String   @default("STAFF")
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OtpCode {
+  id        String   @id @default(cuid())
+  phone     String
+  code      String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([phone])
+}
+
+model WishlistItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+}
+
+model RecentlyViewed {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  viewedAt  DateTime @default(now())
+
+  @@unique([userId, productId])
+}
+
 model Order {
   id            String      @id @default(cuid())
   orderNumber   String      @unique
   items         OrderItem[]
+  userId        String?
+  user          User?       @relation(fields: [userId], references: [id])
   customerName  String
   customerPhone String
   customerEmail String?
@@ -61,6 +126,7 @@ model Order {
   trackingId    String?
   notes         String?
   couponCode    String?
+  country       String      @default("IN")
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 }
@@ -108,6 +174,8 @@ model Review {
   id            String   @id @default(cuid())
   productId     String
   product       Product  @relation(fields: [productId], references: [id])
+  userId        String?
+  user          User?    @relation(fields: [userId], references: [id])
   customerName  String
   customerPhone String?
   rating        Int
@@ -135,7 +203,6 @@ model Newsletter {
   createdAt DateTime @default(now())
 }
 
-
 model ContactSubmission {
   id        String   @id @default(cuid())
   name      String
@@ -146,13 +213,13 @@ model ContactSubmission {
 }
 
 model ReturnRequest {
-  id          String   @id @default(cuid())
-  orderNumber String
-  customerName String
+  id            String   @id @default(cuid())
+  orderNumber   String
+  customerName  String
   customerPhone String
-  reason      String
-  description String?
-  status      String   @default("pending")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  reason        String
+  description   String?
+  status        String   @default("pending")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

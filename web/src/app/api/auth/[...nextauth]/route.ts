@@ -1,0 +1,46 @@
+import NextAuth from 'next-auth';
+import GoogleProvider from 'next-auth/providers/google';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+
+const handler = NextAuth({
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+    }),
+  ],
+  callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === 'google' && user.email) {
+        try {
+          await fetch(`${API_URL}/api/auth/google`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              googleId: account.providerAccountId,
+              email: user.email,
+              name: user.name,
+              avatar: user.image,
+            }),
+          });
+        } catch {
+          // Non-fatal — user still signs in
+        }
+      }
+      return true;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        (session.user as typeof session.user & { id?: string }).id = token.sub;
+      }
+      return session;
+    },
+  },
+  pages: {
+    signIn: '/login',
+  },
+  secret: process.env.NEXTAUTH_SECRET || 'srinidhi-secret-change-in-prod',
+});
+
+export { handler as GET, handler as POST };

@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma';
 import { AppError } from '../middleware/errorHandler';
+import { calculateShipping } from './shipping';
 
 export const orderRoutes = Router();
 
@@ -9,8 +10,9 @@ const addressSchema = z.object({
   line1: z.string().min(1),
   line2: z.string().optional(),
   city: z.string().min(1),
-  state: z.string().min(1),
-  pincode: z.string().min(6).max(6),
+  state: z.string().optional(),
+  pincode: z.string().min(6).max(10),
+  country: z.string().optional(),
 });
 
 const orderItemSchema = z.object({
@@ -22,15 +24,17 @@ const orderItemSchema = z.object({
 
 const placeOrderSchema = z.object({
   customerName: z.string().min(1),
-  customerPhone: z.string().min(10),
+  customerPhone: z.string().min(5),
   customerEmail: z.string().email().optional(),
   address: addressSchema,
   items: z.array(orderItemSchema).min(1),
-  paymentMethod: z.enum(['razorpay', 'cod', 'upi']),
+  paymentMethod: z.enum(['razorpay', 'cod', 'upi', 'stripe']),
   paymentId: z.string().optional(),
   couponCode: z.string().optional(),
   notes: z.string().optional(),
   sessionId: z.string().optional(),
+  country: z.string().optional().default('IN'),
+  userId: z.string().optional(),
 });
 
 async function generateOrderNumber(): Promise<string> {
@@ -40,6 +44,7 @@ async function generateOrderNumber(): Promise<string> {
 
 orderRoutes.post('/', async (req: Request, res: Response) => {
   const data = placeOrderSchema.parse(req.body);
+  const country = data.country || 'IN';
 
   const products = await Promise.all(
     data.items.map((item) =>
@@ -88,7 +93,7 @@ orderRoutes.post('/', async (req: Request, res: Response) => {
     0
   );
 
-  const shipping = subtotal >= 999 ? 0 : 99;
+  const shipping = calculateShipping(subtotal, country);
   const total = subtotal + shipping - discount;
   const orderNumber = await generateOrderNumber();
 
@@ -107,8 +112,10 @@ orderRoutes.post('/', async (req: Request, res: Response) => {
       paymentId: data.paymentId,
       couponCode,
       notes: data.notes,
+      country,
       status: 'placed',
       paymentStatus: data.paymentMethod === 'cod' ? 'pending' : 'paid',
+      ...(data.userId ? { userId: data.userId } : {}),
       items: {
         create: data.items.map((item, i) => ({
           productId: item.productId,

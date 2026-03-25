@@ -101,8 +101,37 @@ export async function createTestReturnRequest(overrides: Record<string, unknown>
   });
 }
 
+export async function createTestUser(overrides: Record<string, unknown> = {}) {
+  const phone = (overrides.phone as string) || `9${Math.floor(100000000 + Math.random() * 900000000)}`;
+  return testPrisma.user.create({
+    data: {
+      phone,
+      name: 'Test User',
+      email: overrides.email as string || `test${Date.now()}@example.com`,
+      ...(overrides as Record<string, unknown>),
+    },
+  });
+}
+
+export async function createTestAdminUser(overrides: Record<string, unknown> = {}) {
+  const email = (overrides.email as string) || `admin${Date.now()}@example.com`;
+  return testPrisma.adminUser.upsert({
+    where: { email },
+    update: {},
+    create: {
+      email,
+      name: 'Test Admin',
+      role: 'STAFF',
+      active: true,
+      ...(overrides as Record<string, unknown>),
+    },
+  });
+}
+
 export async function cleanupTest() {
   // Delete in FK-safe order
+  await testPrisma.recentlyViewed.deleteMany({});
+  await testPrisma.wishlistItem.deleteMany({});
   await testPrisma.returnRequest.deleteMany({});
   await testPrisma.review.deleteMany({});
   await testPrisma.orderItem.deleteMany({});
@@ -114,6 +143,9 @@ export async function cleanupTest() {
   await testPrisma.pincodeZone.deleteMany({});
   await testPrisma.newsletter.deleteMany({});
   await testPrisma.contactSubmission.deleteMany({});
+  await testPrisma.otpCode.deleteMany({});
+  await testPrisma.user.deleteMany({});
+  await testPrisma.adminUser.deleteMany({});
 }
 
 export async function createTestNewsletter(email: string, overrides: Record<string, unknown> = {}) {

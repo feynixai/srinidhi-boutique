@@ -14,11 +14,53 @@ const UPI_ID = 'srinidhioboutique@ybl';
 const STORE_NAME = 'Srinidhi+Boutique';
 const COD_CHARGE = 50;
 
-const INDIAN_STATES = [
-  'Andhra Pradesh', 'Telangana', 'Karnataka', 'Tamil Nadu', 'Maharashtra',
-  'Gujarat', 'Rajasthan', 'Delhi', 'Uttar Pradesh', 'West Bengal',
-  'Madhya Pradesh', 'Kerala', 'Punjab', 'Haryana', 'Bihar', 'Other',
+// Country config
+const COUNTRIES = [
+  { code: 'IN', name: 'India', dialCode: '+91', postalLabel: 'Pincode', postalPattern: /^\d{6}$/, postalPlaceholder: '6-digit pincode' },
+  { code: 'US', name: 'United States', dialCode: '+1', postalLabel: 'ZIP Code', postalPattern: /^\d{5}(-\d{4})?$/, postalPlaceholder: '5-digit ZIP' },
+  { code: 'AE', name: 'United Arab Emirates', dialCode: '+971', postalLabel: 'Postal Code', postalPattern: /^.{3,10}$/, postalPlaceholder: 'Postal code' },
+  { code: 'GB', name: 'United Kingdom', dialCode: '+44', postalLabel: 'Postcode', postalPattern: /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i, postalPlaceholder: 'e.g. SW1A 1AA' },
+  { code: 'CA', name: 'Canada', dialCode: '+1', postalLabel: 'Postal Code', postalPattern: /^[A-Z]\d[A-Z] ?\d[A-Z]\d$/i, postalPlaceholder: 'e.g. K1A 0A9' },
+  { code: 'AU', name: 'Australia', dialCode: '+61', postalLabel: 'Postcode', postalPattern: /^\d{4}$/, postalPlaceholder: '4-digit postcode' },
+  { code: 'OTHER', name: 'Other Country', dialCode: '+', postalLabel: 'Postal Code', postalPattern: /^.{2,10}$/, postalPlaceholder: 'Postal code' },
 ];
+
+const US_STATES = [
+  'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware',
+  'Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky',
+  'Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi',
+  'Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico',
+  'New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania',
+  'Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont',
+  'Virginia','Washington','West Virginia','Wisconsin','Wyoming','Washington DC',
+];
+
+const INDIAN_STATES = [
+  'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat',
+  'Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh',
+  'Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan',
+  'Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal',
+  'Delhi','Jammu & Kashmir','Ladakh','Puducherry','Other',
+];
+
+// Shipping rates
+const SHIPPING_RATES: Record<string, { rate: number; freeAbove?: number; days: string }> = {
+  IN:    { rate: 99,   freeAbove: 999, days: '3-7' },
+  US:    { rate: 1499,                 days: '10-15' },
+  AE:    { rate: 999,                  days: '12-20' },
+  GB:    { rate: 1299,                 days: '12-20' },
+  OTHER: { rate: 1999,                 days: '12-20' },
+};
+
+function getShipping(subtotal: number, countryCode: string): number {
+  const cfg = SHIPPING_RATES[countryCode] || SHIPPING_RATES['OTHER'];
+  if (cfg.freeAbove !== undefined && subtotal >= cfg.freeAbove) return 0;
+  return cfg.rate;
+}
+
+function getDelivery(countryCode: string): string {
+  return (SHIPPING_RATES[countryCode] || SHIPPING_RATES['OTHER']).days + ' business days';
+}
 
 function buildUpiLink(amount: number, orderId: string) {
   return `upi://pay?pa=${UPI_ID}&pn=${STORE_NAME}&am=${amount.toFixed(2)}&cu=INR&tn=Order+${orderId}`;
@@ -41,6 +83,10 @@ export default function CheckoutPage() {
   const [couponApplied, setCouponApplied] = useState(false);
   const [couponLoading, setCouponLoading] = useState(false);
   const [upiOrderId] = useState(`SB${Date.now()}`);
+  const [selectedCountry, setSelectedCountry] = useState('IN');
+
+  const country = COUNTRIES.find((c) => c.code === selectedCountry) || COUNTRIES[0];
+  const isIndia = selectedCountry === 'IN';
 
   const [address, setAddress] = useState({
     customerName: '',
@@ -49,10 +95,21 @@ export default function CheckoutPage() {
     line1: '',
     line2: '',
     city: '',
-    state: 'Telangana',
+    state: isIndia ? 'Telangana' : '',
     pincode: '',
   });
-  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'razorpay' | 'upi'>('cod');
+
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'razorpay' | 'upi' | 'stripe'>('cod');
+
+  // Reset payment method when country changes
+  useEffect(() => {
+    if (!isIndia) {
+      setPaymentMethod('stripe');
+    } else {
+      setPaymentMethod('cod');
+    }
+    setAddress((prev) => ({ ...prev, state: '' }));
+  }, [selectedCountry, isIndia]);
 
   const { data: cart } = useQuery({
     queryKey: ['cart', sessionId],
@@ -61,7 +118,7 @@ export default function CheckoutPage() {
 
   const items = cart?.items || [];
   const subtotal = cart?.subtotal || 0;
-  const shipping = subtotal >= 999 ? 0 : 99;
+  const shipping = getShipping(subtotal, selectedCountry);
   const codCharge = paymentMethod === 'cod' ? COD_CHARGE : 0;
   const total = subtotal + shipping + codCharge - couponDiscount;
   const savings = (cart?.items || []).reduce((sum, item) => {
@@ -106,14 +163,15 @@ export default function CheckoutPage() {
 
   function validateAddress() {
     if (!address.customerName.trim()) { toast.error('Enter your name'); return false; }
-    if (!address.customerPhone.match(/^\d{10}$/)) { toast.error('Enter valid 10-digit phone number'); return false; }
+    if (!address.customerPhone.trim()) { toast.error('Enter your phone number'); return false; }
     if (!address.line1.trim()) { toast.error('Enter address line 1'); return false; }
     if (!address.city.trim()) { toast.error('Enter city'); return false; }
-    if (!address.pincode.match(/^\d{6}$/)) { toast.error('Enter valid 6-digit pincode'); return false; }
+    if (isIndia && !address.pincode.match(/^\d{6}$/)) { toast.error('Enter valid 6-digit pincode'); return false; }
+    if (!isIndia && !address.pincode.trim()) { toast.error(`Enter ${country.postalLabel}`); return false; }
     return true;
   }
 
-  async function handlePlaceOrder(razorpayPaymentId?: string) {
+  async function handlePlaceOrder(razorpayPaymentId?: string, stripeSessionId?: string) {
     if (items.length === 0) { toast.error('Your cart is empty'); return; }
     setSubmitting(true);
     try {
@@ -127,6 +185,7 @@ export default function CheckoutPage() {
           city: address.city,
           state: address.state,
           pincode: address.pincode,
+          country: selectedCountry,
         },
         items: items.map((i) => ({
           productId: i.productId,
@@ -135,9 +194,10 @@ export default function CheckoutPage() {
           color: i.color,
         })),
         paymentMethod,
-        paymentId: razorpayPaymentId,
+        paymentId: razorpayPaymentId || stripeSessionId,
         couponCode: couponCode || undefined,
         sessionId,
+        country: selectedCountry,
       });
       setItemCount(0);
       router.push(`/order/${order.id}`);
@@ -153,7 +213,6 @@ export default function CheckoutPage() {
     if (items.length === 0) { toast.error('Your cart is empty'); return; }
     setSubmitting(true);
     try {
-      // Create Razorpay order on server
       const res = await fetch(`${API_URL}/api/payments/create-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -162,7 +221,6 @@ export default function CheckoutPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to create payment order');
 
-      // Load Razorpay script dynamically
       if (!(window as unknown as Record<string, unknown>)['Razorpay']) {
         await new Promise<void>((resolve, reject) => {
           const script = document.createElement('script');
@@ -189,7 +247,6 @@ export default function CheckoutPage() {
         theme: { color: '#B76E79' },
         handler: async (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
           try {
-            // Verify payment
             const verifyRes = await fetch(`${API_URL}/api/payments/verify`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -197,7 +254,6 @@ export default function CheckoutPage() {
             });
             const verifyData = await verifyRes.json();
             if (!verifyRes.ok || !verifyData.verified) throw new Error('Payment verification failed');
-
             toast.success('Payment successful!');
             await handlePlaceOrder(response.razorpay_payment_id);
           } catch {
@@ -206,16 +262,39 @@ export default function CheckoutPage() {
           }
         },
         modal: {
-          ondismiss: () => {
-            setSubmitting(false);
-            toast.error('Payment cancelled');
-          },
+          ondismiss: () => { setSubmitting(false); toast.error('Payment cancelled'); },
         },
       });
       rzp.open();
     } catch (err: unknown) {
-      const msg = (err as Error).message || 'Payment failed';
-      toast.error(msg);
+      toast.error((err as Error).message || 'Payment failed');
+      setSubmitting(false);
+    }
+  }
+
+  async function handleStripePayment() {
+    if (items.length === 0) { toast.error('Your cart is empty'); return; }
+    setSubmitting(true);
+    try {
+      const orderNum = `SB-${Date.now()}`;
+      const origin = window.location.origin;
+      const res = await fetch(`${API_URL}/api/payments/stripe/create-session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderNumber: orderNum,
+          amount: total,
+          customerEmail: address.customerEmail || undefined,
+          successUrl: `${origin}/order/confirmation?method=stripe&order=${orderNum}`,
+          cancelUrl: `${origin}/checkout`,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Could not create Stripe session');
+      // Redirect to Stripe Checkout
+      window.location.href = data.url;
+    } catch (err: unknown) {
+      toast.error((err as Error).message || 'Stripe checkout failed');
       setSubmitting(false);
     }
   }
@@ -251,6 +330,26 @@ export default function CheckoutPage() {
           {step === 'address' && (
             <div className="space-y-4">
               <h2 className="font-serif text-xl">Delivery Details</h2>
+
+              {/* Country Selector */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Ship To *</label>
+                <select
+                  value={selectedCountry}
+                  onChange={(e) => setSelectedCountry(e.target.value)}
+                  className="w-full border border-gray-200 rounded-sm px-3 py-2.5 focus:outline-none focus:border-rose-gold text-sm bg-white"
+                >
+                  {COUNTRIES.map((c) => (
+                    <option key={c.code} value={c.code}>{c.name} ({c.dialCode})</option>
+                  ))}
+                </select>
+                {!isIndia && (
+                  <div className="mt-2 bg-blue-50 border border-blue-200 rounded px-3 py-2 text-xs text-blue-700">
+                    International shipping to {country.name} — ₹{(SHIPPING_RATES[selectedCountry] || SHIPPING_RATES['OTHER']).rate} flat rate · Est. {getDelivery(selectedCountry)}
+                  </div>
+                )}
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">Full Name *</label>
@@ -263,15 +362,20 @@ export default function CheckoutPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Phone Number *</label>
-                  <input
-                    value={address.customerPhone}
-                    onChange={(e) => setAddress({ ...address, customerPhone: e.target.value })}
-                    className="w-full border border-gray-200 rounded-sm px-3 py-2.5 focus:outline-none focus:border-rose-gold text-sm"
-                    placeholder="10-digit mobile number"
-                    maxLength={10}
-                  />
+                  <div className="flex gap-1">
+                    <span className="flex items-center px-2 bg-gray-50 border border-gray-200 rounded-sm text-gray-600 text-xs font-medium whitespace-nowrap">
+                      {country.dialCode}
+                    </span>
+                    <input
+                      value={address.customerPhone}
+                      onChange={(e) => setAddress({ ...address, customerPhone: e.target.value })}
+                      className="flex-1 border border-gray-200 rounded-sm px-3 py-2.5 focus:outline-none focus:border-rose-gold text-sm"
+                      placeholder="Phone number"
+                    />
+                  </div>
                 </div>
               </div>
+
               <div>
                 <label className="block text-sm font-medium mb-1">Email (optional)</label>
                 <input
@@ -279,9 +383,10 @@ export default function CheckoutPage() {
                   onChange={(e) => setAddress({ ...address, customerEmail: e.target.value })}
                   type="email"
                   className="w-full border border-gray-200 rounded-sm px-3 py-2.5 focus:outline-none focus:border-rose-gold text-sm"
-                  placeholder="For order updates (optional)"
+                  placeholder="For order updates"
                 />
               </div>
+
               <div>
                 <label className="block text-sm font-medium mb-1">Address Line 1 *</label>
                 <input
@@ -291,15 +396,17 @@ export default function CheckoutPage() {
                   placeholder="House/flat no., street, area"
                 />
               </div>
+
               <div>
                 <label className="block text-sm font-medium mb-1">Address Line 2</label>
                 <input
                   value={address.line2}
                   onChange={(e) => setAddress({ ...address, line2: e.target.value })}
                   className="w-full border border-gray-200 rounded-sm px-3 py-2.5 focus:outline-none focus:border-rose-gold text-sm"
-                  placeholder="Landmark (optional)"
+                  placeholder="Landmark / apartment (optional)"
                 />
               </div>
+
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">City *</label>
@@ -311,23 +418,42 @@ export default function CheckoutPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">State *</label>
-                  <select
-                    value={address.state}
-                    onChange={(e) => setAddress({ ...address, state: e.target.value })}
-                    className="w-full border border-gray-200 rounded-sm px-3 py-2.5 focus:outline-none focus:border-rose-gold text-sm bg-white"
-                  >
-                    {INDIAN_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
-                  </select>
+                  <label className="block text-sm font-medium mb-1">State / Province</label>
+                  {isIndia ? (
+                    <select
+                      value={address.state}
+                      onChange={(e) => setAddress({ ...address, state: e.target.value })}
+                      className="w-full border border-gray-200 rounded-sm px-3 py-2.5 focus:outline-none focus:border-rose-gold text-sm bg-white"
+                    >
+                      <option value="">Select state</option>
+                      {INDIAN_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  ) : selectedCountry === 'US' ? (
+                    <select
+                      value={address.state}
+                      onChange={(e) => setAddress({ ...address, state: e.target.value })}
+                      className="w-full border border-gray-200 rounded-sm px-3 py-2.5 focus:outline-none focus:border-rose-gold text-sm bg-white"
+                    >
+                      <option value="">Select state</option>
+                      {US_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  ) : (
+                    <input
+                      value={address.state}
+                      onChange={(e) => setAddress({ ...address, state: e.target.value })}
+                      className="w-full border border-gray-200 rounded-sm px-3 py-2.5 focus:outline-none focus:border-rose-gold text-sm"
+                      placeholder="State / Province"
+                    />
+                  )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Pincode *</label>
+                  <label className="block text-sm font-medium mb-1">{country.postalLabel} *</label>
                   <input
                     value={address.pincode}
                     onChange={(e) => setAddress({ ...address, pincode: e.target.value })}
                     className="w-full border border-gray-200 rounded-sm px-3 py-2.5 focus:outline-none focus:border-rose-gold text-sm"
-                    placeholder="6-digit pincode"
-                    maxLength={6}
+                    placeholder={country.postalPlaceholder}
+                    maxLength={isIndia ? 6 : 10}
                   />
                 </div>
               </div>
@@ -349,11 +475,7 @@ export default function CheckoutPage() {
                       className="flex-1 border border-gray-200 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-rose-gold"
                       onKeyDown={(e) => e.key === 'Enter' && applyCoupon()}
                     />
-                    <button
-                      onClick={applyCoupon}
-                      disabled={couponLoading}
-                      className="btn-outline px-4 py-2 text-sm disabled:opacity-50"
-                    >
+                    <button onClick={applyCoupon} disabled={couponLoading} className="btn-outline px-4 py-2 text-sm disabled:opacity-50">
                       {couponLoading ? '...' : 'Apply'}
                     </button>
                   </div>
@@ -373,105 +495,66 @@ export default function CheckoutPage() {
           {step === 'payment' && (
             <div className="space-y-4">
               <h2 className="font-serif text-xl">Payment Method</h2>
-              <div className="space-y-3">
-                {[
-                  {
-                    id: 'upi' as const,
-                    label: 'UPI / PhonePe / GPay / Paytm',
-                    desc: 'Instant payment via UPI apps — most popular',
-                    icon: '📱',
-                    badge: 'Recommended',
-                  },
-                  {
-                    id: 'razorpay' as const,
-                    label: 'Pay Online (Razorpay)',
-                    desc: 'Debit/Credit cards, Net banking, UPI via Razorpay',
-                    icon: '💳',
-                  },
-                  {
-                    id: 'cod' as const,
-                    label: 'Cash on Delivery',
-                    desc: `Pay when your order arrives (+₹${COD_CHARGE} handling charge)`,
-                    icon: '💵',
-                  },
-                ].map((method) => (
-                  <label key={method.id} className={`flex items-center gap-4 p-4 border-2 rounded-sm cursor-pointer transition-colors ${
-                    paymentMethod === method.id ? 'border-rose-gold bg-rose-gold/5' : 'border-gray-200 hover:border-gray-300'
-                  }`}>
-                    <input
-                      type="radio"
-                      name="payment"
-                      value={method.id}
-                      checked={paymentMethod === method.id}
-                      onChange={() => setPaymentMethod(method.id)}
-                      className="accent-rose-gold"
-                    />
-                    <span className="text-xl">{method.icon}</span>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium text-sm">{method.label}</p>
-                        {method.badge && (
-                          <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">{method.badge}</span>
-                        )}
+
+              {isIndia ? (
+                // Indian payment options
+                <div className="space-y-3">
+                  {[
+                    { id: 'upi' as const, label: 'UPI / PhonePe / GPay / Paytm', desc: 'Instant payment via UPI apps — most popular', icon: '📱', badge: 'Recommended' },
+                    { id: 'razorpay' as const, label: 'Pay Online (Razorpay)', desc: 'Debit/Credit cards, Net banking, UPI via Razorpay', icon: '💳' },
+                    { id: 'cod' as const, label: 'Cash on Delivery', desc: `Pay when your order arrives (+₹${COD_CHARGE} handling charge)`, icon: '💵' },
+                  ].map((method) => (
+                    <label key={method.id} className={`flex items-center gap-4 p-4 border-2 rounded-sm cursor-pointer transition-colors ${paymentMethod === method.id ? 'border-rose-gold bg-rose-gold/5' : 'border-gray-200 hover:border-gray-300'}`}>
+                      <input type="radio" name="payment" value={method.id} checked={paymentMethod === method.id} onChange={() => setPaymentMethod(method.id)} className="accent-rose-gold" />
+                      <span className="text-xl">{method.icon}</span>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-sm">{method.label}</p>
+                          {method.badge && <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">{method.badge}</span>}
+                        </div>
+                        <p className="text-xs text-gray-500">{method.desc}</p>
                       </div>
-                      <p className="text-xs text-gray-500">{method.desc}</p>
+                    </label>
+                  ))}
+                </div>
+              ) : (
+                // International: Stripe only
+                <div>
+                  <div className="flex items-center gap-4 p-4 border-2 border-rose-gold bg-rose-gold/5 rounded-sm">
+                    <span className="text-xl">💳</span>
+                    <div>
+                      <p className="font-medium text-sm">International Card Payment (Stripe)</p>
+                      <p className="text-xs text-gray-500">Visa, Mastercard, Amex — secure checkout</p>
                     </div>
-                  </label>
-                ))}
-              </div>
+                  </div>
+                  <div className="mt-3 bg-amber-50 border border-amber-200 rounded px-3 py-2 text-xs text-amber-700">
+                    All prices in ₹ INR. Your bank will convert to your local currency.
+                  </div>
+                </div>
+              )}
 
               {/* UPI QR Code Section */}
               {paymentMethod === 'upi' && (
                 <div className="border border-rose-gold/30 rounded-sm p-5 bg-rose-gold/5 text-center">
                   <p className="font-medium text-sm mb-3">Scan QR Code to Pay ₹{total.toLocaleString('en-IN')}</p>
-                  <img
-                    src={buildQrUrl(total, upiOrderId)}
-                    alt="UPI QR Code"
-                    className="w-48 h-48 mx-auto border border-gray-200 rounded bg-white p-2"
-                  />
+                  <img src={buildQrUrl(total, upiOrderId)} alt="UPI QR Code" className="w-48 h-48 mx-auto border border-gray-200 rounded bg-white p-2" />
                   <p className="text-xs text-gray-500 mt-3 mb-2">Or use UPI ID directly:</p>
                   <div className="bg-white border border-gray-200 rounded px-3 py-2 inline-flex items-center gap-2">
                     <span className="font-mono text-sm font-medium">{UPI_ID}</span>
-                    <button
-                      onClick={() => { navigator.clipboard.writeText(UPI_ID); toast.success('UPI ID copied!'); }}
-                      className="text-xs text-rose-gold hover:underline"
-                    >
-                      Copy
-                    </button>
+                    <button onClick={() => { navigator.clipboard.writeText(UPI_ID); toast.success('UPI ID copied!'); }} className="text-xs text-rose-gold hover:underline">Copy</button>
                   </div>
                   <div className="flex justify-center gap-3 mt-4">
-                    <a
-                      href={`phonepe://pay?pa=${UPI_ID}&pn=${STORE_NAME}&am=${total.toFixed(2)}&cu=INR`}
-                      className="bg-purple-600 text-white px-3 py-2 rounded text-xs font-medium"
-                    >
-                      PhonePe
-                    </a>
-                    <a
-                      href={`tez://upi/pay?pa=${UPI_ID}&pn=${STORE_NAME}&am=${total.toFixed(2)}&cu=INR`}
-                      className="bg-blue-500 text-white px-3 py-2 rounded text-xs font-medium"
-                    >
-                      GPay
-                    </a>
-                    <a
-                      href={`paytmmp://pay?pa=${UPI_ID}&pn=${STORE_NAME}&am=${total.toFixed(2)}&cu=INR`}
-                      className="bg-blue-400 text-white px-3 py-2 rounded text-xs font-medium"
-                    >
-                      Paytm
-                    </a>
+                    <a href={`phonepe://pay?pa=${UPI_ID}&pn=${STORE_NAME}&am=${total.toFixed(2)}&cu=INR`} className="bg-purple-600 text-white px-3 py-2 rounded text-xs font-medium">PhonePe</a>
+                    <a href={`tez://upi/pay?pa=${UPI_ID}&pn=${STORE_NAME}&am=${total.toFixed(2)}&cu=INR`} className="bg-blue-500 text-white px-3 py-2 rounded text-xs font-medium">GPay</a>
+                    <a href={`paytmmp://pay?pa=${UPI_ID}&pn=${STORE_NAME}&am=${total.toFixed(2)}&cu=INR`} className="bg-blue-400 text-white px-3 py-2 rounded text-xs font-medium">Paytm</a>
                   </div>
-                  <p className="text-xs text-amber-600 mt-3 font-medium">
-                    After payment, proceed to place your order below. We&apos;ll verify & confirm within 1 hour.
-                  </p>
+                  <p className="text-xs text-amber-600 mt-3 font-medium">After payment, proceed to place your order below. We&apos;ll verify & confirm within 1 hour.</p>
                 </div>
               )}
 
               <div className="flex gap-3 mt-4">
-                <button onClick={() => setStep('address')} className="btn-outline flex-1 py-3 text-sm">
-                  Back
-                </button>
-                <button onClick={() => setStep('confirm')} className="btn-primary flex-1 py-3 text-sm tracking-widest">
-                  REVIEW ORDER
-                </button>
+                <button onClick={() => setStep('address')} className="btn-outline flex-1 py-3 text-sm">Back</button>
+                <button onClick={() => setStep('confirm')} className="btn-primary flex-1 py-3 text-sm tracking-widest">REVIEW ORDER</button>
               </div>
             </div>
           )}
@@ -482,15 +565,18 @@ export default function CheckoutPage() {
               <h2 className="font-serif text-xl">Review Your Order</h2>
               <div className="bg-warm-white rounded-sm p-4">
                 <h3 className="text-sm font-medium mb-2">Delivery To</h3>
-                <p className="text-sm">{address.customerName} · {address.customerPhone}</p>
+                <p className="text-sm">{address.customerName} · {country.dialCode} {address.customerPhone}</p>
                 <p className="text-sm text-gray-600">{address.line1}{address.line2 ? `, ${address.line2}` : ''}</p>
-                <p className="text-sm text-gray-600">{address.city}, {address.state} — {address.pincode}</p>
+                <p className="text-sm text-gray-600">{address.city}, {address.state && `${address.state}, `}{address.pincode}</p>
+                <p className="text-sm text-gray-600">{country.name}</p>
+                <p className="text-xs text-blue-600 mt-1">Est. delivery: {getDelivery(selectedCountry)}</p>
               </div>
               <div className="bg-warm-white rounded-sm p-4">
                 <h3 className="text-sm font-medium mb-1">Payment Method</h3>
                 <p className="text-sm">
                   {paymentMethod === 'cod' ? `Cash on Delivery (+₹${COD_CHARGE} handling)` :
-                   paymentMethod === 'razorpay' ? 'Razorpay (Online)' : 'UPI Direct'}
+                   paymentMethod === 'razorpay' ? 'Razorpay (Online)' :
+                   paymentMethod === 'stripe' ? 'International Card (Stripe)' : 'UPI Direct'}
                 </p>
               </div>
               <div className="space-y-3">
@@ -509,17 +595,15 @@ export default function CheckoutPage() {
                 </div>
               )}
               <div className="flex gap-3 mt-4">
-                <button onClick={() => setStep('payment')} className="btn-outline flex-1 py-3 text-sm">
-                  Back
-                </button>
+                <button onClick={() => setStep('payment')} className="btn-outline flex-1 py-3 text-sm">Back</button>
                 <button
-                  onClick={paymentMethod === 'razorpay' ? handleRazorpayPayment : () => handlePlaceOrder()}
+                  onClick={paymentMethod === 'razorpay' ? handleRazorpayPayment : paymentMethod === 'stripe' ? handleStripePayment : () => handlePlaceOrder()}
                   disabled={submitting}
                   className="btn-primary flex-1 py-3 text-sm tracking-widest disabled:opacity-50"
                 >
                   {submitting
-                    ? (paymentMethod === 'razorpay' ? 'OPENING PAYMENT...' : 'PLACING ORDER...')
-                    : (paymentMethod === 'razorpay' ? 'PAY NOW' : 'PLACE ORDER')}
+                    ? (paymentMethod === 'razorpay' ? 'OPENING PAYMENT...' : paymentMethod === 'stripe' ? 'REDIRECTING...' : 'PLACING ORDER...')
+                    : (paymentMethod === 'razorpay' ? 'PAY NOW' : paymentMethod === 'stripe' ? 'PAY WITH CARD' : 'PLACE ORDER')}
                 </button>
               </div>
             </div>
@@ -542,8 +626,8 @@ export default function CheckoutPage() {
               <span>Subtotal</span><span>₹{subtotal.toLocaleString('en-IN')}</span>
             </div>
             <div className="flex justify-between text-gray-600">
-              <span>Shipping</span>
-              <span className={shipping === 0 ? 'text-green-600' : ''}>{shipping === 0 ? 'FREE' : `₹${shipping}`}</span>
+              <span>Shipping ({country.name})</span>
+              <span className={shipping === 0 ? 'text-green-600' : ''}>{shipping === 0 ? 'FREE' : `₹${shipping.toLocaleString('en-IN')}`}</span>
             </div>
             {paymentMethod === 'cod' && (
               <div className="flex justify-between text-amber-600">
@@ -564,10 +648,9 @@ export default function CheckoutPage() {
               <p className="text-green-600 text-xs font-medium">You save ₹{savings.toLocaleString('en-IN')}</p>
             </div>
           )}
-          <div className="mt-4 space-y-1.5 text-xs text-gray-500">
-            <p className="flex items-center gap-1">✓ Secure checkout</p>
-            <p className="flex items-center gap-1">✓ Easy 7-day returns</p>
-            <p className="flex items-center gap-1">✓ Genuine products</p>
+          <div className="mt-4 text-xs text-gray-500 space-y-1">
+            <p>✓ Secure checkout · Easy 7-day returns</p>
+            {!isIndia && <p>✓ International shipping available</p>}
           </div>
         </div>
       </div>

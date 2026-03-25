@@ -14,6 +14,9 @@ import { paymentRoutes } from './routes/payments';
 import { newsletterRoutes } from './routes/newsletter';
 import { contactRoutes } from './routes/contact';
 import { returnRoutes } from './routes/returns';
+import { authRoutes } from './routes/auth';
+import { shippingRoutes } from './routes/shipping';
+import { userRoutes } from './routes/users';
 import { errorHandler } from './middleware/errorHandler';
 
 dotenv.config();
@@ -21,6 +24,10 @@ dotenv.config();
 const app = express();
 
 app.use(cors({ origin: '*' }));
+
+// Raw body needed for Stripe webhook signature verification
+app.use('/api/payments/stripe/webhook', express.raw({ type: 'application/json' }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -36,6 +43,9 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/returns', returnRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/shipping', shippingRoutes);
+app.use('/api/users', userRoutes);
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

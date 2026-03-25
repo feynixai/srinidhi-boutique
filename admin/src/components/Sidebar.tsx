@@ -2,7 +2,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { FiGrid, FiShoppingBag, FiPackage, FiTag, FiMenu, FiX, FiUsers, FiBarChart2, FiSettings, FiRefreshCw } from 'react-icons/fi';
+import { useSession, signOut } from 'next-auth/react';
+import { FiGrid, FiShoppingBag, FiPackage, FiTag, FiMenu, FiX, FiUsers, FiBarChart2, FiSettings, FiRefreshCw, FiLogOut } from 'react-icons/fi';
 
 const NAV = [
   { href: '/admin', label: 'Dashboard', icon: FiGrid },
@@ -17,32 +18,60 @@ const NAV = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const [open, setOpen] = useState(false);
 
   const NavContent = () => (
-    <nav className="p-4 space-y-2">
+    <nav className="p-4 space-y-2 flex flex-col h-full">
       <div className="px-3 py-4 mb-2">
         <h1 className="text-xl font-bold text-charcoal">Srinidhi Boutique</h1>
         <p className="text-sm text-gray-500">Admin Panel</p>
       </div>
-      {NAV.map(({ href, label, icon: Icon }) => {
-        const active = pathname === href || (href !== '/admin' && pathname.startsWith(href));
-        return (
-          <Link
-            key={href}
-            href={href}
-            onClick={() => setOpen(false)}
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl text-lg font-medium transition-all ${
-              active
-                ? 'bg-rose-gold text-white shadow-sm'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            <Icon size={22} />
-            {label}
-          </Link>
-        );
-      })}
+      <div className="flex-1">
+        {NAV.map(({ href, label, icon: Icon }) => {
+          const active = pathname === href || (href !== '/admin' && pathname.startsWith(href));
+          return (
+            <Link
+              key={href}
+              href={href}
+              onClick={() => setOpen(false)}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-lg font-medium transition-all mb-1 ${
+                active
+                  ? 'bg-rose-gold text-white shadow-sm'
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              <Icon size={22} />
+              {label}
+            </Link>
+          );
+        })}
+      </div>
+      {/* User section */}
+      {session?.user && (
+        <div className="border-t border-gray-100 pt-4 mt-2">
+          <div className="flex items-center gap-3 px-3 py-2">
+            {session.user.image ? (
+              <img src={session.user.image} alt="avatar" className="w-9 h-9 rounded-full" />
+            ) : (
+              <div className="w-9 h-9 rounded-full bg-[#8B1A4A] flex items-center justify-center text-white font-bold text-sm">
+                {(session.user.name || session.user.email || 'A')[0].toUpperCase()}
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-800 truncate">{session.user.name || 'Admin'}</p>
+              <p className="text-xs text-gray-500 truncate">{session.user.email}</p>
+            </div>
+            <button
+              onClick={() => signOut({ callbackUrl: '/login' })}
+              className="p-1.5 text-gray-400 hover:text-red-500 transition-colors"
+              title="Sign out"
+            >
+              <FiLogOut size={16} />
+            </button>
+          </div>
+        </div>
+      )}
     </nav>
   );
 
@@ -67,7 +96,7 @@ export function Sidebar() {
       )}
 
       {/* Desktop Sidebar */}
-      <div className="hidden md:block fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-gray-200 z-30">
+      <div className="hidden md:flex md:flex-col fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-gray-200 z-30">
         <NavContent />
       </div>
 

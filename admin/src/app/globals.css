@@ -34,3 +34,10 @@ body {
     @apply bg-white/60 backdrop-blur-xl border border-white/30 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.08)];
   }
 }
+
+/* Mobile-friendly touch targets */
+@media (max-width: 768px) {
+  button, a, input, select, textarea {
+    min-height: 44px;
+  }
+}

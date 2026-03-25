@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { FiPackage, FiDollarSign, FiAlertTriangle, FiClock, FiTrendingUp, FiStar, FiCheckCircle } from 'react-icons/fi';
+import { FiPackage, FiDollarSign, FiAlertTriangle, FiClock, FiTrendingUp } from 'react-icons/fi';
 import { getDashboard, getDashboardWidgets, getLowStockProducts } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
 
@@ -43,7 +43,7 @@ function WeeklyChart({ totalOrders }: { totalOrders: number }) {
   const max = Math.max(...counts, 1);
 
   return (
-    <div>
+    <div className="min-w-[320px]">
       <div className="flex items-end gap-2 h-32">
         {days.map((day, i) => (
           <div key={day.label} className="flex-1 flex flex-col items-center gap-1">
@@ -89,14 +89,14 @@ function TrendArrow({ value, baseline }: { value: number; baseline: number }) {
 
 function SkeletonBento() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <div className="h-8 w-48 bg-white/40 animate-pulse rounded-xl" />
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="glass-card h-32 animate-pulse" />
+          <div key={i} className="glass-card h-28 md:h-32 animate-pulse" />
         ))}
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4">
         <div className="lg:col-span-2 glass-card h-56 animate-pulse" />
         <div className="glass-card h-56 animate-pulse" />
       </div>
@@ -136,15 +136,13 @@ export default function DashboardPage() {
     recentOrders: [],
   };
 
-  const latestOrder = stats.recentOrders?.[0];
-
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-4 md:space-y-6 pb-12">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#1a1a2e]">Dashboard</h1>
-          <p className="text-gray-400 text-sm mt-0.5">Welcome back, Srinidhi Boutique</p>
+          <h1 className="text-xl md:text-2xl font-bold text-[#1a1a2e]">Dashboard</h1>
+          <p className="text-gray-400 text-xs md:text-sm mt-0.5">Welcome back, Srinidhi Boutique</p>
         </div>
         <span className="text-gray-400 text-xs hidden md:block bg-white/60 backdrop-blur-xl border border-white/30 px-4 py-2 rounded-full">
           {new Date().toLocaleDateString('en-IN', {
@@ -158,58 +156,58 @@ export default function DashboardPage() {
         const avgDailyOrders = stats.totalOrders > 0 ? Math.round(stats.totalOrders / 7) : 0;
         const avgDailyRevenue = Number(stats.totalRevenue) > 0 ? Math.round(Number(stats.totalRevenue) / 7) : 0;
         return (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="glass-card p-5 flex flex-col gap-2 border-t-4 border-[#c5a55a]">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+            <div className="glass-card p-3 md:p-5 flex flex-col gap-1.5 md:gap-2 border-t-4 border-[#c5a55a]">
               <div className="flex items-center justify-between">
-                <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold">Orders</p>
+                <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-widest font-semibold">Orders</p>
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" title="Live" />
-                  <FiPackage size={18} className="text-[#c5a55a]" />
+                  <FiPackage size={16} className="text-[#c5a55a] md:w-[18px] md:h-[18px]" />
                 </div>
               </div>
-              <AnimatedNumber value={stats.todayOrders} className="text-4xl font-bold text-[#c5a55a]" />
+              <AnimatedNumber value={stats.todayOrders} className="text-2xl md:text-4xl font-bold text-[#c5a55a]" />
               <div className="flex items-center justify-between">
-                <p className="text-xs text-gray-400">Today · updates every 30s</p>
+                <p className="text-[10px] md:text-xs text-gray-400">Today</p>
                 <TrendArrow value={stats.todayOrders} baseline={avgDailyOrders} />
               </div>
             </div>
 
-            <div className="glass-card p-5 flex flex-col gap-2 border-t-4 border-emerald-500">
+            <div className="glass-card p-3 md:p-5 flex flex-col gap-1.5 md:gap-2 border-t-4 border-emerald-500">
               <div className="flex items-center justify-between">
-                <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold">Revenue</p>
-                <FiDollarSign size={18} className="text-emerald-500" />
+                <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-widest font-semibold">Revenue</p>
+                <FiDollarSign size={16} className="text-emerald-500 md:w-[18px] md:h-[18px]" />
               </div>
-              <AnimatedNumber value={Number(stats.todayRevenue)} prefix="&#x20B9;" className="text-2xl font-bold text-emerald-600" />
+              <AnimatedNumber value={Number(stats.todayRevenue)} prefix="&#x20B9;" className="text-lg md:text-2xl font-bold text-emerald-600" />
               <div className="flex items-center justify-between">
-                <p className="text-xs text-gray-400">Today</p>
+                <p className="text-[10px] md:text-xs text-gray-400">Today</p>
                 <TrendArrow value={Number(stats.todayRevenue)} baseline={avgDailyRevenue} />
               </div>
             </div>
 
-            <div className={`glass-card p-5 flex flex-col gap-2 border-t-4 ${stats.lowStockProducts > 0 ? 'border-red-400' : 'border-gray-200'}`}>
+            <div className={`glass-card p-3 md:p-5 flex flex-col gap-1.5 md:gap-2 border-t-4 ${stats.lowStockProducts > 0 ? 'border-red-400' : 'border-gray-200'}`}>
               <div className="flex items-center justify-between">
-                <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold">Low Stock</p>
-                <FiAlertTriangle size={18} className={stats.lowStockProducts > 0 ? 'text-red-500' : 'text-gray-300'} />
+                <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-widest font-semibold">Low Stock</p>
+                <FiAlertTriangle size={16} className={`md:w-[18px] md:h-[18px] ${stats.lowStockProducts > 0 ? 'text-red-500' : 'text-gray-300'}`} />
               </div>
-              <AnimatedNumber value={stats.lowStockProducts} className={`text-4xl font-bold ${stats.lowStockProducts > 0 ? 'text-red-500' : 'text-gray-400'}`} />
-              <p className="text-xs text-gray-400">{stats.lowStockProducts > 0 ? 'Items need restocking' : 'All stocked up'}</p>
+              <AnimatedNumber value={stats.lowStockProducts} className={`text-2xl md:text-4xl font-bold ${stats.lowStockProducts > 0 ? 'text-red-500' : 'text-gray-400'}`} />
+              <p className="text-[10px] md:text-xs text-gray-400">{stats.lowStockProducts > 0 ? 'Need restocking' : 'All stocked up'}</p>
             </div>
 
-            <div className={`glass-card p-5 flex flex-col gap-2 border-t-4 ${stats.pendingOrders > 0 ? 'border-orange-400' : 'border-gray-200'}`}>
+            <div className={`glass-card p-3 md:p-5 flex flex-col gap-1.5 md:gap-2 border-t-4 ${stats.pendingOrders > 0 ? 'border-orange-400' : 'border-gray-200'}`}>
               <div className="flex items-center justify-between">
-                <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold">Pending</p>
-                <FiClock size={18} className={stats.pendingOrders > 0 ? 'text-orange-500' : 'text-gray-300'} />
+                <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-widest font-semibold">Pending</p>
+                <FiClock size={16} className={`md:w-[18px] md:h-[18px] ${stats.pendingOrders > 0 ? 'text-orange-500' : 'text-gray-300'}`} />
               </div>
-              <AnimatedNumber value={stats.pendingOrders} className={`text-4xl font-bold ${stats.pendingOrders > 0 ? 'text-orange-500' : 'text-gray-400'}`} />
-              <p className="text-xs text-gray-400">Orders need action</p>
+              <AnimatedNumber value={stats.pendingOrders} className={`text-2xl md:text-4xl font-bold ${stats.pendingOrders > 0 ? 'text-orange-500' : 'text-gray-400'}`} />
+              <p className="text-[10px] md:text-xs text-gray-400">Need action</p>
             </div>
           </div>
         );
       })()}
 
       {/* Bento Row 2 — Chart (2/3) + Quick Actions (1/3) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 glass-card p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4">
+        <div className="lg:col-span-2 glass-card p-3 md:p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-sm font-bold text-[#1a1a2e]">Orders — Last 7 Days</h2>
@@ -219,10 +217,12 @@ export default function DashboardPage() {
               {stats.totalOrders} total
             </span>
           </div>
-          <WeeklyChart totalOrders={stats.totalOrders} />
+          <div className="overflow-x-auto -mx-1 px-1">
+            <WeeklyChart totalOrders={stats.totalOrders} />
+          </div>
         </div>
 
-        <div className="glass-card p-6 flex flex-col gap-3">
+        <div className="glass-card p-3 md:p-6 flex flex-col gap-2 md:gap-3">
           <h2 className="text-sm font-bold text-[#1a1a2e] mb-1">Quick Actions</h2>
           {[
             { href: '/admin/orders?status=placed', label: 'View Pending Orders', color: 'bg-orange-500 text-white', badge: stats.pendingOrders > 0 ? stats.pendingOrders : null },
@@ -233,7 +233,7 @@ export default function DashboardPage() {
             <Link
               key={action.href}
               href={action.href}
-              className={`${action.color} rounded-2xl px-4 py-3 text-sm font-semibold hover:opacity-90 transition-all active:scale-[0.98] flex items-center justify-between`}
+              className={`${action.color} rounded-2xl px-3 md:px-4 py-2.5 md:py-3 text-sm font-semibold hover:opacity-90 transition-all active:scale-[0.98] flex items-center justify-between`}
             >
               <span>{action.label}</span>
               {action.badge !== null && (
@@ -278,29 +278,29 @@ export default function DashboardPage() {
       </div>
 
       {/* Bento Row 3 — All-time stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="glass-card p-5">
-          <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-2">Total Orders</p>
-          <AnimatedNumber value={stats.totalOrders} className="text-3xl font-bold text-[#1a1a2e]" />
-          <p className="text-xs text-gray-400 mt-1">All time</p>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+        <div className="glass-card p-3 md:p-5">
+          <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-widest font-semibold mb-1 md:mb-2">Total Orders</p>
+          <AnimatedNumber value={stats.totalOrders} className="text-2xl md:text-3xl font-bold text-[#1a1a2e]" />
+          <p className="text-[10px] md:text-xs text-gray-400 mt-1">All time</p>
         </div>
-        <div className="glass-card p-5">
-          <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-2">Total Revenue</p>
-          <AnimatedNumber value={Number(stats.totalRevenue)} prefix="&#x20B9;" className="text-2xl font-bold text-emerald-600" />
-          <p className="text-xs text-gray-400 mt-1">All time</p>
+        <div className="glass-card p-3 md:p-5">
+          <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-widest font-semibold mb-1 md:mb-2">Total Revenue</p>
+          <AnimatedNumber value={Number(stats.totalRevenue)} prefix="&#x20B9;" className="text-xl md:text-2xl font-bold text-emerald-600" />
+          <p className="text-[10px] md:text-xs text-gray-400 mt-1">All time</p>
         </div>
-        <div className="glass-card p-5">
-          <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-2">Active Products</p>
-          <AnimatedNumber value={stats.totalProducts} className="text-3xl font-bold text-[#1a1a2e]" />
-          <p className="text-xs text-gray-400 mt-1">In catalogue</p>
+        <div className="glass-card p-3 md:p-5">
+          <p className="text-[10px] md:text-xs text-gray-400 uppercase tracking-widest font-semibold mb-1 md:mb-2">Active Products</p>
+          <AnimatedNumber value={stats.totalProducts} className="text-2xl md:text-3xl font-bold text-[#1a1a2e]" />
+          <p className="text-[10px] md:text-xs text-gray-400 mt-1">In catalogue</p>
         </div>
       </div>
 
       {/* Bento Row 4 — Low Stock Alert + Top Selling */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
         {/* Low Stock Alert List */}
         <div className="glass-card p-0 overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-white/20">
+          <div className="flex items-center justify-between px-4 md:px-6 py-3 md:py-4 border-b border-white/20">
             <div className="flex items-center gap-2">
               <FiAlertTriangle size={16} className="text-red-500" />
               <h2 className="text-sm font-bold text-[#1a1a2e]">Low Stock Alerts</h2>
@@ -312,12 +312,12 @@ export default function DashboardPage() {
           {lowStockData && lowStockData.products.length > 0 ? (
             <ul className="divide-y divide-black/5">
               {lowStockData.products.slice(0, 6).map((p) => (
-                <li key={p.id} className="flex items-center justify-between px-6 py-3 hover:bg-white/40 transition-colors">
-                  <div>
-                    <p className="text-sm font-medium text-[#1a1a2e] truncate max-w-[200px]">{p.name}</p>
+                <li key={p.id} className="flex items-center justify-between px-4 md:px-6 py-2.5 md:py-3 hover:bg-white/40 transition-colors">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-[#1a1a2e] truncate">{p.name}</p>
                     {p.category && <p className="text-xs text-gray-400">{p.category.name}</p>}
                   </div>
-                  <span className={`text-xs font-bold px-3 py-1 rounded-full ${
+                  <span className={`text-xs font-bold px-3 py-1 rounded-full flex-shrink-0 ml-2 ${
                     p.stock <= 2 ? 'bg-red-100 text-red-600' : 'bg-orange-100 text-orange-600'
                   }`}>
                     {p.stock} left
@@ -334,7 +334,7 @@ export default function DashboardPage() {
 
         {/* Top Selling Products */}
         <div className="glass-card p-0 overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-white/20">
+          <div className="flex items-center justify-between px-4 md:px-6 py-3 md:py-4 border-b border-white/20">
             <div className="flex items-center gap-2">
               <FiTrendingUp size={16} className="text-[#c5a55a]" />
               <h2 className="text-sm font-bold text-[#1a1a2e]">Top Selling Products</h2>
@@ -346,8 +346,8 @@ export default function DashboardPage() {
           {widgets && widgets.topSellingProducts.length > 0 ? (
             <ul className="divide-y divide-black/5">
               {widgets.topSellingProducts.slice(0, 5).map((p, i) => (
-                <li key={p.productId} className="flex items-center gap-4 px-6 py-3 hover:bg-white/40 transition-colors">
-                  <span className={`w-7 h-7 flex items-center justify-center rounded-full text-xs font-bold flex-shrink-0 ${
+                <li key={p.productId} className="flex items-center gap-3 md:gap-4 px-4 md:px-6 py-2.5 md:py-3 hover:bg-white/40 transition-colors">
+                  <span className={`w-6 h-6 md:w-7 md:h-7 flex items-center justify-center rounded-full text-xs font-bold flex-shrink-0 ${
                     i === 0 ? 'bg-[#c5a55a] text-[#1a1a2e]' : i === 1 ? 'bg-gray-200 text-gray-600' : 'bg-[#f5f0eb] text-gray-500'
                   }`}>
                     {i + 1}
@@ -370,13 +370,35 @@ export default function DashboardPage() {
       {/* Bento Row 5 — Recent Orders */}
       {stats.recentOrders.length > 0 && (
         <div className="glass-card p-0 overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-white/20">
+          <div className="flex items-center justify-between px-4 md:px-6 py-3 md:py-4 border-b border-white/20">
             <h2 className="text-sm font-bold text-[#1a1a2e]">Recent Orders</h2>
             <Link href="/admin/orders" className="text-[#c5a55a] font-semibold text-xs hover:underline">
               View all →
             </Link>
           </div>
-          <div className="overflow-x-auto">
+          {/* Mobile: card-based layout */}
+          <div className="md:hidden divide-y divide-black/5">
+            {stats.recentOrders.slice(0, 5).map((order) => (
+              <Link key={order.id} href={`/admin/orders/${order.id}`} className="block px-4 py-3 hover:bg-white/40 transition-colors">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-semibold text-[#c5a55a] text-sm">{order.orderNumber}</span>
+                  <StatusBadge status={order.status} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-[#1a1a2e]">{order.customerName}</p>
+                    <p className="text-xs text-gray-400">{order.customerPhone}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-[#1a1a2e]">&#x20B9;{Number(order.total).toLocaleString('en-IN')}</p>
+                    <p className="text-xs text-gray-400">{new Date(order.createdAt).toLocaleDateString('en-IN')}</p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+          {/* Desktop: table layout */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-[#f5f5f0]/80 text-gray-400 text-xs uppercase tracking-widest">
                 <tr>

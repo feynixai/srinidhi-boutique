@@ -155,9 +155,9 @@ export default function BulkUploadPage() {
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Bulk Product Upload</h1>
+    <div className="p-3 md:p-6 max-w-6xl mx-auto">
+      <div className="mb-4 md:mb-6">
+        <h1 className="text-xl md:text-2xl font-bold text-gray-800">Bulk Product Upload</h1>
         <p className="text-gray-500 mt-1">
           Type products in natural language, parse them, review, and upload all at once.
         </p>
@@ -181,14 +181,14 @@ export default function BulkUploadPage() {
       )}
 
       {!parsed ? (
-        <div className="bg-white rounded-2xl shadow-sm p-6">
+        <div className="bg-white rounded-2xl shadow-sm p-4 md:p-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Enter products (one per line)
           </label>
           <textarea
             value={rawText}
             onChange={(e) => setRawText(e.target.value)}
-            rows={12}
+            rows={8}
             placeholder={`Red Kanjivaram Silk Saree, price 12500, compare price 15000, wedding and festival occasion, sizes Free Size, colors Red Gold, silk fabric, stock 5, featured
 
 Blue Cotton Office Kurti, price 1200, compare 1800, office occasion, sizes S M L XL, colors Blue, cotton fabric, stock 20`}
@@ -219,21 +219,21 @@ Blue Cotton Office Kurti, price 1200, compare 1800, office occasion, sizes S M L
         </div>
       ) : (
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-gray-600">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <p className="text-gray-600 text-sm">
               <strong>{products.length}</strong> products parsed. Review and edit below.
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-2 sm:gap-3">
               <button
                 onClick={() => { setParsed(false); setProducts([]); }}
-                className="px-4 py-2 border-2 border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 transition-all"
+                className="flex-1 sm:flex-none px-4 py-2 border-2 border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 transition-all text-sm"
               >
-                ← Back to Editor
+                ← Back
               </button>
               <button
                 onClick={handleUpload}
                 disabled={uploading || products.length === 0}
-                className="px-6 py-2 bg-[#8B1A4A] text-white rounded-xl hover:bg-[#6d1439] transition-all font-medium disabled:opacity-40 flex items-center gap-2"
+                className="flex-1 sm:flex-none px-4 sm:px-6 py-2 bg-[#8B1A4A] text-white rounded-xl hover:bg-[#6d1439] transition-all font-medium disabled:opacity-40 flex items-center justify-center gap-2 text-sm"
               >
                 <FiUploadCloud size={18} />
                 {uploading ? 'Uploading...' : `Upload All (${products.length})`}
@@ -249,7 +249,7 @@ Blue Cotton Office Kurti, price 1200, compare 1800, office occasion, sizes S M L
 
           <div className="space-y-4">
             {products.map((product, idx) => (
-              <div key={idx} className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+              <div key={idx} className="bg-white rounded-2xl shadow-sm p-4 md:p-6 border border-gray-100">
                 <div className="flex items-start justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-800">
                     #{idx + 1} — {product.name}
@@ -263,7 +263,7 @@ Blue Cotton Office Kurti, price 1200, compare 1800, office occasion, sizes S M L
                   </button>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                   <div>
                     <label className="block text-xs font-medium text-gray-500 mb-1">Name</label>
                     <input

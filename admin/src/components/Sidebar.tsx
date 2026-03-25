@@ -16,13 +16,33 @@ import {
   FiRefreshCw,
   FiLogOut,
   FiUploadCloud,
+  FiImage,
+  FiStar,
+  FiChevronDown,
+  FiChevronRight,
 } from 'react-icons/fi';
 
-const NAV = [
+interface NavItem {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ size?: number }>;
+  children?: { href: string; label: string; icon: React.ComponentType<{ size?: number }> }[];
+}
+
+const NAV: NavItem[] = [
   { href: '/admin', label: 'Dashboard', icon: FiGrid },
   { href: '/admin/orders', label: 'Orders', icon: FiShoppingBag },
   { href: '/admin/products', label: 'Products', icon: FiPackage },
   { href: '/admin/products/bulk-upload', label: 'Bulk Upload', icon: FiUploadCloud },
+  {
+    href: '/admin/store',
+    label: 'Store',
+    icon: FiImage,
+    children: [
+      { href: '/admin/store/hero', label: 'Hero Slides', icon: FiImage },
+      { href: '/admin/store/occasions', label: 'Occasions', icon: FiStar },
+    ],
+  },
   { href: '/admin/customers', label: 'Customers', icon: FiUsers },
   { href: '/admin/coupons', label: 'Coupons', icon: FiTag },
   { href: '/admin/returns', label: 'Returns', icon: FiRefreshCw },
@@ -36,22 +56,34 @@ export function Sidebar() {
   const { data: session } = useSession();
   const [open, setOpen] = useState(false);
   const [jwtUser, setJwtUser] = useState<{ name?: string; email?: string } | null>(null);
+  const [expandedSections, setExpandedSections] = useState<string[]>([]);
 
   useEffect(() => {
     if (!session) {
       try {
         const stored = localStorage.getItem('admin_user');
         if (stored) setJwtUser(JSON.parse(stored));
-      } catch {}
+      } catch { /* empty */ }
     }
   }, [session]);
 
+  // Auto-expand Store section if on a store page
+  useEffect(() => {
+    if (pathname.startsWith('/admin/store') && !expandedSections.includes('/admin/store')) {
+      setExpandedSections((prev) => [...prev, '/admin/store']);
+    }
+  }, [pathname, expandedSections]);
+
+  function toggleSection(href: string) {
+    setExpandedSections((prev) =>
+      prev.includes(href) ? prev.filter((s) => s !== href) : [...prev, href]
+    );
+  }
+
   function handleSignOut() {
-    // Clear JWT auth
     localStorage.removeItem('admin_token');
     localStorage.removeItem('admin_user');
     document.cookie = 'admin_token=; path=/; max-age=0';
-    // If NextAuth session exists, sign out via NextAuth too
     if (session) {
       signOut({ callbackUrl: '/login' });
     } else {
@@ -67,8 +99,54 @@ export function Sidebar() {
         <h1 className="text-xl font-bold text-[#1a1a2e]">Srinidhi Boutique</h1>
         <p className="text-sm text-gray-400">Admin Panel</p>
       </div>
-      <div className="flex-1">
-        {NAV.map(({ href, label, icon: Icon }) => {
+      <div className="flex-1 overflow-y-auto">
+        {NAV.map((item) => {
+          const { href, label, icon: Icon, children } = item;
+
+          if (children) {
+            const isExpanded = expandedSections.includes(href);
+            const isChildActive = children.some((c) => pathname === c.href || pathname.startsWith(c.href + '/'));
+
+            return (
+              <div key={href}>
+                <button
+                  onClick={() => toggleSection(href)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-base font-medium transition-all mb-1 ${
+                    isChildActive
+                      ? 'bg-[#1a1a2e]/10 text-[#1a1a2e]'
+                      : 'text-gray-600 hover:bg-white/60 hover:text-[#1a1a2e]'
+                  }`}
+                >
+                  <Icon size={20} />
+                  <span className="flex-1 text-left">{label}</span>
+                  {isExpanded ? <FiChevronDown size={16} /> : <FiChevronRight size={16} />}
+                </button>
+                {isExpanded && (
+                  <div className="ml-4 space-y-0.5 mb-1">
+                    {children.map((child) => {
+                      const childActive = pathname === child.href || pathname.startsWith(child.href + '/');
+                      return (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          onClick={() => setOpen(false)}
+                          className={`flex items-center gap-3 px-4 py-2.5 rounded-2xl text-sm font-medium transition-all ${
+                            childActive
+                              ? 'bg-[#1a1a2e] text-white shadow-[0_4px_12px_rgba(26,26,46,0.3)]'
+                              : 'text-gray-500 hover:bg-white/60 hover:text-[#1a1a2e]'
+                          }`}
+                        >
+                          <child.icon size={16} />
+                          {child.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          }
+
           const active = pathname === href || (href !== '/admin' && pathname.startsWith(href));
           return (
             <Link
@@ -106,7 +184,7 @@ export function Sidebar() {
             </div>
             <button
               onClick={handleSignOut}
-              className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
+              className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all min-h-0"
               title="Sign out"
             >
               <FiLogOut size={16} />
@@ -124,7 +202,7 @@ export function Sidebar() {
         <h1 className="text-lg font-bold text-[#1a1a2e]">Srinidhi Admin</h1>
         <button
           onClick={() => setOpen(!open)}
-          className="p-2 hover:bg-white/60 rounded-full transition-all"
+          className="p-2 hover:bg-white/60 rounded-full transition-all min-h-0"
         >
           {open ? <FiX size={24} /> : <FiMenu size={24} />}
         </button>

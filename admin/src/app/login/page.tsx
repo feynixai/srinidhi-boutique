@@ -3,6 +3,7 @@ import { signIn, useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FcGoogle } from 'react-icons/fc';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 
 // Hardcoded admin credentials (works without backend server)
 const ADMIN_CREDENTIALS = [
@@ -19,6 +20,7 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState('');
 
   useEffect(() => {
@@ -116,18 +118,18 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-[#8B1A4A] rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-white font-bold text-2xl font-serif">S</span>
+        <div className="text-center mb-6 md:mb-8">
+          <div className="w-14 h-14 md:w-16 md:h-16 bg-[#8B1A4A] rounded-2xl flex items-center justify-center mx-auto mb-3 md:mb-4">
+            <span className="text-white font-bold text-xl md:text-2xl font-serif">S</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-800">Srinidhi Boutique</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-800">Srinidhi Boutique</h1>
           <p className="text-gray-500 text-sm mt-1">Admin Dashboard</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm p-8">
-          <h2 className="text-lg font-semibold text-gray-800 mb-6 text-center">Sign in to continue</h2>
+        <div className="bg-white rounded-2xl shadow-sm p-5 md:p-8">
+          <h2 className="text-lg font-semibold text-gray-800 mb-5 md:mb-6 text-center">Sign in to continue</h2>
 
           {(error || loginError) && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 text-center">
@@ -150,27 +152,37 @@ export default function AdminLoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@srinidhiboutique.com"
                 required
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#B76E79] focus:outline-none transition-colors text-gray-800"
+                className="w-full px-4 py-3 min-h-[48px] border-2 border-gray-200 rounded-xl focus:border-[#B76E79] focus:outline-none transition-colors text-gray-800 text-base"
               />
             </div>
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                 Password
               </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#B76E79] focus:outline-none transition-colors text-gray-800"
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  className="w-full px-4 py-3 pr-12 min-h-[48px] border-2 border-gray-200 rounded-xl focus:border-[#B76E79] focus:outline-none transition-colors text-gray-800 text-base"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600 transition-colors min-h-0"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                </button>
+              </div>
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 bg-[#8B1A4A] text-white rounded-xl hover:bg-[#6d1439] transition-all font-medium disabled:opacity-60"
+              className="w-full py-3 px-4 min-h-[48px] bg-[#8B1A4A] text-white rounded-xl hover:bg-[#6d1439] transition-all font-medium disabled:opacity-60 text-base"
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
@@ -190,7 +202,7 @@ export default function AdminLoginPage() {
           <button
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 py-3 px-4 border-2 border-gray-200 rounded-xl hover:border-[#B76E79] hover:bg-pink-50 transition-all font-medium text-gray-700 disabled:opacity-60"
+            className="w-full flex items-center justify-center gap-3 py-3 px-4 min-h-[48px] border-2 border-gray-200 rounded-xl hover:border-[#B76E79] hover:bg-pink-50 transition-all font-medium text-gray-700 disabled:opacity-60 text-base"
           >
             <FcGoogle size={22} />
             Continue with Google

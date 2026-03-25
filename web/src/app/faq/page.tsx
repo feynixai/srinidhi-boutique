@@ -103,6 +103,31 @@ const FAQS = [
       },
     ],
   },
+  {
+    category: 'Care & Fabric',
+    items: [
+      {
+        q: 'How should I wash silk sarees?',
+        a: 'Silk sarees should be dry cleaned or hand washed in cold water using a mild silk-friendly detergent. Never wring or machine wash. Dry flat in shade — never in direct sunlight which can fade the colour. Store wrapped in a soft muslin cloth.',
+      },
+      {
+        q: 'How do I care for embroidered or zari work garments?',
+        a: 'Dry clean is strongly recommended for all embroidered and zari work garments. Avoid spraying perfume directly on embellishments as alcohol can damage threads and stones. Store folded with the embroidery side inward, wrapped in a muslin cloth.',
+      },
+      {
+        q: 'Can cotton kurtis and suits be machine washed?',
+        a: 'Yes — most cotton kurtis can be machine washed in gentle/delicate mode with cold water. Wash dark colours separately for the first two washes. Avoid tumble drying; instead, dry flat or hang in shade to prevent shrinkage and colour fading.',
+      },
+      {
+        q: 'How do I prevent colours from fading?',
+        a: 'Always wash in cold water — hot water causes colour bleed and fading. Turn garments inside out before washing. Use colour-safe or mild detergents. For printed fabrics, add 1 tablespoon of salt or white vinegar to the first wash to set the colour.',
+      },
+      {
+        q: 'What is the difference between georgette, chiffon, and organza?',
+        a: 'Georgette is slightly heavier with a grainy texture — drapes beautifully and is easy to wear. Chiffon is lighter and more sheer — flowy and elegant for evenings. Organza is crisp and semi-transparent — holds its shape well, great for structured drapes and lehenga skirts. All three are best dry cleaned or gently hand washed.',
+      },
+    ],
+  },
 ];
 
 function FAQItem({ q, a }: { q: string; a: string }) {

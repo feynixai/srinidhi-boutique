@@ -97,7 +97,7 @@ async function main() {
     {
       name: 'Kanjivaram Silk Saree — Deep Maroon',
       description:
-        'Pure Kanjivaram silk saree with intricate gold zari work. Each saree is handwoven by master weavers in Kanchipuram and takes up to 15 days to complete. Perfect for weddings and festive occasions. Comes with matching blouse piece.',
+        'Pure Kanjivaram silk saree with intricate gold zari work, handwoven by master weavers in Kanchipuram — each piece takes up to 15 days to complete. The rich deep maroon base with contrasting gold border and pallu is a timeless bridal choice. Fabric: 100% pure mulberry silk with genuine gold zari. Comes with an unstitched matching blouse piece (0.8m). Wash care: Dry clean only — never machine wash; store wrapped in muslin cloth. Occasions: Weddings, Upanayanam, Namakarana, Diwali. Styling tip: Pair with a boat-neck or high-neck blouse and a temple jewellery set for a regal look. Stack gold bangles and keep hair in a classic bun.',
       price: 12500,
       comparePrice: 15000,
       images: [
@@ -118,7 +118,7 @@ async function main() {
     {
       name: 'Banarasi Georgette Saree — Royal Blue',
       description:
-        'Elegant Banarasi georgette saree with subtle silver border and floral motifs woven throughout. Lightweight and comfortable for all-day wear at festivals or family functions.',
+        'Elegant Banarasi georgette saree in rich royal blue with a subtle silver border and delicate floral bootis (motifs) woven throughout in silver zari. Lightweight yet richly textured — comfortable enough for all-day wear at festivals or family functions. Fabric: Banarasi georgette with silver zari weave. Includes unstitched blouse piece. Wash care: Dry clean recommended; gentle hand wash in cold water with mild detergent if needed — never wring or tumble dry. Occasions: Navratri, Diwali, Eid, family weddings, office parties. Styling tip: Pair with a silver-sequence blouse and CZ drop earrings. Let the pallu flow freely to showcase the zari work.',
       price: 4200,
       comparePrice: 5500,
       images: [
@@ -139,7 +139,7 @@ async function main() {
     {
       name: 'Cotton Handloom Saree — Pastel Pink',
       description:
-        'Handwoven cotton saree in soft pastel pink, crafted by weavers in Andhra Pradesh. Breathable fabric ideal for daily wear, office, and casual events. Machine washable.',
+        'Handwoven cotton saree in soft pastel pink, crafted by master weavers in Andhra Pradesh on traditional pit looms. The slightly textured weave gives it a natural, organic feel that gets softer with every wash. Fabric: 100% handloom cotton, lightweight and breathable — ideal for Hyderabad\'s warm climate. Wash care: Machine washable on gentle cycle in cold water; wash dark colours separately first; dry flat in shade. Occasions: Daily office wear, casual outings, college, lunch dates. Styling tip: Pair with a solid colour cotton blouse in contrasting ivory or coral. Add simple silver bangles and flat kolhapuri sandals for a relaxed, put-together look.',
       price: 1800,
       comparePrice: null,
       images: [
@@ -159,7 +159,7 @@ async function main() {
     {
       name: 'Chiffon Party Saree — Emerald Green',
       description:
-        'Shimmery chiffon saree with sequin border and pallu. A showstopper for evening parties, receptions, and cocktail dinners. Pre-stitched pallu option available on request.',
+        'Shimmery chiffon saree in vibrant emerald green with an all-over subtle shimmer, a sequin-embellished border, and a heavily sequined pallu that catches every light. A guaranteed showstopper at evening parties, receptions, and cocktail dinners. Fabric: Premium chiffon with sequin embellishments; fully lined inner layer for modesty. Pre-stitched pallu option available on request — WhatsApp us to arrange. Wash care: Dry clean only; sequin and embellished garments must not be machine washed. Occasions: Cocktail parties, sangeet, reception, New Year celebrations, anniversary dinners. Styling tip: Pair with a deep-neck or halter-neck blouse in matching emerald or contrasting black. Keep accessories minimal — statement earrings only. Gold strappy heels complete the look.',
       price: 3500,
       comparePrice: 4200,
       images: [
@@ -180,7 +180,7 @@ async function main() {
     {
       name: 'Linen Saree — Earthy Tan',
       description:
-        'Lightweight linen saree in warm earthy tones with a subtle checked texture. Perfect for office wear and casual outings. Pairs well with a simple cotton blouse.',
+        'Lightweight linen saree in warm earthy tan with a subtle herringbone texture woven from natural linen fibres. The understated sophistication of linen makes this perfect for working women who want to look polished without effort. Fabric: Pure linen — breathable, moisture-wicking, gets softer with each wash. Wrinkles are part of its character. Wash care: Hand wash or machine gentle cycle in cold water; air dry flat; iron on medium heat while slightly damp. Occasions: Office wear, casual outings, brunches, art galleries, travel. Styling tip: Pair with a crisp white linen blouse for a minimalist look, or a terracotta-print blouse for an earthy palette. Wooden or seed bead accessories and flat sandals complete this effortless aesthetic.',
       price: 2200,
       comparePrice: null,
       images: [
@@ -201,7 +201,7 @@ async function main() {
     {
       name: 'Organza Saree — Dusty Rose',
       description:
-        'Dreamy organza saree in dusty rose with floral applique work on the border and pallu. Lightweight and semi-transparent — ideal for festive lunches and sangeet ceremonies.',
+        'Dreamy organza saree in dusty rose with hand-applied 3D floral applique work along the border and a lush embellished pallu. The crisp organza fabric holds its drape beautifully — structured yet ethereal. Lightweight and semi-transparent with a natural shimmer. Fabric: Pure organza silk with thread-embroidered applique flowers; unstitched blouse piece included. Wash care: Dry clean only — organza is delicate and can tear or lose shape with hand/machine washing. Occasions: Festive lunches, sangeet, mehendi, Onam, Navratri, cocktail parties. Styling tip: Let the floral border be the star — wear with a simple solid blouse in blush or gold. Delicate pearl jewelry or Polki earrings pair beautifully. Stilettos in nude or rose gold.',
       price: 5800,
       comparePrice: 7000,
       images: [
@@ -222,7 +222,7 @@ async function main() {
     {
       name: 'Patola Silk Saree — Geometric Multicolor',
       description:
-        'Authentic double ikat Patola silk saree from Patan, Gujarat. The geometric pattern is woven using a 700-year-old technique where both warp and weft are tie-dyed before weaving. A collector\'s piece.',
+        'Authentic double ikat Patola silk saree from Patan, Gujarat — one of India\'s most prized textile traditions. The intricate geometric pattern is created using a 700-year-old technique where both the warp and weft threads are individually tie-dyed before weaving, producing a perfectly mirror-image pattern on both sides of the fabric. Each saree takes 6–12 months to weave. A true collector\'s piece and a generational investment. Fabric: Pure Rajkot or Patan Patola silk — vibrant, naturally dyed. Wash care: Dry clean exclusively; store in a cool, dry place away from light; wrap in muslin. Occasions: Weddings, Betrothals, Navaratri, prestigious family events, gifting. Styling tip: Let the saree speak for itself. Wear with a simple silk blouse in one of the saree colours. Traditional gold jewellery is the only accompaniment this masterpiece needs.',
       price: 18000,
       comparePrice: 22000,
       images: [
@@ -244,7 +244,7 @@ async function main() {
     {
       name: 'Sambalpuri Cotton Saree — Deep Violet',
       description:
-        'Handwoven Sambalpuri cotton saree from Odisha with traditional bandha (ikat) patterns. The deep violet base with contrasting white motifs makes it a bold choice for festive occasions.',
+        'Handwoven Sambalpuri cotton saree from Odisha, created using the ancient bandha (ikat) resist-dyeing technique. The deep violet base with contrasting ivory-white geometric motifs and a traditional shankha (conch), chakra, and phula (flower) border is bold, graphic, and deeply rooted in Indian textile heritage. GI-tagged craft. Fabric: 100% handloom cotton, medium weight, comfortable in all seasons. Wash care: Hand wash separately in cold water (the deep violet may bleed in first 2 washes — this is normal); dry flat in shade. Occasions: Festive occasions, Onam, Durga Puja, Makar Sankranti, cultural events, ethnic day at office. Styling tip: Pair with a solid white or ivory blouse — the contrast makes the violet pop. Simple silver oxidised jewellery enhances the artisanal character of this saree.',
       price: 3200,
       comparePrice: null,
       images: [
@@ -264,7 +264,7 @@ async function main() {
     {
       name: 'A-Line Cotton Kurti — Indigo Block Print',
       description:
-        'Hand block-printed A-line kurti in indigo and white, crafted by artisans in Jaipur. Jaipur craft at its finest. Pairs with white palazzos or blue jeans for a smart casual look.',
+        'Hand block-printed A-line kurti in indigo and white, crafted by artisans using traditional wooden blocks in Jaipur — each print is slightly unique, the hallmark of genuine hand-block craft. The A-line silhouette is flattering on all body types, nipping at the waist and flaring gently below. Fabric: 100% pure cotton, breathable and perfect for Hyderabad\'s warm weather. Wash care: Machine wash gentle in cold water; turn inside out; add a teaspoon of salt in first wash to set the indigo dye; dry flat in shade. Size guide: Knee-length (approx 42 inches); side slits for ease of movement. Occasions: Office casual, college, weekend errands, casual brunches, travel. Styling tip: Pair with white palazzos for a crisp look, or blue jeans for a casual Indo-western style. Simple silver jhumkas and kolhapuri sandals complete the look.',
       price: 899,
       comparePrice: null,
       images: [
@@ -284,7 +284,7 @@ async function main() {
     {
       name: 'Embroidered Silk Kurti — Crimson',
       description:
-        'Rich art silk kurti with intricate thread embroidery at the neckline and sleeves. Pair with churidar and dupatta for a complete ethnic look for festivals and family gatherings.',
+        'Rich art silk kurti in deep crimson with intricate zardozi-inspired thread embroidery at the neckline, cuffs, and hem. The embroidery is done by hand in Lucknow, making each piece slightly unique. The kurti has a long straight silhouette that can be worn as a kurta or belted as a dress. Fabric: Art silk with thread embroidery; fully lined. Wash care: Dry clean strongly recommended to preserve embroidery; if hand washing, submerge gently in cold water — do not rub embellishments. Occasions: Festivals (Diwali, Navratri, Eid), family functions, sangeet as a guest, dinner parties. Styling tip: Pair with a churidar and a contrasting golden or ivory dupatta for a complete ethnic look. Heavy earrings but keep necklace subtle — the neckline embroidery is the star.',
       price: 2299,
       comparePrice: 2800,
       images: [
@@ -305,7 +305,7 @@ async function main() {
     {
       name: 'Straight Fit Kurti — Lavender',
       description:
-        'Clean straight-cut kurti in soft lavender georgette. Easy to style with jeans, leggings, or palazzos. The subtle sheen makes it suitable for both casual outings and evening wear.',
+        'Clean straight-cut kurti in soft lavender georgette with a subtle sheen that photographs beautifully. The minimal design makes it the most versatile piece in your ethnic wardrobe — dress it up or down in seconds. Fabric: Premium georgette, lightweight and slightly sheer with a silky drape; fully lined. Wash care: Hand wash in cold water with mild detergent; do not wring — press gently between towels; hang dry in shade; iron on low heat inside-out. Occasions: Office wear, casual outings, evening walk, family visits, low-key celebrations. Styling tip: Wear with white leggings and silver jhumkas for a fresh daytime look. Switch to wide-leg palazzos and a statement necklace for an evening out. Nude flats or heeled sandals both work beautifully.',
       price: 699,
       comparePrice: null,
       images: [
@@ -324,7 +324,7 @@ async function main() {
     {
       name: 'Mirror Work Kurti — Deep Teal',
       description:
-        'Vibrant kurti with traditional mirror work embellishments inspired by Rajasthani craft. The tiny mirrors catch light beautifully. Pairs with wide-leg palazzos or straight pants.',
+        'Vibrant kurti in deep teal cotton with traditional mirror work (shisha embroidery) embellishments across the yoke, sleeves, and hem — each tiny mirror is hand-stitched by artisans inspired by Rajasthani and Gujarati craft. The mirrors catch light beautifully and create a dazzling effect at any gathering. Fabric: 100% cotton with hand-stitched mirror work; comfortable and breathable. Wash care: Hand wash gently in cold water — do not scrub the mirror work; dry flat in shade; iron carefully on reverse side, avoiding the embellishments. Occasions: Navratri Garba, Dandiya, Diwali, festivals, college fests, casual parties. Styling tip: Let the mirror work shine — pair with wide-leg palazzos in ivory or mustard. Stack thin gold bangles and add simple gold studs. Juttis or mojri footwear complete the festive look.',
       price: 1299,
       comparePrice: 1600,
       images: [
@@ -345,7 +345,7 @@ async function main() {
     {
       name: 'Kurta Set with Dupatta — Mustard Yellow',
       description:
-        'Three-piece kurta set in mustard yellow cotton. Includes a straight-fit kurta, matching palazzo, and a complementary printed dupatta. Ready-to-wear festive look.',
+        'Complete three-piece kurta set in rich mustard yellow cotton — a ready-to-wear festive look with zero effort. Includes a straight-fit kurta with subtle gota patti detailing at the neck, matching wide-leg palazzo pants, and a complementary block-printed cotton dupatta in mustard-orange-ivory tones. Fabric: 100% cotton for all three pieces — breathable, comfortable, and easy to care for. Wash care: Machine wash gentle in cold water; wash separately first time; dry flat in shade; iron on medium heat. Occasions: Navratri, Diwali puja, Makar Sankranti, Ugadi, Ganesh Chaturthi, family functions, festive home gatherings. Styling tip: Wear the full set for a coordinated festive look. Or pair just the kurta with jeans for casual wear. Pair with jhumka earrings in gold and kolhapuri sandals in tan.',
       price: 1899,
       comparePrice: 2400,
       images: [
@@ -366,7 +366,7 @@ async function main() {
     {
       name: 'Lucknowi Chikankari Kurti — Ivory',
       description:
-        'Exquisite hand-embroidered Chikankari kurti from Lucknow in pure white cotton. Each piece is embroidered by skilled artisans using 36 types of Chikankari stitches. Timeless and elegant.',
+        'Exquisite hand-embroidered Chikankari kurti from Lucknow in pure ivory cotton. Each piece is individually embroidered by skilled artisans using 32 types of traditional Chikankari stitches — including shadow work, tepchi, phanda, and murri — creating an intricate all-over floral pattern. GI-tagged Lucknow Chikankari craft. Fabric: 100% pure cotton cambric, lightweight and breathable — perfect for summer. Wash care: Hand wash gently in cold water with mild detergent; turn inside out; do not soak for more than 5 minutes; dry flat in shade — avoid direct sun which can yellow white cotton; iron inside out on low heat. Occasions: Eid, casual festive events, family puja, garden parties, lunch dates, travel. Styling tip: The ivory colour is a blank canvas — let the embroidery speak. Pair with white, ivory, or soft pastel leggings. Add pearl jewellery or delicate silver chains. Understated elegance at its finest.',
       price: 3200,
       comparePrice: 4000,
       images: [
@@ -387,7 +387,7 @@ async function main() {
     {
       name: 'Bridal Lehenga — Scarlet Red',
       description:
-        'Heavily embroidered bridal lehenga in scarlet red with intricate gold zari work and resham embroidery. Set includes a flared skirt, padded blouse, and matching net dupatta with scalloped border. A dream for the modern bride.',
+        'Heavily embroidered bridal lehenga in scarlet red — the colour of love, tradition, and new beginnings. The full flared skirt features wall-to-wall gold zari and resham embroidery with intricate floral and paisley motifs. Set includes: a heavily embroidered flared skirt (7-layer cancan lining for maximum volume), a padded and boned blouse with deep back neckline, and a matching scalloped-border net dupatta with zari detailing. Fabric: Velvet and raw silk with genuine gold zari; fully cancan-lined skirt. Wash care: Dry clean only — do not wash at home; air after wearing and store in the garment bag provided. Fitting: Blouse is made-to-measure (WhatsApp us your measurements at time of order). Occasions: Wedding day, engagement ceremony. Styling tip: Pair with a full temple or Kundan jewellery set — maang tikka, nath, necklace, earrings, and bangles. Red embroidered juttis. Bridal smoky eye and red lip.',
       price: 28000,
       comparePrice: 35000,
       images: [
@@ -409,7 +409,7 @@ async function main() {
     {
       name: 'Festive Lehenga — Powder Blue',
       description:
-        'Light-weight festive lehenga with delicate floral embroidery in powder blue. Perfect for mehendi and haldi ceremonies. The flowing net skirt adds a fairy-tale charm.',
+        'Light and dreamy festive lehenga in powder blue — the perfect choice for pre-wedding functions and festival celebrations. The delicate floral embroidery with silver threadwork and tiny mirror accents gives it a fairy-tale quality. Set includes: a flowy net skirt with 3-layer lining, a matching embroidered blouse, and a sheer organza dupatta with embroidered border. Fabric: Net skirt with satin lining; embroidered blouse in raw silk; organza dupatta. Wash care: Dry clean only; store on a hanger to preserve skirt volume. Occasions: Mehendi ceremony, Haldi function, Navratri, Eid, sister\'s wedding as bridesmaid, outdoor garden parties. Styling tip: Keep jewellery delicate — pearl drops, floral hair accessories, or a simple maang tikka. Strappy silver heels or embroidered flats. Go for dewy, glowy makeup for a fresh festive look.',
       price: 8500,
       comparePrice: 10000,
       images: [
@@ -429,7 +429,7 @@ async function main() {
     {
       name: 'Party Lehenga — Rose Gold',
       description:
-        'Shimmer party lehenga in rose gold with all-over sequin work. A head-turner at cocktail parties, receptions, and New Year bashes. The flared silhouette ensures maximum floor coverage.',
+        'Shimmer party lehenga in rose gold with all-over sequin work — every step you take, every move you make, this lehenga catches the light and turns heads. The flared A-line silhouette ensures maximum floor coverage and a dramatic entrance. Set includes: a sequin-embellished flared skirt with satin lining, a matching sequin blouse with cold-shoulder cut, and a sheer dupatta. Fabric: Sequin georgette on satin base; fully lined for comfort. Wash care: Dry clean only; never machine wash sequin garments; store flat or loosely folded. Occasions: Cocktail parties, reception evenings, sangeet nights, New Year bashes, anniversary dinners, engagement party as a guest. Styling tip: Sequins are the statement — keep accessories minimal. Just studs or small hoops and a delicate bracelet. Nude or rose gold strappy heels. Nude or rose lip, dramatic eye.',
       price: 5500,
       comparePrice: 6500,
       images: [
@@ -450,7 +450,7 @@ async function main() {
     {
       name: 'Indo-Western Lehenga — Sage Green',
       description:
-        'Contemporary indo-western lehenga in sage green with a crop top blouse and asymmetric hem. The modern silhouette meets traditional craftsmanship in this versatile piece for sangeet and pre-wedding functions.',
+        'Contemporary indo-western lehenga in sage green — where modern design meets traditional craftsmanship. The asymmetric hem skirt (shorter at front, longer at back) creates a fashion-forward silhouette while the intricate thread embroidery anchors it firmly in Indian aesthetic. Set includes: asymmetric hem georgette skirt with embroidered border, a crop top blouse with off-shoulder neckline, and a plain organza dupatta. Fabric: Georgette skirt with thread embroidery; georgette blouse; organza dupatta. Wash care: Dry clean recommended; gentle hand wash permissible in cold water if needed — press gently, do not rub embroidery. Occasions: Sangeet, pre-wedding photoshoots, engagement ceremony, reception as a guest, festive parties. Styling tip: Tuck in the dupatta for an outfit photo, then drape it to dance. Gold hoop earrings, stacked metal bangles, and strappy block heels. The asymmetric hem looks stunning with block heels or ankle-strap shoes.',
       price: 6800,
       comparePrice: 8500,
       images: [

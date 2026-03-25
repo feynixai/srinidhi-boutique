@@ -262,21 +262,28 @@ export default function ContactPage() {
               </div>
             </div>
 
-            {/* Map Placeholder */}
-            <div className="bg-gray-100 rounded-sm overflow-hidden">
-              <div className="relative h-48 flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300">
-                <div className="text-center">
-                  <FiMapPin size={32} className="text-rose-gold mx-auto mb-2" />
-                  <p className="text-sm font-medium text-charcoal">Banjara Hills, Hyderabad</p>
-                  <a
-                    href="https://maps.google.com/?q=Banjara+Hills+Road+12+Hyderabad"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-rose-gold hover:underline mt-1 inline-block"
-                  >
-                    Open in Google Maps →
-                  </a>
-                </div>
+            {/* Google Maps Embed */}
+            <div className="rounded-sm overflow-hidden border border-gray-200">
+              <iframe
+                src="https://maps.google.com/maps?q=Banjara+Hills+Road+No+12+Hyderabad+Telangana&output=embed&z=15"
+                width="100%"
+                height="220"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Srinidhi Boutique — Banjara Hills, Hyderabad"
+              />
+              <div className="px-4 py-2 bg-gray-50 flex items-center justify-between">
+                <p className="text-xs text-charcoal/60">Banjara Hills, Hyderabad — 500034</p>
+                <a
+                  href="https://maps.google.com/?q=Banjara+Hills+Road+No+12+Hyderabad"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-rose-gold hover:underline font-medium"
+                >
+                  Open in Maps →
+                </a>
               </div>
             </div>
           </div>

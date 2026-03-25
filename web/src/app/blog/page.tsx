@@ -4,55 +4,55 @@ import Image from 'next/image';
 const POSTS = [
   {
     slug: 'how-to-drape-a-saree',
-    title: 'The Ultimate Guide to Draping a Saree',
-    excerpt: 'From the classic Nivi drape to the Gujarati style — learn how to drape your saree beautifully for any occasion.',
+    title: 'How to Drape a Saree — 5 Elegant Styles',
+    excerpt: 'From the classic Nivi drape worn across South India to the regal Gujarati style — learn five beautiful ways to drape your saree for any occasion.',
     image: 'https://picsum.photos/seed/saree-drape/800/500',
     category: 'Style Guide',
     date: 'March 20, 2026',
     readTime: '8 min read',
   },
   {
-    slug: 'festival-outfit-ideas-2026',
-    title: 'Festival Outfit Ideas for 2026 — Navratri to Diwali',
-    excerpt: 'Light up every celebration with our curated picks for the festive season. From vibrant lehengas to elegant kurtis.',
-    image: 'https://picsum.photos/seed/festival-outfits/800/500',
-    category: 'Lookbook',
+    slug: 'top-10-kurti-styles',
+    title: 'Top 10 Kurti Styles for Every Occasion',
+    excerpt: 'Straight-fit to A-line, chikankari to mirror work — discover the 10 kurti styles every Indian woman needs in her wardrobe and how to style each one.',
+    image: 'https://picsum.photos/seed/kurti-style/800/500',
+    category: 'Style Guide',
     date: 'March 15, 2026',
     readTime: '6 min read',
   },
   {
-    slug: 'choosing-right-fabric',
-    title: 'How to Choose the Right Fabric for Indian Weather',
-    excerpt: 'Cotton vs silk vs georgette — understand which fabric works best for Hyderabad\'s climate and different occasions.',
-    image: 'https://picsum.photos/seed/fabric-guide/800/500',
-    category: 'Style Guide',
+    slug: 'wedding-season-outfit-guide',
+    title: 'Wedding Season: Complete Outfit Guide',
+    excerpt: 'From the mehendi morning to the reception night — a complete outfit guide so you always look stunning at every wedding function, whatever your role.',
+    image: 'https://picsum.photos/seed/wedding-outfit/800/500',
+    category: 'Lookbook',
     date: 'March 10, 2026',
+    readTime: '9 min read',
+  },
+  {
+    slug: 'caring-for-silk-sarees',
+    title: 'Caring for Your Silk Sarees',
+    excerpt: 'A silk saree is an heirloom. Learn exactly how to wash, dry, store, and preserve your silk sarees so they remain beautiful for generations.',
+    image: 'https://picsum.photos/seed/silk-care/800/500',
+    category: 'Care Tips',
+    date: 'March 5, 2026',
     readTime: '5 min read',
   },
   {
-    slug: 'lehenga-buying-guide',
-    title: 'The Complete Lehenga Buying Guide — Fabrics, Styles & Care',
-    excerpt: 'Everything you need to know before buying a lehenga — from choosing the right flare to understanding embroidery types.',
+    slug: 'lehenga-vs-saree',
+    title: 'Lehenga vs Saree: Which One for Your Event?',
+    excerpt: 'Can\'t decide between a lehenga and a saree for the big day? We break down comfort, occasion suitability, styling ease, and budget to help you choose.',
     image: 'https://picsum.photos/seed/lehenga-guide/800/500',
     category: 'Buying Guide',
-    date: 'March 5, 2026',
-    readTime: '10 min read',
-  },
-  {
-    slug: 'kurti-styling-tips',
-    title: '10 Ways to Style Your Kurtis for Different Occasions',
-    excerpt: 'From office wear to casual outings and festive gatherings — style your kurti differently for every occasion.',
-    image: 'https://picsum.photos/seed/kurti-style/800/500',
-    category: 'Style Guide',
     date: 'February 28, 2026',
     readTime: '7 min read',
   },
   {
-    slug: 'care-for-silk-sarees',
-    title: 'How to Care for Your Silk Sarees — Storage & Washing Tips',
-    excerpt: 'Proper care keeps your silk sarees beautiful for generations. Learn the best storage, washing and maintenance techniques.',
-    image: 'https://picsum.photos/seed/silk-care/800/500',
-    category: 'Care Tips',
+    slug: 'accessorize-with-indian-wear',
+    title: 'Accessorize Right: Jewelry Guide for Indian Wear',
+    excerpt: 'The right jewelry transforms an outfit. From temple gold for silk sarees to oxidised silver for printed kurtis — the complete guide to accessorizing Indian wear.',
+    image: 'https://picsum.photos/seed/jewel-guide/800/500',
+    category: 'Style Guide',
     date: 'February 20, 2026',
     readTime: '6 min read',
   },
@@ -66,13 +66,13 @@ export default function BlogPage() {
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
       <div className="text-center mb-12">
         <p className="text-rose-gold text-sm tracking-[0.2em] uppercase mb-2">Our Journal</p>
-        <h1 className="font-serif text-4xl md:text-5xl mb-3">Style & Care</h1>
+        <h1 className="font-serif text-4xl md:text-5xl mb-3">Style &amp; Care</h1>
         <p className="text-gray-500 max-w-xl mx-auto">Tips, lookbooks, and buying guides for the modern Indian woman.</p>
       </div>
 
       {/* Featured Post */}
       <div className="mb-12">
-        <div className="relative rounded-sm overflow-hidden group cursor-pointer">
+        <Link href={`/blog/${featured.slug}`} className="block relative rounded-sm overflow-hidden group cursor-pointer">
           <div className="relative h-[400px] md:h-[500px]">
             <Image src={featured.image} alt={featured.title} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
             <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-charcoal/30 to-transparent" />
@@ -87,33 +87,35 @@ export default function BlogPage() {
               <span>{featured.readTime}</span>
             </div>
           </div>
-        </div>
+        </Link>
       </div>
 
       {/* Post Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {rest.map((post) => (
-          <article key={post.slug} className="bg-white border border-gray-100 rounded-sm overflow-hidden group hover:shadow-md transition-shadow">
-            <div className="relative h-52 overflow-hidden">
-              <Image src={post.image} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
-            </div>
-            <div className="p-5">
-              <span className="text-xs text-rose-gold uppercase tracking-wider font-medium">{post.category}</span>
-              <h3 className="font-serif text-lg mt-2 mb-2 line-clamp-2 leading-snug">{post.title}</h3>
-              <p className="text-gray-500 text-sm line-clamp-2 mb-4">{post.excerpt}</p>
-              <div className="flex items-center justify-between text-xs text-gray-400">
-                <span>{post.date}</span>
-                <span>{post.readTime}</span>
+          <Link key={post.slug} href={`/blog/${post.slug}`}>
+            <article className="bg-white border border-gray-100 rounded-sm overflow-hidden group hover:shadow-md transition-shadow h-full">
+              <div className="relative h-52 overflow-hidden">
+                <Image src={post.image} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
               </div>
-            </div>
-          </article>
+              <div className="p-5">
+                <span className="text-xs text-rose-gold uppercase tracking-wider font-medium">{post.category}</span>
+                <h3 className="font-serif text-lg mt-2 mb-2 line-clamp-2 leading-snug">{post.title}</h3>
+                <p className="text-gray-500 text-sm line-clamp-2 mb-4">{post.excerpt}</p>
+                <div className="flex items-center justify-between text-xs text-gray-400">
+                  <span>{post.date}</span>
+                  <span>{post.readTime}</span>
+                </div>
+              </div>
+            </article>
+          </Link>
         ))}
       </div>
 
       {/* Newsletter */}
       <div className="mt-16 bg-warm-white rounded-sm p-8 text-center">
         <h2 className="font-serif text-2xl mb-2">Get Style Tips in Your Inbox</h2>
-        <p className="text-gray-500 text-sm mb-6">Subscribe for new lookbooks, care guides & exclusive offers.</p>
+        <p className="text-gray-500 text-sm mb-6">Subscribe for new lookbooks, care guides &amp; exclusive offers.</p>
         <div className="flex max-w-sm mx-auto gap-3">
           <input
             type="email"

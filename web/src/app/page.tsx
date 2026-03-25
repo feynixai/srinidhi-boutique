@@ -272,31 +272,186 @@ export default async function HomePage() {
         </FadeInSection>
       )}
 
+      {/* Why Shop With Us */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-10">
+            <p className="text-[#c5a55a] uppercase tracking-[0.2em] text-xs font-semibold mb-3">Our Promise</p>
+            <h2 className="section-heading">Why Shop With Us</h2>
+            <div className="divider-gold mx-auto" />
+            <p className="text-[#1a1a2e]/50 text-sm mt-3 max-w-md mx-auto">
+              Everything we do is designed to make your ethnic fashion experience effortless and joyful.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {[
+              {
+                icon: '🚚',
+                title: 'Free Shipping',
+                subtitle: 'Above ₹999',
+                desc: 'Free delivery anywhere in India on all orders above ₹999. Express delivery available in Hyderabad and major cities.',
+              },
+              {
+                icon: '🔄',
+                title: 'Easy 7-Day Returns',
+                subtitle: 'Hassle-Free',
+                desc: 'Changed your mind? No problem. Return any unworn item within 7 days for a full refund or exchange — no questions asked.',
+              },
+              {
+                icon: '💳',
+                title: 'Secure Payments',
+                subtitle: 'UPI · Cards · COD',
+                desc: 'Pay via UPI, credit/debit cards, net banking, or Cash on Delivery. All transactions secured by Razorpay — PCI-DSS certified.',
+              },
+              {
+                icon: '📞',
+                title: '24/7 WhatsApp Support',
+                subtitle: 'Always Available',
+                desc: 'Our team is always a WhatsApp message away — whether you need sizing help, want a live product video, or have a question about your order.',
+              },
+            ].map((b) => (
+              <div
+                key={b.title}
+                className="bg-white/60 backdrop-blur-xl border border-white/40 rounded-3xl p-6 text-center shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300"
+                style={{ boxShadow: '0 4px 24px rgba(197,165,90,0.08), 0 1px 4px rgba(0,0,0,0.04)' }}
+              >
+                <div className="text-4xl mb-3">{b.icon}</div>
+                <h3 className="font-semibold text-[#1a1a2e] text-base mb-0.5">{b.title}</h3>
+                <p className="text-[#c5a55a] text-xs font-medium uppercase tracking-wider mb-3">{b.subtitle}</p>
+                <p className="text-[#1a1a2e]/60 text-sm leading-relaxed">{b.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Our Promise / Quality Statement */}
+      <section className="bg-[#1a1a2e] py-16 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <p className="text-[#c5a55a] uppercase tracking-[0.2em] text-xs font-semibold mb-3">Authenticity Guaranteed</p>
+              <h2 className="font-serif text-3xl md:text-4xl text-white mb-5 leading-snug">
+                Our Promise of Quality &amp; Authenticity
+              </h2>
+              <div className="w-12 h-px bg-[#c5a55a] mb-6" />
+              <p className="text-white/60 text-sm leading-relaxed mb-5">
+                Every product at Srinidhi Boutique is personally inspected by our founder before it reaches you. We source directly from weavers in Kanchipuram, artisans in Lucknow, craftsmen in Jaipur, and textile hubs across India.
+              </p>
+              <p className="text-white/60 text-sm leading-relaxed mb-6">
+                We never sell mass-produced replicas or compromise on fabric quality. What you see is exactly what you get — and if it's not perfect, our 7-day return policy means you're always protected.
+              </p>
+              <div className="grid grid-cols-3 gap-4 text-center">
+                {[
+                  { num: '500+', label: 'Happy Customers' },
+                  { num: '100+', label: 'Products' },
+                  { num: '5+', label: 'Years' },
+                ].map((s) => (
+                  <div key={s.label} className="bg-white/10 rounded-2xl p-4">
+                    <p className="font-serif text-2xl text-[#c5a55a] mb-1">{s.num}</p>
+                    <p className="text-white/50 text-xs">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-4">
+              {[
+                { icon: '🌸', title: 'Handpicked by Srinidhi', desc: 'Every product is personally chosen by our founder — nothing reaches the shelf unless she truly loves it.' },
+                { icon: '🇮🇳', title: 'Sourced from the Best Artisans', desc: 'Direct relationships with weavers and craftspeople across India means better quality and fair prices for you.' },
+                { icon: '📦', title: 'Packaged with Care', desc: 'Your order is wrapped in tissue, sealed, and packed to arrive in perfect condition — every single time.' },
+                { icon: '💬', title: 'Backed by Real Support', desc: 'A real person answers your WhatsApp — not a chatbot. We\'re here for personalised advice, live product videos, and more.' },
+              ].map((p) => (
+                <div key={p.title} className="flex gap-4 items-start bg-white/5 rounded-2xl p-4">
+                  <span className="text-2xl flex-shrink-0">{p.icon}</span>
+                  <div>
+                    <h3 className="text-white font-semibold text-sm mb-1">{p.title}</h3>
+                    <p className="text-white/50 text-xs leading-relaxed">{p.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Testimonials */}
       <section className="py-16 bg-[#f5f5f0]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-10">
             <h2 className="section-heading">What Our Customers Say</h2>
             <div className="divider-gold mx-auto" />
+            <p className="text-[#1a1a2e]/50 text-sm mt-2">Real reviews from real customers across India</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
               {
                 name: 'Priya Reddy',
                 location: 'Hyderabad',
-                text: 'The Kanjivaram saree I ordered was absolutely stunning. The zari work is exquisite and delivery was prompt. Will definitely order again!',
+                product: 'Kanjivaram Silk Saree',
+                text: 'The Kanjivaram saree I ordered was absolutely stunning. The zari work is exquisite and the silk quality is exactly as described. Delivery was within 4 days. Will definitely order again!',
                 rating: 5,
               },
               {
                 name: 'Anjali Sharma',
                 location: 'Bangalore',
-                text: 'Ordered a bridal lehenga for my sister\'s wedding — the quality exceeded our expectations. Packaging was beautiful too. Highly recommend!',
+                product: 'Bridal Lehenga — Scarlet Red',
+                text: 'Ordered the bridal lehenga for my sister\'s wedding — the quality far exceeded our expectations. The embroidery is gorgeous, the blouse fitting was perfect, and the packaging was beautiful. Highly recommend!',
                 rating: 5,
               },
               {
                 name: 'Meera Nair',
                 location: 'Chennai',
-                text: 'Best place to shop for ethnic wear online. The saree colours in person are even better than the photos. Easy returns policy is a bonus.',
+                product: 'Organza Saree — Dusty Rose',
+                text: 'Best place to shop for ethnic wear online. The saree colours in person are even better than the photos. The organza quality is premium. Easy returns policy is a big bonus.',
+                rating: 5,
+              },
+              {
+                name: 'Deepika Venkat',
+                location: 'Hyderabad',
+                product: 'Lucknowi Chikankari Kurti',
+                text: 'The Chikankari kurti is absolutely divine. The embroidery is so delicate and intricate — I kept getting compliments at the office all day. The cotton is super soft and breathable. Love it!',
+                rating: 5,
+              },
+              {
+                name: 'Sunita Agarwal',
+                location: 'Pune',
+                product: 'Kurta Set with Dupatta',
+                text: 'Ordered the mustard yellow kurta set for Diwali and it arrived in 5 days — perfectly in time! The three pieces fit together so beautifully. Got so many compliments. Will be back for sure.',
+                rating: 5,
+              },
+              {
+                name: 'Ramya Krishnaswamy',
+                location: 'Coimbatore',
+                product: 'Cotton Handloom Saree',
+                text: 'I love supporting handloom weavers and this saree is a perfect example of why. The quality is exceptional, the colour is exactly as shown, and delivery was fast. Srinidhi Boutique has earned a loyal customer!',
+                rating: 5,
+              },
+              {
+                name: 'Nandini Kulkarni',
+                location: 'Mumbai',
+                product: 'Temple Jewellery Set',
+                text: 'The temple jewellery set is absolutely gorgeous! The finish is high quality and it pairs beautifully with my Kanjivaram saree. WhatsApp support team was very helpful in helping me choose the right set.',
+                rating: 5,
+              },
+              {
+                name: 'Lakshmi Prasad',
+                location: 'Vijayawada',
+                product: 'Patola Silk Saree',
+                text: 'The Patola saree is a masterpiece. I was nervous ordering something this expensive online but the team sent me a video before shipping and it was exactly what I hoped for. Worth every rupee!',
+                rating: 5,
+              },
+              {
+                name: 'Kavitha Mohan',
+                location: 'Mysore',
+                product: 'Indo-Western Lehenga',
+                text: 'Wore the sage green indo-western lehenga to my cousin\'s sangeet and felt like a star! The asymmetric hem is so unique and the embroidery is beautiful. Multiple people asked where I bought it!',
+                rating: 5,
+              },
+              {
+                name: 'Pooja Iyer',
+                location: 'Hyderabad',
+                product: 'Mirror Work Kurti — Teal',
+                text: 'The mirror work kurti is everything! Wore it to Navratri Garba and it literally sparkled on the dance floor. The cotton fabric kept me cool all evening. Fast delivery and lovely packaging too!',
                 rating: 5,
               },
             ].map((t) => (
@@ -304,11 +459,12 @@ export default async function HomePage() {
                 key={t.name}
                 className="bg-white/60 backdrop-blur-xl border border-white/30 rounded-3xl p-6 shadow-card"
               >
-                <div className="flex gap-0.5 mb-3">
+                <div className="flex gap-0.5 mb-2">
                   {Array.from({ length: t.rating }).map((_, i) => (
                     <span key={i} className="text-[#c5a55a] text-sm">★</span>
                   ))}
                 </div>
+                <p className="text-[#c5a55a] text-xs font-medium mb-2 uppercase tracking-wide">{t.product}</p>
                 <p className="text-[#1a1a2e]/80 text-sm leading-relaxed mb-4 italic">&ldquo;{t.text}&rdquo;</p>
                 <div>
                   <p className="text-sm font-semibold text-[#1a1a2e]">{t.name}</p>

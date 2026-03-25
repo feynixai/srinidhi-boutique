@@ -9,10 +9,16 @@ export const metadata: Metadata = {
 };
 
 const VALUES = [
-  { icon: '🌸', title: 'Handpicked Selection', desc: 'Every piece is personally chosen for quality, design, and wearability.' },
-  { icon: '🤝', title: 'Family Values', desc: 'We treat every customer like family — with warmth, honesty, and care.' },
-  { icon: '✨', title: 'Premium Quality', desc: 'From fabric to finish, we never compromise on the quality you deserve.' },
-  { icon: '🇮🇳', title: 'Made in India', desc: 'Supporting Indian weavers, artisans, and designers at every step.' },
+  { icon: '🌸', title: 'Handpicked Selection', desc: 'Every piece is personally chosen for quality, design, and wearability. Nothing goes on the shelf unless Srinidhi herself loves it.' },
+  { icon: '🤝', title: 'Family Values', desc: 'We treat every customer like family — with warmth, honesty, and care. Our team is always just a WhatsApp away.' },
+  { icon: '✨', title: 'Premium Quality', desc: 'From fabric to finish, we never compromise on the quality you deserve. Every stitch, every thread, every colour is thoughtfully chosen.' },
+  { icon: '🇮🇳', title: 'Made in India', desc: 'Supporting Indian weavers, artisans, and designers at every step — from Kanchipuram to Kutch, from Lucknow to Jaipur.' },
+];
+
+const MISSION_POINTS = [
+  { title: 'Celebrate Indian Craft', desc: 'We believe every handwoven saree, every block-printed kurti, every hand-embroidered dupatta tells a story of incredible skill. Our mission is to connect you with those stories.' },
+  { title: 'Make Fashion Accessible', desc: 'Premium ethnic fashion shouldn\'t cost a fortune. We work directly with weavers and artisans to bring you exceptional quality at honest prices.' },
+  { title: 'Build Lasting Relationships', desc: 'We\'re not just a store — we\'re your personal stylist, your trusted fashion partner, your go-to when you need the perfect outfit for life\'s important moments.' },
 ];
 
 export default function AboutPage() {
@@ -76,16 +82,20 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Values */}
-      <section className="bg-cream py-16 px-4">
+      {/* Why Choose Us — Glass Cards */}
+      <section className="bg-gradient-to-br from-[#f5f0eb] to-[#fffff0] py-16 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
+            <p className="text-gold uppercase tracking-[0.2em] text-xs font-semibold mb-3">Why Choose Us</p>
             <h2 className="section-heading">What We Stand For</h2>
             <div className="divider-gold" />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
             {VALUES.map((v) => (
-              <div key={v.title} className="text-center px-4">
+              <div
+                key={v.title}
+                className="bg-white/60 backdrop-blur-xl border border-white/40 rounded-3xl p-6 text-center shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300"
+              >
                 <div className="text-4xl mb-3">{v.icon}</div>
                 <h3 className="font-serif text-lg text-charcoal mb-2">{v.title}</h3>
                 <p className="text-charcoal/60 text-sm leading-relaxed">{v.desc}</p>
@@ -95,14 +105,38 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Our Mission */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
+        <div className="text-center mb-10">
+          <p className="text-gold uppercase tracking-[0.2em] text-xs font-semibold mb-3">Our Purpose</p>
+          <h2 className="section-heading">Our Mission</h2>
+          <div className="divider-gold" />
+          <p className="text-charcoal/60 text-sm mt-4 max-w-xl mx-auto leading-relaxed">
+            Every decision we make — every fabric we source, every design we choose — comes back to this.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {MISSION_POINTS.map((m) => (
+            <div
+              key={m.title}
+              className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-3xl p-7 shadow-sm hover:shadow-md transition-all duration-300"
+            >
+              <div className="w-10 h-px bg-gold mb-4" />
+              <h3 className="font-serif text-xl text-charcoal mb-3">{m.title}</h3>
+              <p className="text-charcoal/60 text-sm leading-relaxed">{m.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Stats */}
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
-              { num: '10+', label: 'Years in Business' },
-              { num: '5,000+', label: 'Happy Customers' },
-              { num: '500+', label: 'Styles Available' },
+              { num: '5+', label: 'Years in Business' },
+              { num: '500+', label: 'Happy Customers' },
+              { num: '100+', label: 'Products Available' },
               { num: '₹999', label: 'Free Shipping Above' },
             ].map((s) => (
               <div key={s.label}>

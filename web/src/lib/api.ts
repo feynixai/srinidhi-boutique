@@ -92,7 +92,7 @@ export interface Address {
 
 // Products
 export const getProducts = (params?: Record<string, string>) =>
-  api.get('/api/products', { params }).then((r) => r.data);
+  api.get('/api/products', { params }).then((r) => r.data as { products: Product[]; total: number; page: number; totalPages: number });
 
 export const getProduct = (slug: string) =>
   api.get(`/api/products/${slug}`).then((r) => r.data as Product);

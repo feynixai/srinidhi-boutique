@@ -1,4 +1,4 @@
-import { getProducts, getCategories } from '@/lib/api';
+import { getProducts, getCategories, Product } from '@/lib/api';
 import { ProductCard } from '@/components/ProductCard';
 import { notFound } from 'next/navigation';
 
@@ -30,7 +30,7 @@ export default async function CategoryPage({
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-          {data.products.map((p) => <ProductCard key={p.id} product={p} />)}
+          {data.products.map((p: Product) => <ProductCard key={p.id} product={p} />)}
         </div>
       )}
     </div>

@@ -129,6 +129,16 @@ export async function createTestAdminUser(overrides: Record<string, unknown> = {
 }
 
 export async function cleanupTest() {
+  // Build 11 — delete first (FK references)
+  await testPrisma.webhookDelivery.deleteMany({});
+  await testPrisma.webhook.deleteMany({});
+  await testPrisma.giftCardTransaction.deleteMany({});
+  await testPrisma.giftCard.deleteMany({});
+  await testPrisma.preOrderBooking.deleteMany({});
+  await testPrisma.preOrder.deleteMany({});
+  await testPrisma.storeCredit.deleteMany({});
+  await testPrisma.bundle.deleteMany({});
+  await testPrisma.abandonedCart.deleteMany({});
   // Delete in FK-safe order
   await testPrisma.chatMessage.deleteMany({});
   await testPrisma.lookbook.deleteMany({});

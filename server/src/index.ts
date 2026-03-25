@@ -30,6 +30,14 @@ import { collectionRoutes } from './routes/collections';
 import { qaRoutes } from './routes/qa';
 import { userNotificationRoutes } from './routes/userNotifications';
 import { reportRoutes } from './routes/reports';
+import { abandonedCartRoutes } from './routes/abandonedCarts';
+import { bundleRoutes } from './routes/bundles';
+import { giftCardRoutes } from './routes/giftCards';
+import { preOrderRoutes } from './routes/preOrders';
+import { storeCreditRoutes } from './routes/storeCredits';
+import { customerSegmentRoutes } from './routes/customerSegments';
+import { webhookRoutes } from './routes/webhooks';
+import { performanceMetricsRoutes } from './routes/performanceMetrics';
 import { errorHandler } from './middleware/errorHandler';
 import { validateEnv } from './lib/validateEnv';
 import { prisma } from './lib/prisma';
@@ -73,6 +81,14 @@ app.use('/api/collections', collectionRoutes);
 app.use('/api/qa', qaRoutes);
 app.use('/api/user-notifications', userNotificationRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/abandoned-carts', abandonedCartRoutes);
+app.use('/api/bundles', bundleRoutes);
+app.use('/api/gift-cards', giftCardRoutes);
+app.use('/api/pre-orders', preOrderRoutes);
+app.use('/api/store-credits', storeCreditRoutes);
+app.use('/api/customer-segments', customerSegmentRoutes);
+app.use('/api/webhooks', webhookRoutes);
+app.use('/api/performance-metrics', performanceMetricsRoutes);
 
 app.get('/health', async (_req, res) => {
   try {

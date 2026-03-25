@@ -444,3 +444,147 @@ model ProductQA {
 
   @@index([productId])
 }
+
+// ── Build 11 models ──────────────────────────────────────────────────────────
+
+model AbandonedCart {
+  id             String   @id @default(cuid())
+  sessionId      String   @unique
+  userId         String?
+  items          Json
+  recoveryToken  String   @unique @default(cuid())
+  recovered      Boolean  @default(false)
+  reminderSent   Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([recovered])
+}
+
+model Bundle {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  description   String?
+  productIds    String[]
+  bundlePrice   Decimal  @db.Decimal(10, 2)
+  originalPrice Decimal  @db.Decimal(10, 2)
+  savings       Decimal  @db.Decimal(10, 2)
+  image         String?
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([active])
+}
+
+model GiftCard {
+  id             String    @id @default(cuid())
+  code           String    @unique
+  balance        Decimal   @db.Decimal(10, 2)
+  originalAmount Decimal   @db.Decimal(10, 2)
+  purchasedById  String?
+  recipientEmail String?
+  recipientPhone String?
+  recipientName  String?
+  message        String?
+  expiresAt      DateTime
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  transactions   GiftCardTransaction[]
+
+  @@index([code])
+  @@index([purchasedById])
+}
+
+model GiftCardTransaction {
+  id         String   @id @default(cuid())
+  giftCardId String
+  giftCard   GiftCard @relation(fields: [giftCardId], references: [id], onDelete: Cascade)
+  amount     Decimal  @db.Decimal(10, 2)
+  orderId    String?
+  note       String?
+  createdAt  DateTime @default(now())
+
+  @@index([giftCardId])
+}
+
+model PreOrder {
+  id               String    @id @default(cuid())
+  productId        String    @unique
+  expectedShipDate DateTime
+  bookingAmount    Decimal?  @db.Decimal(10, 2)
+  note             String?
+  active           Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  bookings         PreOrderBooking[]
+
+  @@index([active])
+}
+
+model PreOrderBooking {
+  id            String   @id @default(cuid())
+  preOrderId    String
+  preOrder      PreOrder @relation(fields: [preOrderId], references: [id], onDelete: Cascade)
+  customerName  String
+  customerPhone String
+  customerEmail String?
+  size          String?
+  color         String?
+  quantity      Int      @default(1)
+  amountPaid    Decimal  @db.Decimal(10, 2)
+  paymentId     String?
+  notified      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  @@index([preOrderId])
+  @@index([customerPhone])
+}
+
+model StoreCredit {
+  id           String    @id @default(cuid())
+  userId       String
+  amount       Decimal   @db.Decimal(10, 2)
+  source       String
+  note         String?
+  orderId      String?
+  expiresAt    DateTime?
+  used         Boolean   @default(false)
+  usedAt       DateTime?
+  usedInOrder  String?
+  createdAt    DateTime  @default(now())
+
+  @@index([userId, used])
+  @@index([userId])
+}
+
+model Webhook {
+  id         String    @id @default(cuid())
+  url        String
+  events     String[]
+  secret     String
+  active     Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deliveries WebhookDelivery[]
+
+  @@index([active])
+}
+
+model WebhookDelivery {
+  id         String   @id @default(cuid())
+  webhookId  String
+  webhook    Webhook  @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+  event      String
+  payload    Json
+  statusCode Int?
+  success    Boolean  @default(false)
+  error      String?
+  createdAt  DateTime @default(now())
+
+  @@index([webhookId])
+  @@index([event])
+}

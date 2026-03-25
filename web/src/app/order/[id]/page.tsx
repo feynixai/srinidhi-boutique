@@ -100,10 +100,17 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
               style={{ width: `${Math.max(0, (currentStepIndex / (STATUS_STEPS.length - 1)) * 100)}%` }}
             />
           </div>
-          {order.trackingId && (
-            <p className="text-sm text-gray-600 mt-3 text-center">
-              Tracking ID: <span className="font-medium">{order.trackingId}</span>
-            </p>
+          {(order.trackingId || order.awbNumber) && (
+            <div className="text-sm text-gray-600 mt-3 text-center space-y-1">
+              {order.trackingId && (
+                <p>Tracking ID: <span className="font-medium">{order.trackingId}</span></p>
+              )}
+              {order.awbNumber && (
+                <p>AWB: <span className="font-medium">{order.awbNumber}</span>
+                  {order.courierName && <span className="text-gray-400"> via {order.courierName}</span>}
+                </p>
+              )}
+            </div>
           )}
         </div>
       )}
@@ -161,18 +168,41 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
         </div>
       </div>
 
-      <div className="mt-8 flex flex-col sm:flex-row gap-3">
+      {/* Share your purchase */}
+      {order.status === 'placed' && (
+        <div className="mt-6 border border-rose-gold/30 rounded-sm p-4 bg-rose-50/50">
+          <p className="font-serif text-base text-charcoal mb-1">Share your purchase!</p>
+          <p className="text-xs text-charcoal/60 mb-3">Spread the love — share on WhatsApp or Instagram Stories.</p>
+          <div className="flex gap-2 flex-wrap">
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(`Just shopped at Srinidhi Boutique! Gorgeous ethnic wear from Hyderabad. Check them out at ${process.env.NEXT_PUBLIC_SITE_URL || 'https://srinidhiboutique.com'}`)}`}
+              target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-1.5 bg-green-500 text-white px-4 py-2 text-xs font-medium hover:bg-green-600 transition-colors rounded-sm"
+            >
+              <FaWhatsapp size={14} /> WhatsApp
+            </a>
+            <a
+              href={`https://www.instagram.com/`}
+              target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-1.5 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 text-white px-4 py-2 text-xs font-medium hover:opacity-90 transition-opacity rounded-sm"
+            >
+              📸 Instagram Story
+            </a>
+          </div>
+        </div>
+      )}
+
+      <div className="mt-6 flex flex-col sm:flex-row gap-3">
         <a href={waLink} target="_blank" rel="noopener noreferrer"
           className="flex-1 flex items-center justify-center gap-2 border border-green-500 text-green-600 py-3 text-sm hover:bg-green-50 transition-colors rounded-sm">
           <FaWhatsapp size={18} /> Track via WhatsApp
         </a>
         <a
-          href={`https://wa.me/?text=${encodeURIComponent(`I just ordered from Srinidhi Boutique! Check them out at srinidhiboutique.com`)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex-1 flex items-center justify-center gap-2 bg-green-500 text-white py-3 text-sm hover:bg-green-600 transition-colors rounded-sm"
+          href={`${process.env.NEXT_PUBLIC_API_URL}/orders/${id}/invoice-pdf`}
+          target="_blank" rel="noopener noreferrer"
+          className="flex-1 flex items-center justify-center gap-2 border border-charcoal text-charcoal py-3 text-sm hover:bg-charcoal hover:text-white transition-colors rounded-sm"
         >
-          <FaWhatsapp size={18} /> Share on WhatsApp
+          📄 Download Invoice
         </a>
         <Link href="/shop" className="flex-1 btn-primary text-center py-3 text-sm">
           Continue Shopping

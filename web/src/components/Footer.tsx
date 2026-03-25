@@ -5,6 +5,9 @@ import { FaWhatsapp } from 'react-icons/fa';
 export function Footer() {
   const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+919876543210';
   const waLink = `https://wa.me/${whatsappNumber.replace('+', '')}?text=Hi! I'd like to know more about your collection.`;
+  const instagramLink = process.env.NEXT_PUBLIC_INSTAGRAM_URL || 'https://instagram.com/srinidhiboutique';
+  const facebookLink = process.env.NEXT_PUBLIC_FACEBOOK_URL || 'https://facebook.com/srinidhiboutique';
+  const youtubeLink = process.env.NEXT_PUBLIC_YOUTUBE_URL || 'https://youtube.com/@srinidhiboutique';
 
   return (
     <footer className="bg-charcoal text-white mt-16">
@@ -18,19 +21,27 @@ export function Footer() {
             </p>
             <div className="flex items-center space-x-4 mt-4">
               <a href={waLink} target="_blank" rel="noopener noreferrer"
+                aria-label="Chat on WhatsApp"
                 className="text-green-400 hover:text-green-300 transition-colors">
                 <FaWhatsapp size={22} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-soft-pink transition-colors">
+              <a href={instagramLink} target="_blank" rel="noopener noreferrer"
+                aria-label="Follow on Instagram"
+                className="text-gray-400 hover:text-pink-400 transition-colors">
                 <FiInstagram size={20} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
+              <a href={facebookLink} target="_blank" rel="noopener noreferrer"
+                aria-label="Follow on Facebook"
+                className="text-gray-400 hover:text-blue-400 transition-colors">
                 <FiFacebook size={20} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-red-400 transition-colors">
+              <a href={youtubeLink} target="_blank" rel="noopener noreferrer"
+                aria-label="Watch on YouTube"
+                className="text-gray-400 hover:text-red-400 transition-colors">
                 <FiYoutube size={20} />
               </a>
             </div>
+            <p className="text-gray-500 text-xs mt-3">Follow us for style inspiration, new arrivals & exclusive offers</p>
           </div>
 
           <div>
@@ -54,7 +65,7 @@ export function Footer() {
               <li><Link href="/orders" className="hover:text-white transition-colors">My Orders</Link></li>
               <li><Link href="/returns" className="hover:text-white transition-colors">Returns & Exchanges</Link></li>
               <li><Link href="/shipping" className="hover:text-white transition-colors">Shipping Info</Link></li>
-              <li><Link href="/blog" className="hover:text-white transition-colors">Style Blog</Link></li>
+              <li><Link href="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
               <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
               <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
             </ul>
@@ -68,9 +79,14 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-700 mt-10 pt-6 text-center text-sm text-gray-500">
+        <div className="border-t border-gray-700 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-500">
           <p>© {new Date().getFullYear()} Srinidhi Boutique. All rights reserved.</p>
-          <p className="mt-1">Free shipping on orders above ₹999 · 7-day easy returns · Secure payments</p>
+          <div className="flex gap-4">
+            <Link href="/privacy" className="hover:text-gray-300 transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-gray-300 transition-colors">Terms</Link>
+            <Link href="/faq" className="hover:text-gray-300 transition-colors">FAQ</Link>
+          </div>
+          <p>Free shipping above ₹999 · 7-day returns · Secure payments</p>
         </div>
       </div>
 

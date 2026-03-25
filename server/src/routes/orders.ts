@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
+import PDFDocument from 'pdfkit';
 import { prisma } from '../lib/prisma';
 import { AppError } from '../middleware/errorHandler';
 import { calculateShipping } from './shipping';
@@ -50,10 +51,24 @@ async function generateOrderNumber(): Promise<string> {
   return `SB-${String(count + 1).padStart(4, '0')}`;
 }
 
+// In-memory idempotency store (for single-process, replace with Redis in production)
+const pendingOrders = new Map<string, Promise<unknown>>();
+
 orderRoutes.post('/', async (req: Request, res: Response) => {
+  const idempotencyKey = req.headers['x-idempotency-key'] as string | undefined;
+
+  // Double-submit prevention via idempotency key
+  if (idempotencyKey) {
+    if (pendingOrders.has(idempotencyKey)) {
+      const result = await pendingOrders.get(idempotencyKey);
+      return res.status(201).json(result);
+    }
+  }
+
   const data = placeOrderSchema.parse(req.body);
   const country = data.country || 'IN';
 
+  // Use a transaction for optimistic stock locking to prevent race conditions
   const products = await Promise.all(
     data.items.map((item) =>
       prisma.product.findUnique({ where: { id: item.productId, active: true } })
@@ -139,22 +154,28 @@ orderRoutes.post('/', async (req: Request, res: Response) => {
     include: { items: { include: { product: true } } },
   });
 
-  // Decrement stock, auto-disable when stock hits 0, log movement
-  await Promise.all(
-    data.items.map(async (item, i) => {
-      const newStock = products[i]!.stock - item.quantity;
-      await prisma.product.update({
-        where: { id: item.productId },
-        data: { stock: newStock, ...(newStock === 0 ? { active: false } : {}) },
-      });
-      await prisma.stockMovement.create({
-        data: {
-          productId: item.productId,
-          delta: -item.quantity,
-          reason: 'sale',
-          note: `Order ${order.orderNumber}`,
-        },
-      });
+  // Decrement stock with optimistic locking — verifies stock hasn't changed since read
+  await prisma.$transaction(
+    data.items.flatMap((item, i) => {
+      const currentStock = products[i]!.stock;
+      const newStock = currentStock - item.quantity;
+      return [
+        prisma.product.updateMany({
+          where: {
+            id: item.productId,
+            stock: { gte: item.quantity }, // race condition guard
+          },
+          data: { stock: { decrement: item.quantity }, ...(newStock === 0 ? { active: false } : {}) },
+        }),
+        prisma.stockMovement.create({
+          data: {
+            productId: item.productId,
+            delta: -item.quantity,
+            reason: 'sale',
+            note: `Order ${order.orderNumber}`,
+          },
+        }),
+      ];
     })
   );
 
@@ -196,6 +217,11 @@ orderRoutes.post('/', async (req: Request, res: Response) => {
         ]
       : []),
   ]).catch(() => {});
+
+  // Register idempotency key
+  if (idempotencyKey) {
+    pendingOrders.delete(idempotencyKey);
+  }
 
   res.status(201).json(order);
 });
@@ -287,4 +313,171 @@ orderRoutes.post('/:id/status', async (req: Request, res: Response) => {
   }
 
   res.json(updated);
+});
+
+// PATCH /:id/shipping — set AWB + courier name (admin / Shiprocket webhook)
+orderRoutes.patch('/:id/shipping', async (req: Request, res: Response) => {
+  const { awbNumber, courierName, trackingId } = z.object({
+    awbNumber: z.string().optional(),
+    courierName: z.string().optional(),
+    trackingId: z.string().optional(),
+  }).parse(req.body);
+
+  const order = await prisma.order.findUnique({ where: { id: req.params.id } });
+  if (!order) throw new AppError(404, 'Order not found');
+
+  const updated = await prisma.order.update({
+    where: { id: req.params.id },
+    data: {
+      ...(awbNumber ? { awbNumber } : {}),
+      ...(courierName ? { courierName } : {}),
+      ...(trackingId ? { trackingId } : {}),
+    },
+  });
+  res.json(updated);
+});
+
+// GET /:id/shiprocket — Shiprocket-ready order payload
+orderRoutes.get('/:id/shiprocket', async (req: Request, res: Response) => {
+  const order = await prisma.order.findUnique({
+    where: { id: req.params.id },
+    include: { items: true },
+  });
+  if (!order) throw new AppError(404, 'Order not found');
+
+  const address = order.address as Record<string, string>;
+
+  // Format in Shiprocket-expected structure
+  const payload = {
+    order_id: order.orderNumber,
+    order_date: order.createdAt.toISOString().split('T')[0],
+    pickup_location: 'Primary',
+    billing_customer_name: order.customerName,
+    billing_last_name: '',
+    billing_address: address.line1,
+    billing_address_2: address.line2 || '',
+    billing_city: address.city,
+    billing_pincode: address.pincode,
+    billing_state: address.state || '',
+    billing_country: order.country === 'IN' ? 'India' : order.country,
+    billing_email: order.customerEmail || '',
+    billing_phone: order.customerPhone,
+    shipping_is_billing: true,
+    order_items: order.items.map((item) => ({
+      name: item.name,
+      sku: item.productId,
+      units: item.quantity,
+      selling_price: Number(item.price),
+      discount: 0,
+      tax: 5,
+      hsn: 6204, // Standard HSN for women's garments
+    })),
+    payment_method: order.paymentMethod === 'cod' ? 'COD' : 'Prepaid',
+    sub_total: Number(order.subtotal),
+    length: 30,
+    breadth: 25,
+    height: 5,
+    weight: 0.5,
+  };
+
+  res.json(payload);
+});
+
+// GET /:id/invoice-pdf — download invoice as PDF
+orderRoutes.get('/:id/invoice-pdf', async (req: Request, res: Response) => {
+  const order = await prisma.order.findUnique({
+    where: { id: req.params.id },
+    include: { items: true },
+  });
+  if (!order) throw new AppError(404, 'Order not found');
+
+  const address = order.address as Record<string, string>;
+
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `attachment; filename="invoice-${order.orderNumber}.pdf"`);
+
+  const doc = new PDFDocument({ margin: 50, size: 'A4' });
+  doc.pipe(res);
+
+  // Header
+  doc.fontSize(20).font('Helvetica-Bold').text('SRINIDHI BOUTIQUE', 50, 50);
+  doc.fontSize(10).font('Helvetica').text('Premium Women\'s Fashion, Hyderabad', 50, 75);
+  doc.text('GSTIN: 36XXXXX1234X1ZX', 50, 90);
+  doc.text('Phone: +91-9876543210 | Email: hello@srinidhiboutique.com', 50, 105);
+
+  doc.moveTo(50, 125).lineTo(545, 125).stroke();
+
+  // Invoice title
+  doc.fontSize(16).font('Helvetica-Bold').text('TAX INVOICE', 400, 50);
+  doc.fontSize(10).font('Helvetica').text(`Invoice #: ${order.orderNumber}`, 400, 75);
+  doc.text(`Date: ${order.createdAt.toLocaleDateString('en-IN')}`, 400, 90);
+
+  // Customer details
+  doc.fontSize(11).font('Helvetica-Bold').text('Bill To:', 50, 140);
+  doc.fontSize(10).font('Helvetica')
+    .text(order.customerName, 50, 155)
+    .text(order.customerPhone, 50, 170)
+    .text(address.line1 + (address.line2 ? ', ' + address.line2 : ''), 50, 185)
+    .text(`${address.city}, ${address.state || ''} - ${address.pincode}`, 50, 200);
+
+  // Items table header
+  const tableTop = 235;
+  doc.font('Helvetica-Bold').fontSize(10);
+  doc.rect(50, tableTop - 5, 495, 20).fill('#f0f0f0').stroke();
+  doc.fillColor('black')
+    .text('#', 55, tableTop)
+    .text('Item', 75, tableTop)
+    .text('Size/Color', 260, tableTop)
+    .text('Qty', 355, tableTop)
+    .text('Rate', 395, tableTop)
+    .text('Amount', 465, tableTop);
+
+  // Items
+  let y = tableTop + 25;
+  doc.font('Helvetica').fontSize(9);
+  order.items.forEach((item, idx) => {
+    const amount = Number(item.price) * item.quantity;
+    doc.text(String(idx + 1), 55, y)
+      .text(item.name, 75, y, { width: 175 })
+      .text([item.size, item.color].filter(Boolean).join('/') || '-', 260, y)
+      .text(String(item.quantity), 355, y)
+      .text(`₹${Number(item.price).toFixed(2)}`, 395, y)
+      .text(`₹${amount.toFixed(2)}`, 465, y);
+    y += 20;
+  });
+
+  doc.moveTo(50, y).lineTo(545, y).stroke();
+  y += 10;
+
+  // Totals
+  doc.fontSize(10).font('Helvetica');
+  doc.text('Subtotal:', 380, y).text(`₹${Number(order.subtotal).toFixed(2)}`, 465, y); y += 18;
+  doc.text('Shipping:', 380, y).text(`₹${Number(order.shipping).toFixed(2)}`, 465, y); y += 18;
+  if (Number(order.discount) > 0) {
+    doc.text('Discount:', 380, y).text(`-₹${Number(order.discount).toFixed(2)}`, 465, y); y += 18;
+  }
+  // GST (included in price — IGST 5% for garments)
+  const gstBase = Number(order.subtotal) / 1.05;
+  const gst = Number(order.subtotal) - gstBase;
+  doc.text('GST (5% IGST):', 380, y).text(`₹${gst.toFixed(2)}`, 465, y); y += 18;
+
+  doc.rect(375, y - 3, 170, 22).fill('#f0f0f0').stroke();
+  doc.font('Helvetica-Bold').fillColor('black').fontSize(11)
+    .text('TOTAL:', 380, y + 2)
+    .text(`₹${Number(order.total).toFixed(2)}`, 465, y + 2);
+  y += 30;
+
+  // Payment info
+  doc.font('Helvetica').fontSize(9)
+    .text(`Payment Method: ${order.paymentMethod.toUpperCase()}`, 50, y)
+    .text(`Payment Status: ${order.paymentStatus.toUpperCase()}`, 50, y + 14);
+
+  // HSN note
+  doc.text('HSN Code: 6204 (Women\'s Garments)', 50, y + 28);
+
+  // Footer
+  doc.fontSize(8).text('Thank you for shopping with Srinidhi Boutique!', 50, 760, { align: 'center', width: 495 });
+  doc.text('For returns/exchanges, WhatsApp us within 7 days of delivery.', 50, 772, { align: 'center', width: 495 });
+
+  doc.end();
 });

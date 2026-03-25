@@ -147,6 +147,13 @@ export async function cleanupTest() {
   await testPrisma.cartItem.deleteMany({});
   await testPrisma.order.deleteMany({});
   await testPrisma.coupon.deleteMany({});
+  // Build 10 models
+  await testPrisma.productQA.deleteMany({});
+  await testPrisma.productTag.deleteMany({});
+  await testPrisma.productVariant.deleteMany({});
+  await testPrisma.tag.deleteMany({});
+  await testPrisma.collection.deleteMany({});
+  await testPrisma.userNotification.deleteMany({});
   await testPrisma.product.deleteMany({});
   await testPrisma.category.deleteMany({});
   await testPrisma.pincodeZone.deleteMany({});

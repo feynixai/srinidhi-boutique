@@ -37,6 +37,9 @@ model Product {
   stockMovements         StockMovement[]
   backInStockNotifications BackInStockNotification[]
   flashSaleProducts      FlashSaleProduct[]
+  variants               ProductVariant[]
+  tags                   ProductTag[]
+  qaItems                ProductQA[]
 
   @@index([categoryId])
   @@index([active, featured])
@@ -69,8 +72,9 @@ model User {
   wishlistItems   WishlistItem[]
   recentlyViewed  RecentlyViewed[]
   loyaltyAccount  LoyaltyAccount?
-  referralsMade   Referral[]       @relation("ReferralsMade")
-  referralReceived Referral[]      @relation("ReferralReceived")
+  referralsMade   Referral[]         @relation("ReferralsMade")
+  referralReceived Referral[]        @relation("ReferralReceived")
+  notifications   UserNotification[]
 }
 
 model AdminUser {
@@ -137,6 +141,8 @@ model Order {
   paymentId     String?
   status        String      @default("placed")
   trackingId    String?
+  awbNumber     String?
+  courierName   String?
   notes         String?
   couponCode    String?
   country       String      @default("IN")
@@ -169,6 +175,7 @@ model CartItem {
   sessionId String
   productId String
   product   Product @relation(fields: [productId], references: [id])
+  variantId String?
   quantity  Int     @default(1)
   size      String?
   color     String?
@@ -357,4 +364,83 @@ model ChatMessage {
 
   @@index([status])
   @@index([createdAt])
+}
+
+// ── Build 10 models ──────────────────────────────────────────────────────────
+
+model ProductVariant {
+  id            String   @id @default(cuid())
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  size          String
+  color         String
+  sku           String?
+  stock         Int      @default(0)
+  priceOverride Decimal? @db.Decimal(10, 2)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([productId, size, color])
+  @@index([productId])
+  @@index([stock])
+}
+
+model Tag {
+  id       String       @id @default(cuid())
+  name     String       @unique
+  slug     String       @unique
+  products ProductTag[]
+}
+
+model ProductTag {
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  tagId     String
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([productId, tagId])
+}
+
+model Collection {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  image       String?
+  productIds  String[]
+  featured    Boolean  @default(false)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model UserNotification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // order_update, price_drop, flash_sale, loyalty_reward
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
+}
+
+model ProductQA {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  question    String
+  answer      String?
+  askedBy     String?  // name of customer
+  askedByPhone String?
+  answeredAt  DateTime?
+  approved    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([productId])
 }

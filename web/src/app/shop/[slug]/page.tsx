@@ -12,6 +12,7 @@ import { useWishlistStore } from '@/lib/wishlist-store';
 import { SizeGuideModal } from '@/components/SizeGuideModal';
 import { ProductReviews } from '@/components/ProductReviews';
 import { ProductCard } from '@/components/ProductCard';
+import { ProductQA } from '@/components/ProductQA';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -506,6 +507,11 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
       </div>
 
       <ProductReviews productId={product.id} />
+
+      {/* Q&A Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-12">
+        <ProductQA productId={product.id} />
+      </div>
 
       {/* Related Products */}
       {relatedProducts.length > 0 && (

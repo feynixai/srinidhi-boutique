@@ -27,6 +27,27 @@ export function errorHandler(
     return;
   }
 
-  console.error(err);
-  res.status(500).json({ error: 'Internal server error' });
+  // JSON parse errors from express.json()
+  if (err instanceof SyntaxError && 'body' in err) {
+    res.status(400).json({ error: 'Invalid JSON body' });
+    return;
+  }
+
+  // Prisma-specific errors
+  const prismaError = err as { code?: string; meta?: { target?: string[] } };
+  if (prismaError.code === 'P2002') {
+    res.status(409).json({ error: 'A record with this value already exists', field: prismaError.meta?.target });
+    return;
+  }
+  if (prismaError.code === 'P2025') {
+    res.status(404).json({ error: 'Record not found' });
+    return;
+  }
+  if (prismaError.code === 'P1001') {
+    res.status(503).json({ error: 'Database connection failed. Please try again.' });
+    return;
+  }
+
+  console.error('[ERROR]', err.name, err.message);
+  res.status(500).json({ error: 'Internal server error. Please try again.' });
 }

@@ -1,14 +1,12 @@
 # Srinidhi Boutique
 
-Premium Indian ethnic wear e-commerce platform built for Srinidhi Boutique — a women's clothing store in Hyderabad, India. 27 commits, store live at proofcrest.com.
+Premium women's ethnic wear e-commerce platform built for Srinidhi Boutique — a women's clothing store in Hyderabad, India.
 
-## Live URLs
+![Srinidhi Boutique Store](https://via.placeholder.com/1200x600/1a1a2e/c5a55a?text=Srinidhi+Boutique+—+Live+at+proofcrest.com)
 
-| App | URL |
-|-----|-----|
-| Store | https://proofcrest.com |
-| Admin Dashboard | https://admin-cyan-one-44.vercel.app |
-| API | Railway — server/ |
+> **Live store:** [proofcrest.com](https://proofcrest.com) &nbsp;|&nbsp; **Admin:** [admin-cyan-one-44.vercel.app](https://admin-cyan-one-44.vercel.app)
+
+---
 
 ## Architecture
 
@@ -38,112 +36,107 @@ Premium Indian ethnic wear e-commerce platform built for Srinidhi Boutique — a
 | Store frontend | Next.js 14, Tailwind CSS, Zustand, React Query, next/image |
 | Admin frontend | Next.js 14, Tailwind CSS, React Query |
 | API server | Node.js, Express, Prisma ORM, TypeScript |
-| Database | PostgreSQL |
-| Payments | Razorpay (UPI, cards, net banking, EMI) + Cash on Delivery |
+| Database | PostgreSQL (40+ models) |
+| Payments | Razorpay (UPI/cards/netbanking/EMI), PhonePe UPI QR, Bank Transfer, COD |
 | Notifications | WhatsApp Cloud API + Nodemailer (SMTP) |
-| Auth | Google OAuth + Phone OTP |
-| Shipping | Indian pincode zones + international rates |
-| Testing | Vitest, Supertest |
+| Auth | Google OAuth (NextAuth), Phone OTP, Admin roles |
+| Shipping | Indian pincode zones + international rates (US/UAE/UK) |
+| Testing | Vitest, Supertest (1324+ tests) |
 | Deployment | Vercel (frontend), Railway (API + DB) |
 
-## Feature List
+---
 
-### Store (web/)
-- Apple Liquid Glass UI — glassmorphism, pill shapes, natural rose gold palette
-- Hero carousel with featured collections
-- Mega menu with category navigation
+## Features
+
+### Payments
+- **Razorpay** — UPI, credit/debit cards, net banking, EMI, wallets
+- **PhonePe UPI QR** — scannable QR at checkout
+- **Bank Transfer** — NEFT/RTGS/IMPS with IFSC + SWIFT for international
+- **Cash on Delivery** — with COD surcharge support
+- **Gift Cards** — purchase, redeem, check balance
+- **Store Credits** — issued on returns, redeemable at checkout
+- Auto-apply best coupon — ranks eligible coupons by savings, one-click apply
+
+### Authentication & Authorization
+- **Google OAuth** (NextAuth.js) — customer and admin login
+- **Phone OTP** — SMS-based one-time password login
+- **Admin roles** — separate admin auth with role-based access
+- Guest checkout — no registration wall
+
+### Shopping Experience
 - Product catalog with filters: category, size, color, price, fabric, occasion
-- Product detail pages: image gallery, size guide, WhatsApp order button
-- Customer reviews with star ratings
-- Cart drawer with coupon code support
-- 3-step checkout: address → payment → confirm
-- Guest checkout (no forced registration)
-- Order confirmation, tracking, and history pages
+- Quick View modal + Product Comparison (up to 3 products side-by-side)
+- Smart search with autocomplete
 - Wishlist (persisted per user)
 - Recently viewed products bar
-- Back-in-stock notification signup
-- Product recommendations (same category + price range)
-- Abandoned cart reminder (shown on return visit)
-- Returns flow with reason selection
-- PWA support (offline mode, installable)
-- Newsletter signup
-- Contact form
-- Flash sales with countdown timers
-- Loyalty points programme (earn on purchase, redeem on checkout)
-- Referral system (share link, earn on friend's first order)
-- Lookbook / style guide
 - Product bundles (buy-together deals)
-- Gift cards (purchase + redeem)
 - Pre-order support for out-of-stock items
-- Store credits (returns → credits → redeem)
-- Smart search with autocomplete
-- Hindi language toggle (EN | हिंदी) — key UI strings translated, preference saved to localStorage
-- Product comparison (up to 3 products side-by-side, floating compare bar)
+- Product Q&A with admin moderation
+- Customer reviews with star ratings
+- Flash sales with countdown timers
 - Urgency triggers: "Only X left!" badge (stock < 5), "Trending" badge, weekly sold counter
-- Auto-apply best coupon at checkout — shows eligible coupons ranked by savings, one-click apply
+- Back-in-stock notification signup
+- Abandoned cart reminder (shown on return visit)
 
-### Admin Dashboard (admin/)
-- Glass-design stats dashboard: today's orders, revenue, pending orders, low stock
+### Loyalty & Retention
+- **Loyalty points** — earn on every purchase, redeem at checkout
+- **Tiers** — bronze / silver / gold based on total spend
+- **Referral system** — unique link, earn points on friend's first order
+- **Gift cards** — purchasable in any denomination
+- **Store credits** — returns refunded as credits, redeemable instantly
+- Newsletter signup + promotional email flows
+
+### Orders & Checkout
+- 3-step checkout: address → payment → confirm
+- Multi-step order lifecycle: Placed → Confirmed → Packed → Shipped → Delivered
+- Order tracking by order number + phone
+- Order cancellation with automatic store credit refund
+- Returns flow with reason selection and admin review
+- WhatsApp order button on every product page
+- GST calculation (CGST/SGST intra-state, IGST inter-state)
+- Delivery slot selection
+- International shipping (US / UAE / UK) with zone-based rates
+
+### Admin Dashboard
+- Bento-grid stats: today's orders, revenue, pending, low stock
 - Pro analytics:
-  - Revenue chart (daily/weekly/monthly)
+  - Revenue chart (daily / weekly / monthly)
   - Conversion funnel (cart → checkout → paid)
-  - Top selling products with units sold
-  - Revenue by category (bar chart)
-  - Revenue by payment method
+  - Top-selling products with units sold
+  - Revenue by category and payment method
   - New vs returning customer split
-  - Abandoned carts count
-- Orders management: full lifecycle (Placed → Confirmed → Packed → Shipped → Delivered)
-- Bulk order operations (confirm, pack, ship selected)
-- Products CRUD with image upload support
-- Categories management
-- Collections management (wedding, festival, etc.)
-- Coupon management (discount %, expiry, max uses, min order, category-specific)
+  - Abandoned cart count
+- Full order management + bulk status updates (confirm, pack, ship)
+- Product CRUD with image upload
+- Categories + collections management
+- Coupon management (%, fixed, first-order, category-specific, countdown)
 - Customer list with order history
-- Inventory management:
-  - Stock movement log (who added/removed, when, why)
-  - Auto-disable products when stock hits 0
-  - Bulk stock update via CSV upload
-  - Low-stock alert panel (threshold: 5 units)
+- Inventory: stock movement log, CSV bulk update, low-stock alert panel
 - Invoice generation (HTML, printable)
 - Return requests management
 - Q&A moderation
 - Lookbook management
 - Flash sale scheduling
-- WhatsApp + email notifications per order
-- Quick actions: add product, view pending orders, manage coupons
+- CSV data export: orders, products, customers, reviews
 
-### API (server/)
-- RESTful Express API — 25+ route groups, fully typed with TypeScript
-- Full products, categories, cart, orders, coupons endpoints
-- Razorpay payment verification (HMAC signature check)
-- International shipping rates by zone
-- WhatsApp Cloud API integration (order confirmation, shipping, delivery)
-- Email notifications via SMTP (order confirmation, shipping, welcome)
-- Stock movement logging on every sale
-- Inventory management: CSV bulk update, back-in-stock subscriptions
-- Analytics queries: revenue aggregation, conversion funnel, top products
-- Google OAuth + Phone OTP authentication
-- Admin authentication (Google OAuth, role-based)
-- Loyalty programme API (earn/redeem points)
-- Referral tracking API
-- Flash sales with automatic expiry
-- Lookbook API
-- Product bundles
-- Gift cards (purchase, redeem, balance check)
-- Pre-orders with booking management
-- Store credits
-- Webhook delivery system
-- CSV data export (products, orders, customers, reviews)
-- GST calculation (intra-state CGST/SGST vs inter-state IGST)
-- Delivery slot selection
-- Order cancellation + store credit refund
-- SEO: sitemap generation
-- Security: Helmet, CORS, Zod validation, rate limiting
-- Health check endpoint with database connectivity
-- Environment variable validation on startup
-- Graceful shutdown (SIGTERM/SIGINT)
-- In-memory response caching for product listings (5 min TTL)
-- Database indexes on all key query patterns
+### Content & Marketing
+- Blog (full article pages with author, tags, estimated read time)
+- Lookbook / style guide
+- FAQ page
+- About page
+- Contact form + WhatsApp click-to-chat
+
+### Technical
+- **PWA** — offline mode, installable on mobile
+- **SEO** — sitemap, Open Graph, structured data
+- **Accessibility** — ARIA labels, keyboard navigation, contrast-compliant
+- **i18n** — Hindi language toggle (EN | हिंदी), key UI strings translated
+- **Performance** — in-memory response caching (5 min TTL), DB indexes on all key query patterns
+- **Security** — Helmet, CORS, Zod validation, rate limiting, HMAC payment verification
+- **Environment validation** — startup check with clear error messages
+- **Graceful shutdown** — SIGTERM/SIGINT handling
+
+---
 
 ## Project Structure
 
@@ -151,25 +144,30 @@ Premium Indian ethnic wear e-commerce platform built for Srinidhi Boutique — a
 web/
   src/
     app/                   Next.js App Router pages
-    components/            Reusable UI components (Header, Cart, ProductCard, etc.)
-    lib/                   API client, Zustand stores, utils
+    components/            Header, Cart, ProductCard, Footer, etc.
+    lib/                   API client, Zustand stores, utils, auth
+
 admin/
   src/
-    app/admin/             Admin pages (dashboard, analytics, orders, products, etc.)
-    components/            Admin UI components (StatusBadge, etc.)
+    app/admin/             Dashboard, analytics, orders, products, etc.
+    components/            StatusBadge, shared admin UI
     lib/                   API client, types
+
 server/
   src/
-    routes/                Express route handlers (25+ route files)
+    routes/                Express route handlers (35+ route files)
     lib/                   Prisma client, cache, email, WhatsApp, env validation
-    middleware/            Error handler, rate limiter, admin auth
-    __tests__/             Vitest tests (1324+)
+    middleware/             Error handler, rate limiter, admin auth
+    __tests__/             Vitest integration tests (1324+)
     scripts/               seed.ts
   prisma/
-    schema.prisma          Database schema (30+ models)
+    schema.prisma          Database schema (40+ models)
+
 scripts/
   setup.sh                 One-command dev environment setup
 ```
+
+---
 
 ## Getting Started
 
@@ -187,7 +185,7 @@ cd srinidhi-boutique
 bash scripts/setup.sh
 ```
 
-The setup script checks prerequisites, installs dependencies, copies `.env.example`, runs `prisma db push`, and seeds the database.
+The setup script checks prerequisites, installs dependencies, copies `.env.example` → `.env`, runs `prisma db push`, and seeds the database.
 
 ### Manual Setup
 
@@ -199,6 +197,12 @@ npm install
 cp server/.env.example server/.env
 # Edit server/.env with your DATABASE_URL and credentials
 
+cp web/.env.example web/.env.local
+# Set NEXT_PUBLIC_API_URL=http://localhost:4000
+
+cp admin/.env.example admin/.env.local
+# Set NEXT_PUBLIC_API_URL=http://localhost:4000
+
 # 3. Push database schema
 npm run db:push
 
@@ -209,53 +213,101 @@ npm run db:seed
 npm run dev
 ```
 
-Access at:
-- Store: http://localhost:3000
-- Admin: http://localhost:3001
-- API: http://localhost:4000
+| Service | URL |
+|---------|-----|
+| Store | http://localhost:3000 |
+| Admin | http://localhost:3001 |
+| API | http://localhost:4000 |
+
+---
 
 ## Environment Variables
 
-### server/.env
+### `server/.env`
 
-| Variable | Required | Description | Example |
-|----------|----------|-------------|---------|
-| `DATABASE_URL` | Yes | PostgreSQL connection string | `postgresql://user:pass@localhost:5432/srinidhi` |
-| `PORT` | No | API server port (default: 4000) | `4000` |
-| `FRONTEND_URL` | No | Store URL for CORS | `http://localhost:3000` |
-| `RAZORPAY_KEY_ID` | No* | Razorpay key — payments disabled without this | `rzp_test_xxx` |
-| `RAZORPAY_KEY_SECRET` | No* | Razorpay secret | `xxxxxxxxxxxxxxxx` |
-| `WHATSAPP_API_TOKEN` | No | WhatsApp Cloud API token | `EAAxxxxx` |
-| `WHATSAPP_PHONE_NUMBER_ID` | No | WhatsApp sender phone number ID | `123456789` |
-| `ADMIN_WHATSAPP_PHONE` | No | Admin phone for order alerts | `919876543210` |
-| `SMTP_HOST` | No | SMTP server host | `smtp.gmail.com` |
-| `SMTP_PORT` | No | SMTP port | `587` |
-| `SMTP_USER` | No | SMTP login email | `orders@yourdomain.com` |
-| `SMTP_PASS` | No | SMTP app password | `your_app_password` |
-| `SMTP_FROM` | No | From name + address | `Srinidhi Boutique <orders@...>` |
-| `GOOGLE_CLIENT_ID` | No | Google OAuth client ID | `xxx.apps.googleusercontent.com` |
-| `JWT_SECRET` | No | JWT signing secret | `your_jwt_secret` |
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | **Yes** | PostgreSQL connection string — `postgresql://user:pass@host:5432/db` |
+| `PORT` | No | API server port (default: `4000`) |
+| `NODE_ENV` | No | `development` / `production` / `test` |
+| `FRONTEND_URL` | No | Store URL for CORS and email links — `http://localhost:3000` |
+| `RAZORPAY_KEY_ID` | No* | Razorpay key ID — payments fall back to COD without this |
+| `RAZORPAY_KEY_SECRET` | No* | Razorpay key secret |
+| `WHATSAPP_API_TOKEN` | No | WhatsApp Cloud API token (from Meta developers portal) |
+| `WHATSAPP_PHONE_NUMBER_ID` | No | WhatsApp sender Phone Number ID |
+| `ADMIN_WHATSAPP_PHONE` | No | Admin phone for order alerts — e.g. `919876543210` |
+| `SMTP_HOST` | No | SMTP host — e.g. `smtp.gmail.com` |
+| `SMTP_PORT` | No | SMTP port — default `587` |
+| `SMTP_USER` | No | SMTP login email |
+| `SMTP_PASS` | No | SMTP app password |
+| `SMTP_FROM` | No | From display name — `Srinidhi Boutique <orders@srinidhiboutique.in>` |
+| `BANK_ACCOUNT_NUMBER` | No | Bank account number shown on Bank Transfer checkout |
+| `BANK_IFSC` | No | Bank IFSC code |
+| `BANK_SWIFT` | No | Bank SWIFT code (for international transfers) |
 
-*Payments silently fall back to COD if Razorpay keys are absent.
+*Falls back to COD if absent. No error thrown.
 
-### web/.env.local and admin/.env.local
+### `web/.env.local`
 
-| Variable | Required | Description | Example |
-|----------|----------|-------------|---------|
-| `NEXT_PUBLIC_API_URL` | Yes | API server base URL | `http://localhost:4000` |
-| `NEXT_PUBLIC_WHATSAPP_NUMBER` | No | WhatsApp click-to-chat number | `+919876543210` |
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NEXT_PUBLIC_API_URL` | **Yes** | API base URL — `http://localhost:4000` |
+| `NEXT_PUBLIC_SITE_URL` | No | Public store URL for SEO — `https://proofcrest.com` |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER` | No | WhatsApp click-to-chat — `+919876543210` |
+| `NEXT_PUBLIC_INSTAGRAM_URL` | No | Instagram profile URL |
+| `NEXT_PUBLIC_FACEBOOK_URL` | No | Facebook page URL |
+| `NEXT_PUBLIC_YOUTUBE_URL` | No | YouTube channel URL |
+| `GOOGLE_CLIENT_ID` | No | Google OAuth client ID (for customer login) |
+| `GOOGLE_CLIENT_SECRET` | No | Google OAuth client secret |
+| `NEXTAUTH_SECRET` | No | NextAuth.js JWT secret — **required in production** |
 
-## Tests
+### `admin/.env.local`
 
-```bash
-npm test          # Run all 1324 tests (singleFork mode, ~2 min)
-```
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NEXT_PUBLIC_API_URL` | **Yes** | API base URL — `http://localhost:4000` |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER` | No | WhatsApp number for admin notifications |
+| `GOOGLE_CLIENT_ID` | No | Google OAuth client ID (for admin login) |
+| `GOOGLE_CLIENT_SECRET` | No | Google OAuth client secret |
+| `NEXTAUTH_SECRET` | No | NextAuth.js JWT secret — **required in production** |
 
-Test coverage includes products, categories, cart, orders, coupons, payments (Razorpay + COD), auth (Google OAuth + Phone OTP), admin CRUD + bulk operations, international shipping + pincode zones, returns, WhatsApp + email notifications, analytics, stock movement + back-in-stock, cache, health check, env validation, GST calculation, delivery slots, order cancellation + store credits, coupons (category-specific, first-order, countdown), CSV export, loyalty, referrals, flash sales, lookbook, chat, bundles, gift cards, pre-orders, abandoned cart recovery, webhooks, and seed data validation.
+---
 
-## API Endpoint Reference
+## Database Schema
 
-See [API.md](./API.md) for the full reference with request/response examples.
+40+ Prisma models. Key models:
+
+| Model | Purpose |
+|-------|---------|
+| `Product` | Products with images, variants, sizes, colors, fabric, occasion, stock |
+| `Category` | Product categories with GST rate and HSN code |
+| `Collection` | Curated collections (wedding, festival, etc.) |
+| `Order` / `OrderItem` | Orders with multi-status lifecycle, GST, delivery slot |
+| `User` / `AdminUser` | Customers and admin users (separate tables) |
+| `CartItem` | Session-based cart (no login required) |
+| `Coupon` | Discounts — %, fixed, first-order, category-specific, countdown |
+| `Review` | Product reviews with star ratings |
+| `StockMovement` | Audit log of every stock change |
+| `LoyaltyAccount` / `LoyaltyHistory` | Loyalty points balance and transaction history |
+| `Referral` | Referral codes, tracking, reward dispatch |
+| `FlashSale` / `FlashSaleProduct` | Time-limited flash sales |
+| `Lookbook` | Styled editorial images |
+| `GiftCard` / `GiftCardTransaction` | Gift card lifecycle |
+| `StoreCredit` | Per-user credit balance |
+| `Bundle` | Product bundles (buy-together) |
+| `PreOrder` / `PreOrderBooking` | Pre-order with booking management |
+| `AbandonedCart` | Recovered via email/WhatsApp re-engagement |
+| `Webhook` / `WebhookDelivery` | Outbound webhook system |
+| `ReturnRequest` | Customer returns with reason + admin resolution |
+| `PincodeZone` | Delivery zone mapping for Indian pincodes |
+
+Full schema: [`server/prisma/schema.prisma`](./server/prisma/schema.prisma)
+
+---
+
+## API Endpoints
+
+Full reference: [`API.md`](./API.md)
 
 ### Quick Reference
 
@@ -280,12 +332,12 @@ See [API.md](./API.md) for the full reference with request/response examples.
 | GET | `/api/orders/:id` | Order detail |
 | POST | `/api/orders/:id/status` | Update order status |
 | POST | `/api/payments/razorpay/create` | Create Razorpay order |
-| POST | `/api/payments/razorpay/verify` | Verify payment signature |
+| POST | `/api/payments/razorpay/verify` | Verify payment (HMAC) |
 | POST | `/api/auth/google` | Google OAuth login |
 | POST | `/api/auth/send-otp` | Send phone OTP |
 | POST | `/api/auth/verify-otp` | Verify OTP + issue token |
 | GET | `/api/coupons/validate` | Validate coupon code |
-| POST | `/api/notifications/send-order-confirmation` | Send order notification |
+| POST | `/api/notifications/send-order-confirmation` | Send order WhatsApp + email |
 | POST | `/api/notifications/send-shipping-update` | Send shipping notification |
 | GET | `/api/inventory/low-stock` | Low stock products |
 | POST | `/api/inventory/movements` | Log stock adjustment |
@@ -304,7 +356,7 @@ See [API.md](./API.md) for the full reference with request/response examples.
 | GET | `/api/admin/orders` | All orders with filters |
 | PATCH | `/api/admin/orders/:id/status` | Update order status |
 | POST | `/api/admin/orders/bulk-action` | Bulk order status update |
-| GET | `/api/admin/products` | All products (admin view) |
+| GET | `/api/admin/products` | All products (admin) |
 | POST | `/api/admin/products` | Create product |
 | PUT | `/api/admin/products/:id` | Update product |
 | DELETE | `/api/admin/products/:id` | Delete product (soft) |
@@ -316,94 +368,85 @@ See [API.md](./API.md) for the full reference with request/response examples.
 | GET | `/api/admin/export/products` | Export products CSV |
 | GET | `/api/admin/orders/:id/invoice` | Generate HTML invoice |
 
+---
+
+## Tests
+
+```bash
+npm test          # Run all 1324+ tests (singleFork mode, ~2 min)
+```
+
+Coverage: products, categories, cart, orders, coupons, payments (Razorpay + COD), auth (Google OAuth + Phone OTP), admin CRUD + bulk operations, international shipping + pincode zones, returns, WhatsApp + email notifications, analytics, stock movement + back-in-stock, cache, health check, env validation, GST calculation, delivery slots, order cancellation + store credits, CSV export, loyalty, referrals, flash sales, lookbook, chat, bundles, gift cards, pre-orders, abandoned cart recovery, webhooks, seed data.
+
+---
+
 ## Deployment
 
-### Quick Deploy — Vercel
+### Vercel (Store + Admin)
 
 ```bash
 # Store
-cd web && npx vercel --prod
+cd web && npx vercel --yes --prod
 
 # Admin
-cd admin && npx vercel --prod
+cd admin && npx vercel --yes --prod
 ```
 
 Set `NEXT_PUBLIC_API_URL` to your deployed API URL in each Vercel project's environment variables.
 
 ### API Server (Railway / Render)
 
-1. Connect your GitHub repo
-2. Set **root directory** to `server/`
-3. **Build command**: `npm install && npx prisma generate && npm run build`
-4. **Start command**: `npm start`
-5. Add all environment variables from `server/.env.example`
+1. Connect GitHub repo → set **root directory** to `server/`
+2. **Build:** `npm install && npx prisma generate && npm run build`
+3. **Start:** `npm start`
+4. Add all `server/.env.example` variables in the platform's env settings
 
-### Store & Admin (Vercel — manual)
-
-For `web/` and `admin/`:
-1. Import repo in Vercel
-2. Set **root directory** to `web/` (or `admin/`)
-3. Set `NEXT_PUBLIC_API_URL` to your deployed server URL
-4. Deploy
-
-### Database (Supabase / Neon / Railway PostgreSQL)
+### Database
 
 ```bash
-# After deploying API, run migrations against production DB
-DATABASE_URL=your_production_url npx prisma db push
+# Push schema to production database
+DATABASE_URL=your_prod_url npx prisma db push
 
 # Seed sample data
-DATABASE_URL=your_production_url npm run db:seed
+DATABASE_URL=your_prod_url npm run db:seed
 ```
 
-## Design System — Apple Liquid Glass
+---
+
+## Design System
+
+Apple Liquid Glass aesthetic — glassmorphism, pill shapes, natural warm palette.
 
 | Token | Value | Usage |
 |-------|-------|-------|
 | Gold | `#c5a55a` | CTAs, accents, prices |
-| Navy | `#1a1a2e` | Primary text, buttons |
+| Navy | `#1a1a2e` | Primary text, dark buttons |
 | Ivory | `#f5f5f0` | Page background |
-| Glass BG | `rgba(255,255,255,0.6)` | Card backgrounds (blur-xl) |
+| Glass | `rgba(255,255,255,0.6)` + `backdrop-blur-xl` | All card surfaces |
 | Playfair Display | serif | Headings, product names |
-| Inter | sans-serif | Body text, UI |
+| Inter | sans-serif | Body text, UI labels |
 
-All cards use `backdrop-blur-xl` with `bg-white/60` and `border border-white/30` — the Liquid Glass style. Mobile-first — 80%+ of Indian shoppers browse on phones.
+Mobile-first — 80%+ of Indian shoppers browse on phones.
 
-## Screenshots
-
-| Page | Description |
-|------|-------------|
-| Store home | Hero carousel, trust badge pills, category grid, featured products |
-| Product detail | Image gallery with hover swap, size selector, WhatsApp order |
-| Cart | Glass cards, free shipping progress, save-for-later |
-| Checkout | Glass progress bar, glass payment cards, UPI QR glass modal |
-| Admin dashboard | Bento grid, glass stat cards, weekly chart, low stock alerts |
-
-> Screenshots coming soon — run locally at http://localhost:3000
+---
 
 ## Contributing
 
-1. Fork the repo
-2. Create a feature branch: `git checkout -b feat/your-feature`
-3. Make your changes and add tests
-4. Run `npm test` and ensure all tests pass
-5. Submit a pull request
-
-For bug reports or feature requests, open an issue.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
 ## License
 
-MIT — see [LICENSE](./LICENSE) for details.
+MIT — see [LICENSE](./LICENSE).
 
 ---
 
 ## Build Log
 
-| Build | Date | Features | Tests |
-|-------|------|----------|-------|
-| Build 1 | 2026-01-01 | Core product catalog, cart, orders, payments (Razorpay), admin | 100+ |
-| Build 2 | 2026-01-02 | Auth, pincode zones, WhatsApp/email notifications, SEO | 200+ |
-| Build 3 | 2026-01-03 | Inventory management, back-in-stock, returns, analytics | 300+ |
+| Build | Date | Highlights | Tests |
+|-------|------|-----------|-------|
+| Build 1 | 2026-01-01 | Core catalog, cart, orders, Razorpay, admin | 100+ |
+| Build 2 | 2026-01-02 | Auth, pincode zones, WhatsApp/email, SEO | 200+ |
+| Build 3 | 2026-01-03 | Inventory, back-in-stock, returns, analytics | 300+ |
 | Build 4 | 2026-01-04 | Admin dashboard, shipping, international rates | 400+ |
 | Build 5 | 2026-01-05 | Bulk status, security, Razorpay everywhere | 475+ |
 | Build 6 | 2026-01-06 | WhatsApp/email notifications, pro analytics | 530+ |
@@ -412,12 +455,14 @@ MIT — see [LICENSE](./LICENSE) for details.
 | Build 9 | 2026-01-09 | Lookbook, customer segments, advanced reports | 826+ |
 | Build 10 | 2026-01-10 | Bundles, gift cards, pre-orders, store credits, webhooks | 825+ |
 | Build 11 | 2026-01-11 | Abandoned cart, bundles, gift cards, pre-orders, webhooks | 825+ |
-| Build 12 | 2026-03-25 | GST system, bulk product ops, delivery slots, order cancellation, coupon enhancements, stock alerts, data export | 901+ |
+| Build 12 | 2026-03-25 | GST, bulk product ops, delivery slots, order cancellation, coupon enhancements, data export | 901+ |
 | Build 13 | 2026-03-25 | Admin power tools, order workflow, product analytics | 1000+ |
 | Build 14 | 2026-03-25 | Admin power tools, order workflow, product analytics | 1050+ |
 | Build 15 | 2026-03-25 | Admin power tools, order workflow, product analytics | 1126 |
 | Build 16 | 2026-03-25 | Apple Liquid Glass UI overhaul — glassmorphism, pill shapes | 1126 |
-| Build 17 | 2026-03-25 | Admin bento dashboard, product image hover, trust badge pills, glass checkout, skeleton loaders, 404/500 pages, accessibility | 1324 |
-| Build 18 | 2026-03-25 | README rewrite, Vercel redeploy, setup script, seed polish, package.json cleanup | 1324 |
+| Build 17 | 2026-03-25 | Admin bento dashboard, product hover, trust badges, glass checkout, skeleton loaders, 404/500, accessibility | 1324 |
+| Build 18 | 2026-03-25 | README rewrite, Vercel redeploy, env docs, CONTRIBUTING.md, setup script polish | 1324 |
+
+---
 
 Built with care for Srinidhi Boutique, Hyderabad.

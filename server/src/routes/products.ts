@@ -13,6 +13,7 @@ productRoutes.get('/', async (req: Request, res: Response) => {
     search,
     size,
     color,
+    sort,
     page = '1',
     limit = '20',
   } = req.query;
@@ -40,11 +41,18 @@ productRoutes.get('/', async (req: Request, res: Response) => {
   if (size) where.sizes = { has: size };
   if (color) where.colors = { has: color };
 
+  type OrderBy = Record<string, 'asc' | 'desc'>;
+  const orderBy: OrderBy =
+    sort === 'price_asc' ? { price: 'asc' } :
+    sort === 'price_desc' ? { price: 'desc' } :
+    sort === 'popular' ? { bestSeller: 'desc' } :
+    { createdAt: 'desc' };
+
   const [products, total] = await Promise.all([
     prisma.product.findMany({
       where,
       include: { category: true },
-      orderBy: { createdAt: 'desc' },
+      orderBy,
       skip,
       take: limitNum,
     }),

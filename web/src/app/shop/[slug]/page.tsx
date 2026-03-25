@@ -7,6 +7,8 @@ import { FaWhatsapp } from 'react-icons/fa';
 import { FiShare2 } from 'react-icons/fi';
 import { getProduct, addToCart } from '@/lib/api';
 import { useCartStore } from '@/lib/cart-store';
+import { SizeGuideModal } from '@/components/SizeGuideModal';
+import { ProductReviews } from '@/components/ProductReviews';
 
 export default function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
@@ -140,9 +142,12 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
           {product.sizes.length > 0 && (
             <div>
-              <p className="text-sm font-medium mb-2">
-                Size: {selectedSize && <span className="text-rose-gold">{selectedSize}</span>}
-              </p>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm font-medium">
+                  Size: {selectedSize && <span className="text-rose-gold">{selectedSize}</span>}
+                </p>
+                <SizeGuideModal />
+              </div>
               <div className="flex flex-wrap gap-2">
                 {product.sizes.map((size) => (
                   <button
@@ -243,6 +248,8 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
           </button>
         </div>
       </div>
+
+      <ProductReviews productId={product.id} />
     </div>
   );
 }

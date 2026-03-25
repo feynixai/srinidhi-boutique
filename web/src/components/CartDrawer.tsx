@@ -1,8 +1,8 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FiX, FiTrash2, FiPlus, FiMinus } from 'react-icons/fi';
+import { FiX, FiTrash2, FiPlus, FiMinus, FiTag } from 'react-icons/fi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { useCartStore } from '@/lib/cart-store';
@@ -11,6 +11,8 @@ import { getCart, updateCartItem, removeCartItem } from '@/lib/api';
 export function CartDrawer() {
   const { sessionId, isCartOpen, closeCart, setItemCount } = useCartStore();
   const queryClient = useQueryClient();
+  const [couponInput, setCouponInput] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState('');
 
   const { data: cart } = useQuery({
     queryKey: ['cart', sessionId],
@@ -143,8 +145,42 @@ export function CartDrawer() {
                 <span>₹{(subtotal + shipping).toLocaleString('en-IN')}</span>
               </div>
             </div>
+
+            {/* Coupon */}
+            {appliedCoupon ? (
+              <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-sm px-3 py-2 mb-3 text-sm">
+                <span className="text-green-700 flex items-center gap-1.5">
+                  <FiTag size={13} /> <span className="font-medium">{appliedCoupon}</span> applied
+                </span>
+                <button onClick={() => setAppliedCoupon('')} className="text-green-600 hover:text-green-800 text-xs underline">
+                  Remove
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2 mb-3">
+                <input
+                  value={couponInput}
+                  onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                  placeholder="Coupon code"
+                  className="flex-1 border border-gray-200 rounded-sm px-3 py-2 text-xs focus:outline-none focus:border-rose-gold"
+                />
+                <button
+                  onClick={() => {
+                    if (couponInput.trim()) {
+                      setAppliedCoupon(couponInput.trim());
+                      setCouponInput('');
+                      toast.success('Coupon applied!');
+                    }
+                  }}
+                  className="bg-rose-gold text-white px-3 py-2 text-xs rounded-sm hover:bg-opacity-90 transition-colors"
+                >
+                  Apply
+                </button>
+              </div>
+            )}
+
             <Link
-              href="/checkout"
+              href={`/checkout${appliedCoupon ? `?coupon=${appliedCoupon}` : ''}`}
               onClick={closeCart}
               className="btn-primary w-full text-center block text-sm tracking-widest"
             >

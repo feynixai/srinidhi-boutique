@@ -6,14 +6,15 @@ import { FiHeart, FiShoppingBag } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 import { Product, addToCart } from '@/lib/api';
 import { useCartStore } from '@/lib/cart-store';
+import { useWishlistStore } from '@/lib/wishlist-store';
 
 interface ProductCardProps {
   product: Product;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const [wishlist, setWishlist] = useState(false);
   const [adding, setAdding] = useState(false);
+  const { toggle: toggleWishlist, has: inWishlist } = useWishlistStore();
   const { sessionId, itemCount, setItemCount, openCart } = useCartStore();
 
   const discountPct = product.onOffer && product.offerPercent
@@ -45,7 +46,7 @@ export function ProductCard({ product }: ProductCardProps) {
   }
 
   return (
-    <Link href={`/shop/${product.slug}`} className="product-card block">
+    <Link href={`/shop/${product.slug}`} className="product-card block group">
       <div className="relative aspect-[3/4] overflow-hidden bg-gray-50">
         {product.images[0] ? (
           <Image
@@ -88,13 +89,13 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
 
         <button
-          onClick={(e) => { e.preventDefault(); setWishlist(!wishlist); }}
+          onClick={(e) => { e.preventDefault(); toggleWishlist(product.id); }}
           className="absolute top-2 right-2 p-2 bg-white/80 rounded-full hover:bg-white transition-colors"
           aria-label="Add to wishlist"
         >
           <FiHeart
             size={16}
-            className={wishlist ? 'fill-rose-gold text-rose-gold' : 'text-charcoal'}
+            className={inWishlist(product.id) ? 'fill-rose-gold text-rose-gold' : 'text-charcoal'}
           />
         </button>
       </div>

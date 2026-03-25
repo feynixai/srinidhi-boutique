@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { getProducts } from '@/lib/api';
 import { ProductCard } from '@/components/ProductCard';
 import { FilterSidebar } from '@/components/FilterSidebar';
+import { ShopSortBar } from '@/components/ShopSortBar';
 
 interface ShopPageProps {
   searchParams: Record<string, string>;
@@ -12,9 +13,7 @@ async function ProductGrid({ searchParams }: { searchParams: Record<string, stri
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <p className="text-sm text-gray-500">{data.total} products</p>
-      </div>
+      <ShopSortBar total={data.total} searchParams={searchParams} />
       {data.products.length === 0 ? (
         <div className="col-span-full text-center py-16 text-gray-400">
           No products found. Try adjusting your filters.
@@ -36,7 +35,7 @@ export default function ShopPage({ searchParams }: ShopPageProps) {
         <Suspense fallback={<div className="w-64 flex-shrink-0" />}>
           <FilterSidebar />
         </Suspense>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <Suspense fallback={
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {[...Array(6)].map((_, i) => (

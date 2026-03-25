@@ -1,0 +1,9 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "env": {
+    "NEXT_PUBLIC_API_URL": "@srinidhi_api_url",
+    "NEXT_PUBLIC_WHATSAPP_NUMBER": "@srinidhi_whatsapp_number"
+  }
+}

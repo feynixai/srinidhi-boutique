@@ -1,0 +1,466 @@
+import { PrismaClient } from '@prisma/client';
+import slugify from 'slugify';
+
+const prisma = new PrismaClient();
+
+async function main() {
+  console.log('Seeding database...');
+
+  // Categories
+  const [sarees, kurtis, lehengas, blouses, dupattas, accessories] = await Promise.all([
+    prisma.category.upsert({
+      where: { slug: 'sarees' },
+      update: {},
+      create: {
+        name: 'Sarees',
+        slug: 'sarees',
+        image: 'https://picsum.photos/seed/cat-sarees/400/400',
+      },
+    }),
+    prisma.category.upsert({
+      where: { slug: 'kurtis' },
+      update: {},
+      create: {
+        name: 'Kurtis',
+        slug: 'kurtis',
+        image: 'https://picsum.photos/seed/cat-kurtis/400/400',
+      },
+    }),
+    prisma.category.upsert({
+      where: { slug: 'lehengas' },
+      update: {},
+      create: {
+        name: 'Lehengas',
+        slug: 'lehengas',
+        image: 'https://picsum.photos/seed/cat-lehengas/400/400',
+      },
+    }),
+    prisma.category.upsert({
+      where: { slug: 'blouses' },
+      update: {},
+      create: {
+        name: 'Blouses',
+        slug: 'blouses',
+        image: 'https://picsum.photos/seed/cat-blouses/400/400',
+      },
+    }),
+    prisma.category.upsert({
+      where: { slug: 'dupattas' },
+      update: {},
+      create: {
+        name: 'Dupattas',
+        slug: 'dupattas',
+        image: 'https://picsum.photos/seed/cat-dupattas/400/400',
+      },
+    }),
+    prisma.category.upsert({
+      where: { slug: 'accessories' },
+      update: {},
+      create: {
+        name: 'Accessories',
+        slug: 'accessories',
+        image: 'https://picsum.photos/seed/cat-accessories/400/400',
+      },
+    }),
+  ]);
+
+  const products = [
+    // ── Sarees (5) ──────────────────────────────────────────────────────────
+    {
+      name: 'Kanjivaram Silk Saree — Deep Maroon',
+      description:
+        'Pure Kanjivaram silk saree with intricate gold zari work. Perfect for weddings and festive occasions. Comes with matching blouse piece.',
+      price: 12500,
+      comparePrice: 15000,
+      images: [
+        'https://picsum.photos/seed/saree1/600/800',
+        'https://picsum.photos/seed/saree1b/600/800',
+      ],
+      categoryId: sarees.id,
+      sizes: ['Free Size'],
+      colors: ['Maroon', 'Gold'],
+      fabric: 'Pure Kanjivaram Silk',
+      occasion: ['wedding', 'festival'],
+      stock: 8,
+      featured: true,
+      bestSeller: true,
+      onOffer: false,
+    },
+    {
+      name: 'Banarasi Georgette Saree — Royal Blue',
+      description:
+        'Elegant Banarasi georgette saree with subtle silver border. Lightweight and comfortable for all-day wear.',
+      price: 4200,
+      comparePrice: 5500,
+      images: [
+        'https://picsum.photos/seed/saree2/600/800',
+        'https://picsum.photos/seed/saree2b/600/800',
+      ],
+      categoryId: sarees.id,
+      sizes: ['Free Size'],
+      colors: ['Royal Blue', 'Silver'],
+      fabric: 'Banarasi Georgette',
+      occasion: ['festival', 'party'],
+      stock: 15,
+      featured: true,
+      bestSeller: false,
+      onOffer: true,
+      offerPercent: 24,
+    },
+    {
+      name: 'Cotton Handloom Saree — Pastel Pink',
+      description:
+        'Handwoven cotton saree in soft pastel pink. Breathable fabric ideal for daily wear and casual events.',
+      price: 1800,
+      comparePrice: null,
+      images: ['https://picsum.photos/seed/saree3/600/800'],
+      categoryId: sarees.id,
+      sizes: ['Free Size'],
+      colors: ['Pastel Pink', 'White'],
+      fabric: 'Handloom Cotton',
+      occasion: ['casual'],
+      stock: 25,
+      featured: false,
+      bestSeller: true,
+      onOffer: false,
+    },
+    {
+      name: 'Chiffon Party Saree — Emerald Green',
+      description:
+        'Shimmery chiffon saree with sequin border. A showstopper for evening parties and receptions.',
+      price: 3500,
+      comparePrice: 4200,
+      images: ['https://picsum.photos/seed/saree4/600/800'],
+      categoryId: sarees.id,
+      sizes: ['Free Size'],
+      colors: ['Emerald Green', 'Gold'],
+      fabric: 'Chiffon',
+      occasion: ['party'],
+      stock: 12,
+      featured: true,
+      bestSeller: false,
+      onOffer: true,
+      offerPercent: 17,
+    },
+    {
+      name: 'Linen Saree — Earthy Tan',
+      description:
+        'Lightweight linen saree in warm earthy tones. Perfect for office wear and casual outings.',
+      price: 2200,
+      comparePrice: null,
+      images: ['https://picsum.photos/seed/saree5/600/800'],
+      categoryId: sarees.id,
+      sizes: ['Free Size'],
+      colors: ['Tan', 'Brown'],
+      fabric: 'Linen',
+      occasion: ['casual'],
+      stock: 20,
+      featured: false,
+      bestSeller: true,
+      onOffer: false,
+    },
+    // ── Kurtis (5) ──────────────────────────────────────────────────────────
+    {
+      name: 'Anarkali Kurti — Floral Peach',
+      description:
+        'Floor-length anarkali kurti with floral print. Comes with palazzo pants. A festive favourite.',
+      price: 1599,
+      comparePrice: 2000,
+      images: [
+        'https://picsum.photos/seed/kurti1/600/800',
+        'https://picsum.photos/seed/kurti1b/600/800',
+      ],
+      categoryId: kurtis.id,
+      sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+      colors: ['Peach', 'White'],
+      fabric: 'Rayon',
+      occasion: ['festival', 'casual'],
+      stock: 30,
+      featured: true,
+      bestSeller: true,
+      onOffer: true,
+      offerPercent: 20,
+    },
+    {
+      name: 'A-Line Cotton Kurti — Indigo Block Print',
+      description: 'Hand block-printed A-line kurti in indigo and white. Jaipur craft at its finest.',
+      price: 899,
+      comparePrice: null,
+      images: ['https://picsum.photos/seed/kurti2/600/800'],
+      categoryId: kurtis.id,
+      sizes: ['S', 'M', 'L', 'XL'],
+      colors: ['Indigo', 'White'],
+      fabric: 'Cotton',
+      occasion: ['casual'],
+      stock: 40,
+      featured: false,
+      bestSeller: true,
+      onOffer: false,
+    },
+    {
+      name: 'Embroidered Silk Kurti — Crimson',
+      description: 'Rich silk kurti with thread embroidery. Pair with churidar for a complete ethnic look.',
+      price: 2299,
+      comparePrice: 2800,
+      images: ['https://picsum.photos/seed/kurti3/600/800'],
+      categoryId: kurtis.id,
+      sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+      colors: ['Crimson', 'Gold'],
+      fabric: 'Art Silk',
+      occasion: ['festival', 'party'],
+      stock: 18,
+      featured: true,
+      bestSeller: false,
+      onOffer: true,
+      offerPercent: 18,
+    },
+    {
+      name: 'Straight Fit Kurti — Lavender',
+      description: 'Clean straight-cut kurti in soft lavender. Easy to style with jeans or leggings.',
+      price: 699,
+      comparePrice: null,
+      images: ['https://picsum.photos/seed/kurti4/600/800'],
+      categoryId: kurtis.id,
+      sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+      colors: ['Lavender'],
+      fabric: 'Georgette',
+      occasion: ['casual'],
+      stock: 50,
+      featured: false,
+      bestSeller: false,
+      onOffer: false,
+    },
+    {
+      name: 'Mirror Work Kurti — Deep Teal',
+      description:
+        'Vibrant kurti with traditional mirror work embellishments. Rajasthani art meets modern silhouette.',
+      price: 1299,
+      comparePrice: 1600,
+      images: ['https://picsum.photos/seed/kurti5/600/800'],
+      categoryId: kurtis.id,
+      sizes: ['S', 'M', 'L', 'XL'],
+      colors: ['Teal', 'Multicolor'],
+      fabric: 'Cotton',
+      occasion: ['festival', 'casual'],
+      stock: 22,
+      featured: true,
+      bestSeller: true,
+      onOffer: true,
+      offerPercent: 19,
+    },
+    // ── Lehengas (3) ────────────────────────────────────────────────────────
+    {
+      name: 'Bridal Lehenga — Scarlet Red',
+      description:
+        'Heavily embroidered bridal lehenga in scarlet red with zari work. Comes with dupatta and blouse piece. A dream for the modern bride.',
+      price: 28000,
+      comparePrice: 35000,
+      images: [
+        'https://picsum.photos/seed/lehenga1/600/800',
+        'https://picsum.photos/seed/lehenga1b/600/800',
+      ],
+      categoryId: lehengas.id,
+      sizes: ['S', 'M', 'L', 'XL'],
+      colors: ['Scarlet Red', 'Gold'],
+      fabric: 'Velvet & Silk',
+      occasion: ['wedding'],
+      stock: 5,
+      featured: true,
+      bestSeller: true,
+      onOffer: true,
+      offerPercent: 20,
+    },
+    {
+      name: 'Festive Lehenga — Powder Blue',
+      description:
+        'Light-weight festive lehenga with floral embroidery. Perfect for mehendi and haldi ceremonies.',
+      price: 8500,
+      comparePrice: 10000,
+      images: ['https://picsum.photos/seed/lehenga2/600/800'],
+      categoryId: lehengas.id,
+      sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+      colors: ['Powder Blue', 'White'],
+      fabric: 'Net & Satin',
+      occasion: ['wedding', 'festival'],
+      stock: 10,
+      featured: true,
+      bestSeller: false,
+      onOffer: false,
+    },
+    {
+      name: 'Party Lehenga — Rose Gold',
+      description:
+        'Shimmer party lehenga in rose gold with sequin work. A perfect choice for cocktail parties and receptions.',
+      price: 5500,
+      comparePrice: 6500,
+      images: ['https://picsum.photos/seed/lehenga3/600/800'],
+      categoryId: lehengas.id,
+      sizes: ['S', 'M', 'L', 'XL'],
+      colors: ['Rose Gold'],
+      fabric: 'Sequin Georgette',
+      occasion: ['party'],
+      stock: 8,
+      featured: true,
+      bestSeller: true,
+      onOffer: true,
+      offerPercent: 15,
+    },
+    // ── Blouses (3) ─────────────────────────────────────────────────────────
+    {
+      name: 'Zardozi Blouse — Ivory',
+      description: 'Exquisite zardozi embroidery blouse in ivory. Pairs beautifully with any saree.',
+      price: 1800,
+      comparePrice: 2200,
+      images: ['https://picsum.photos/seed/blouse1/600/800'],
+      categoryId: blouses.id,
+      sizes: ['XS', 'S', 'M', 'L', 'XL'],
+      colors: ['Ivory', 'Gold'],
+      fabric: 'Silk',
+      occasion: ['wedding', 'festival'],
+      stock: 15,
+      featured: false,
+      bestSeller: true,
+      onOffer: true,
+      offerPercent: 18,
+    },
+    {
+      name: 'Backless Designer Blouse — Navy',
+      description:
+        'Trendy backless blouse in navy with pearl buttons. Adds a contemporary touch to traditional sarees.',
+      price: 1200,
+      comparePrice: null,
+      images: ['https://picsum.photos/seed/blouse2/600/800'],
+      categoryId: blouses.id,
+      sizes: ['XS', 'S', 'M', 'L', 'XL'],
+      colors: ['Navy Blue'],
+      fabric: 'Velvet',
+      occasion: ['party'],
+      stock: 20,
+      featured: false,
+      bestSeller: false,
+      onOffer: false,
+    },
+    {
+      name: 'Patchwork Cotton Blouse — Multicolor',
+      description: 'Vibrant patchwork blouse handcrafted from vintage fabrics. Each piece is unique.',
+      price: 950,
+      comparePrice: 1200,
+      images: ['https://picsum.photos/seed/blouse3/600/800'],
+      categoryId: blouses.id,
+      sizes: ['S', 'M', 'L', 'XL'],
+      colors: ['Multicolor'],
+      fabric: 'Cotton',
+      occasion: ['casual', 'festival'],
+      stock: 12,
+      featured: false,
+      bestSeller: true,
+      onOffer: true,
+      offerPercent: 21,
+    },
+    // ── Dupattas (2) ────────────────────────────────────────────────────────
+    {
+      name: 'Chikankari Dupatta — Powder White',
+      description:
+        'Hand-embroidered chikankari dupatta in pristine white. Adds a delicate charm to any outfit.',
+      price: 1200,
+      comparePrice: 1500,
+      images: ['https://picsum.photos/seed/dupatta1/600/800'],
+      categoryId: dupattas.id,
+      sizes: ['Free Size'],
+      colors: ['White', 'Ivory'],
+      fabric: 'Georgette',
+      occasion: ['festival', 'wedding'],
+      stock: 30,
+      featured: true,
+      bestSeller: true,
+      onOffer: true,
+      offerPercent: 20,
+    },
+    {
+      name: 'Bandhani Dupatta — Sunset Orange',
+      description:
+        'Vibrant bandhani tie-dye dupatta in warm sunset orange. A pop of colour for festive looks.',
+      price: 750,
+      comparePrice: null,
+      images: ['https://picsum.photos/seed/dupatta2/600/800'],
+      categoryId: dupattas.id,
+      sizes: ['Free Size'],
+      colors: ['Orange', 'Pink'],
+      fabric: 'Cotton',
+      occasion: ['festival', 'casual'],
+      stock: 40,
+      featured: false,
+      bestSeller: false,
+      onOffer: false,
+    },
+    // ── Accessories (2) ─────────────────────────────────────────────────────
+    {
+      name: 'Temple Jewellery Set — Antique Gold',
+      description:
+        'Traditional temple jewellery set including necklace, earrings, and maang tikka. Perfect for bridal and festive look.',
+      price: 3200,
+      comparePrice: 4000,
+      images: ['https://picsum.photos/seed/acc1/600/800'],
+      categoryId: accessories.id,
+      sizes: ['Free Size'],
+      colors: ['Antique Gold'],
+      fabric: null,
+      occasion: ['wedding', 'festival'],
+      stock: 20,
+      featured: true,
+      bestSeller: true,
+      onOffer: true,
+      offerPercent: 20,
+    },
+    {
+      name: 'Silk Potli Bag — Bottle Green',
+      description:
+        'Hand-embroidered silk potli bag. The perfect ethnic accessory to complete your traditional outfit.',
+      price: 599,
+      comparePrice: 799,
+      images: ['https://picsum.photos/seed/acc2/600/800'],
+      categoryId: accessories.id,
+      sizes: ['Free Size'],
+      colors: ['Bottle Green', 'Gold'],
+      fabric: 'Silk',
+      occasion: ['wedding', 'festival', 'party'],
+      stock: 35,
+      featured: false,
+      bestSeller: false,
+      onOffer: true,
+      offerPercent: 25,
+    },
+  ];
+
+  for (const product of products) {
+    const slug = slugify(product.name, { lower: true, strict: true });
+    await prisma.product.upsert({
+      where: { slug },
+      update: {},
+      create: { ...product, slug },
+    });
+  }
+
+  // Sample coupons
+  await prisma.coupon.upsert({
+    where: { code: 'WELCOME10' },
+    update: {},
+    create: { code: 'WELCOME10', discount: 10, minOrder: 500, maxUses: 1000, active: true },
+  });
+  await prisma.coupon.upsert({
+    where: { code: 'FESTIVE20' },
+    update: {},
+    create: { code: 'FESTIVE20', discount: 20, minOrder: 2000, maxUses: 500, active: true },
+  });
+  await prisma.coupon.upsert({
+    where: { code: 'FLAT15' },
+    update: {},
+    create: { code: 'FLAT15', discount: 15, minOrder: 1000, active: true },
+  });
+
+  console.log(`✅ Seeded 6 categories and ${products.length} products`);
+}
+
+main()
+  .catch(console.error)
+  .finally(() => prisma.$disconnect());

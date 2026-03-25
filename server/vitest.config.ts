@@ -7,6 +7,12 @@ export default defineConfig({
     include: ['src/__tests__/**/*.test.ts'],
     setupFiles: ['./src/__tests__/test-env.ts'],
     fileParallelism: false,
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
     testTimeout: 30000,
   },
 });

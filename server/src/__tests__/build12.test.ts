@@ -22,7 +22,6 @@ beforeEach(async () => {
 afterAll(async () => {
   await testPrisma.storeCredit.deleteMany({});
   await cleanupTest();
-  await testPrisma.$disconnect();
 });
 
 // ── Bulk Product Operations ────────────────────────────────────────────────

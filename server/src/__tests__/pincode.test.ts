@@ -11,7 +11,6 @@ beforeEach(async () => {
 
 afterAll(async () => {
   await cleanupTest();
-  await testPrisma.$disconnect();
 });
 
 describe('GET /api/pincode/:pincode', () => {

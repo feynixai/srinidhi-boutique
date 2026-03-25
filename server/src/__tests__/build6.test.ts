@@ -19,7 +19,6 @@ beforeEach(async () => {
 
 afterAll(async () => {
   await cleanupTest();
-  await testPrisma.$disconnect();
 });
 
 // ── Phone OTP ────────────────────────────────────────────────────────────────

@@ -20,7 +20,6 @@ beforeEach(async () => {
 
 afterAll(async () => {
   await cleanupTest();
-  await testPrisma.$disconnect();
 });
 
 // ── Loyalty Program ───────────────────────────────────────────────────────────

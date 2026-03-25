@@ -18,7 +18,6 @@ beforeEach(async () => {
 
 afterAll(async () => {
   await cleanupTest();
-  await testPrisma.$disconnect();
 });
 
 // ── Stripe fully removed ──────────────────────────────────────────────────────

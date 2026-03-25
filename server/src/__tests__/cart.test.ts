@@ -9,7 +9,6 @@ beforeEach(async () => {
 
 afterAll(async () => {
   await cleanupTest();
-  await testPrisma.$disconnect();
 });
 
 describe('POST /api/cart — Add to cart', () => {

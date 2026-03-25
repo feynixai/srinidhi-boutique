@@ -15,7 +15,6 @@ beforeEach(async () => {
 
 afterAll(async () => {
   await cleanupTest();
-  await testPrisma.$disconnect();
 });
 
 const addr = { line1: '1 Street', city: 'Hyderabad', state: 'Telangana', pincode: '500001' };

@@ -37,7 +37,6 @@ afterAll(async () => {
   await testPrisma.bundle.deleteMany({});
   await testPrisma.abandonedCart.deleteMany({});
   await cleanupTest();
-  await testPrisma.$disconnect();
 });
 
 // ── Abandoned Cart ─────────────────────────────────────────────────────────

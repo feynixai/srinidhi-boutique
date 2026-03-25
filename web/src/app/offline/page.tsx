@@ -7,12 +7,9 @@ export default function OfflinePage() {
         <p className="text-charcoal/60 text-sm max-w-xs mx-auto mb-6">
           It looks like you've lost your internet connection. Please check your network and try again.
         </p>
-        <button
-          onClick={() => window.location.reload()}
-          className="btn-primary px-8 py-3 text-sm"
-        >
-          Try Again
-        </button>
+        <a href="/" className="btn-primary px-8 py-3 text-sm">
+          Go to Homepage
+        </a>
       </div>
     </div>
   );

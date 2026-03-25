@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Playfair_Display, Inter } from 'next/font/google';
+import { Cormorant_Garamond, DM_Sans } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
 import { Header } from '@/components/Header';
@@ -15,18 +15,18 @@ import { AnnouncementBar } from '@/components/AnnouncementBar';
 import { ExitIntentPopup } from '@/components/ExitIntentPopup';
 import { Toaster } from 'react-hot-toast';
 
-const playfair = Playfair_Display({
+const heading = Cormorant_Garamond({
   subsets: ['latin'],
   variable: '--font-playfair',
   display: 'swap',
   weight: ['400', '500', '600', '700'],
 });
 
-const inter = Inter({
+const body = DM_Sans({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',
-  weight: ['300', '400', '500', '600'],
+  weight: ['300', '400', '500', '600', '700'],
 });
 
 export const metadata: Metadata = {
@@ -69,7 +69,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
+    <html lang="en" className={`${heading.variable} ${body.variable}`}>
       <head>
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />

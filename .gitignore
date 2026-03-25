@@ -10,3 +10,4 @@ coverage/
 prisma/migrations/
 uploads/
 .vercel
+*.tsbuildinfo

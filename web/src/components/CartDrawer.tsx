@@ -70,10 +70,18 @@ export function CartDrawer() {
         {/* Items */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
           {items.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-gray-400 mb-4">Your bag is empty</p>
-              <button onClick={closeCart} className="btn-primary text-sm">
-                Continue Shopping
+            <div className="text-center py-12 px-4">
+              <svg className="mx-auto mb-5 w-24 h-24 opacity-70" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="48" cy="48" r="44" fill="#1a1a2e" fillOpacity="0.04"/>
+                <path d="M28 32h4l6 24h24l4-16H36" stroke="#c5a55a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="42" cy="62" r="2.5" fill="#1a1a2e" fillOpacity="0.3"/>
+                <circle cx="56" cy="62" r="2.5" fill="#1a1a2e" fillOpacity="0.3"/>
+                <path d="M48 22 C44 22 41 25 41 29 L55 29 C55 25 52 22 48 22Z" stroke="#c5a55a" strokeWidth="1.5" strokeLinecap="round" fill="none" strokeOpacity="0.5"/>
+              </svg>
+              <p className="font-serif text-lg text-[#1a1a2e] mb-1">Your bag is empty</p>
+              <p className="text-gray-400 text-xs mb-5">Add your favourite pieces to get started</p>
+              <button onClick={closeCart} className="btn-primary text-sm px-6">
+                Start Shopping
               </button>
             </div>
           ) : (

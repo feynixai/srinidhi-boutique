@@ -24,11 +24,15 @@ export default function WishlistPage() {
     return (
       <div className="max-w-2xl mx-auto px-4 py-20 text-center">
         <div className="glass-card p-12">
-          <div className="text-6xl mb-6">♡</div>
+          <svg className="mx-auto mb-6 w-28 h-28 opacity-80" viewBox="0 0 112 112" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="56" cy="56" r="50" fill="#1a1a2e" fillOpacity="0.04"/>
+            <path d="M56 78 C56 78 30 62 30 44 C30 36 36 30 44 30 C49 30 53 33 56 37 C59 33 63 30 68 30 C76 30 82 36 82 44 C82 62 56 78 56 78Z" stroke="#c5a55a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" strokeOpacity="0.6"/>
+            <path d="M56 70 C56 70 36 57 36 44 C36 39 40 35 44 35 C49 35 52 38 56 42 C60 38 63 35 68 35 C72 35 76 39 76 44 C76 57 56 70 56 70Z" fill="#c5a55a" fillOpacity="0.12"/>
+          </svg>
           <h1 className="font-bold text-3xl mb-3 text-[#1a1a2e] tracking-tight">Your Wishlist is Empty</h1>
           <p className="text-[#6b7280] mb-8">Save your favourite pieces here and come back to them anytime.</p>
           <Link href="/shop" className="btn-primary px-8 py-3 inline-block">
-            BROWSE COLLECTION
+            EXPLORE PRODUCTS
           </Link>
         </div>
       </div>

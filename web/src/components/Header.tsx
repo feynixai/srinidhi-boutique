@@ -5,6 +5,7 @@ import { FiSearch, FiShoppingBag, FiMenu, FiX, FiHeart, FiChevronDown, FiChevron
 import { useCartStore } from '@/lib/cart-store';
 import { useWishlistStore } from '@/lib/wishlist-store';
 import { getCart } from '@/lib/api';
+import { useLanguage } from '@/lib/language-context';
 
 const megaMenu = [
   {
@@ -119,6 +120,7 @@ export function Header() {
   const wishlistCount = useWishlistStore((s) => s.items.length);
   const menuRef = useRef<HTMLDivElement>(null);
   const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { lang, setLang, t } = useLanguage();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -241,10 +243,20 @@ export function Header() {
 
             {/* Action icons */}
             <div className="flex items-center space-x-1">
+              {/* Language toggle */}
+              <button
+                onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
+                className="hidden md:flex items-center gap-0.5 text-xs font-medium px-2.5 py-1 rounded-full border border-[#c5a55a]/40 text-[#c5a55a] hover:bg-[#c5a55a]/10 transition-all"
+                aria-label="Toggle language"
+              >
+                <span className={lang === 'en' ? 'font-bold' : 'opacity-50'}>EN</span>
+                <span className="opacity-30 mx-0.5">|</span>
+                <span className={lang === 'hi' ? 'font-bold' : 'opacity-50'}>हिंदी</span>
+              </button>
               <Link
                 href="/search"
                 className="p-2 text-[#1a1a2e]/70 hover:text-[#1a1a2e] hover:bg-white/60 rounded-full transition-all"
-                aria-label="Search"
+                aria-label={t.search}
               >
                 <FiSearch size={20} />
               </Link>
@@ -336,9 +348,17 @@ export function Header() {
                   )}
                 </div>
               ))}
-              <Link href="/orders" className="block py-3.5 text-base font-medium text-[#1a1a2e] hover:text-[#c5a55a] border-b border-black/5" onClick={() => setMobileOpen(false)}>My Orders</Link>
-              <Link href="/wishlist" className="block py-3.5 text-base font-medium text-[#1a1a2e] hover:text-[#c5a55a] border-b border-black/5" onClick={() => setMobileOpen(false)}>Wishlist</Link>
-              <Link href="/blog" className="block py-3.5 text-base font-medium text-[#1a1a2e] hover:text-[#c5a55a]" onClick={() => setMobileOpen(false)}>Blog</Link>
+              <Link href="/orders" className="block py-3.5 text-base font-medium text-[#1a1a2e] hover:text-[#c5a55a] border-b border-black/5" onClick={() => setMobileOpen(false)}>{t.myOrders}</Link>
+              <Link href="/wishlist" className="block py-3.5 text-base font-medium text-[#1a1a2e] hover:text-[#c5a55a] border-b border-black/5" onClick={() => setMobileOpen(false)}>{t.wishlist}</Link>
+              <Link href="/blog" className="block py-3.5 text-base font-medium text-[#1a1a2e] hover:text-[#c5a55a] border-b border-black/5" onClick={() => setMobileOpen(false)}>{t.blog}</Link>
+              <button
+                onClick={() => { setLang(lang === 'en' ? 'hi' : 'en'); setMobileOpen(false); }}
+                className="w-full text-left py-3.5 text-base font-medium text-[#c5a55a] flex items-center gap-2"
+              >
+                <span className={lang === 'en' ? 'font-bold' : 'opacity-50'}>EN</span>
+                <span className="opacity-30">|</span>
+                <span className={lang === 'hi' ? 'font-bold' : 'opacity-50'}>हिंदी</span>
+              </button>
             </div>
           </div>
         )}

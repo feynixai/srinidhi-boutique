@@ -8,11 +8,7 @@ export default defineConfig({
     setupFiles: ['./src/__tests__/test-env.ts'],
     fileParallelism: false,
     pool: 'forks',
-    poolOptions: {
-      forks: {
-        singleFork: true,
-      },
-    },
+    singleFork: true,
     testTimeout: 30000,
   },
 });

@@ -54,7 +54,7 @@ lookbookRoutes.post('/admin', async (req: Request, res: Response) => {
       title: z.string().min(1),
       description: z.string().optional(),
       image: z.string().url(),
-      productIds: z.array(z.string()).min(1).max(10),
+      productIds: z.array(z.string()).max(10),
     })
     .parse(req.body);
 
@@ -110,7 +110,7 @@ lookbookRoutes.delete('/admin/:id', async (req: Request, res: Response) => {
   if (!entry) throw new AppError(404, 'Lookbook entry not found');
 
   await prisma.lookbook.delete({ where: { id: req.params.id } });
-  res.json({ message: 'Lookbook entry deleted' });
+  res.json({ success: true, message: 'Lookbook entry deleted' });
 });
 
 // Admin: list all lookbook entries

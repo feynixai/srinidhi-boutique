@@ -54,21 +54,25 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* Trust Badges Strip */}
-      <div className="bg-white/40 backdrop-blur-sm border-b border-white/30">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-black/5">
+      {/* Trust Badges — Glass Pills */}
+      <div className="bg-white/30 backdrop-blur-sm border-b border-white/20 py-5">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex flex-wrap justify-center gap-3">
             {[
               { icon: '🚚', text: 'Free Shipping', sub: 'Above ₹999' },
-              { icon: '↩', text: 'Easy Returns', sub: '7-Day Policy' },
+              { icon: '↩️', text: 'Easy Returns', sub: '7-Day Policy' },
               { icon: '🔒', text: 'Secure Payments', sub: 'UPI · Cards · COD' },
+              { icon: '💰', text: 'Cash on Delivery', sub: 'Pan India' },
               { icon: '💬', text: 'WhatsApp Support', sub: 'Always Available' },
             ].map((b) => (
-              <div key={b.text} className="flex items-center gap-3 px-4 py-2 first:pl-0 last:pr-0">
-                <span className="text-2xl">{b.icon}</span>
+              <div
+                key={b.text}
+                className="flex items-center gap-2.5 bg-white/60 backdrop-blur-xl border border-white/40 px-4 py-2.5 rounded-full shadow-sm hover:bg-white/80 transition-all"
+              >
+                <span className="text-lg leading-none">{b.icon}</span>
                 <div>
-                  <p className="text-xs font-semibold text-[#1a1a2e] tracking-wide">{b.text}</p>
-                  <p className="text-xs text-[#1a1a2e]/50">{b.sub}</p>
+                  <p className="text-xs font-semibold text-[#1a1a2e] leading-tight">{b.text}</p>
+                  <p className="text-[10px] text-[#1a1a2e]/50 leading-tight">{b.sub}</p>
                 </div>
               </div>
             ))}
@@ -238,6 +242,54 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* Testimonials */}
+      <section className="py-16 bg-[#f5f5f0]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-10">
+            <h2 className="section-heading">What Our Customers Say</h2>
+            <div className="divider-gold mx-auto" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {[
+              {
+                name: 'Priya Reddy',
+                location: 'Hyderabad',
+                text: 'The Kanjivaram saree I ordered was absolutely stunning. The zari work is exquisite and delivery was prompt. Will definitely order again!',
+                rating: 5,
+              },
+              {
+                name: 'Anjali Sharma',
+                location: 'Bangalore',
+                text: 'Ordered a bridal lehenga for my sister\'s wedding — the quality exceeded our expectations. Packaging was beautiful too. Highly recommend!',
+                rating: 5,
+              },
+              {
+                name: 'Meera Nair',
+                location: 'Chennai',
+                text: 'Best place to shop for ethnic wear online. The saree colours in person are even better than the photos. Easy returns policy is a bonus.',
+                rating: 5,
+              },
+            ].map((t) => (
+              <div
+                key={t.name}
+                className="bg-white/60 backdrop-blur-xl border border-white/30 rounded-3xl p-6 shadow-card"
+              >
+                <div className="flex gap-0.5 mb-3">
+                  {Array.from({ length: t.rating }).map((_, i) => (
+                    <span key={i} className="text-[#c5a55a] text-sm">★</span>
+                  ))}
+                </div>
+                <p className="text-[#1a1a2e]/80 text-sm leading-relaxed mb-4 italic">&ldquo;{t.text}&rdquo;</p>
+                <div>
+                  <p className="text-sm font-semibold text-[#1a1a2e]">{t.name}</p>
+                  <p className="text-xs text-[#1a1a2e]/50">{t.location}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Newsletter */}
       <NewsletterSignup />

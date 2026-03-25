@@ -88,8 +88,38 @@ export interface DashboardStats {
   lowStockProducts: number;
 }
 
+export interface TopSellingProduct {
+  productId: string;
+  name: string;
+  totalSold: number;
+}
+
+export interface LowStockItem {
+  id: string;
+  name: string;
+  stock: number;
+  category?: { name: string };
+}
+
+export interface DashboardWidgets {
+  todayOrders: number;
+  todayRevenue: number;
+  totalProducts: number;
+  lowStockCount: number;
+  topSellingProducts: TopSellingProduct[];
+  recentOrders: Order[];
+  weekRevenue7: number;
+  weekRevenue30: number;
+}
+
 export const getDashboard = () =>
   api.get('/api/admin/dashboard').then((r) => r.data as DashboardStats);
+
+export const getDashboardWidgets = () =>
+  api.get('/api/admin/dashboard/widgets').then((r) => r.data as DashboardWidgets);
+
+export const getLowStockProducts = (threshold = 5) =>
+  api.get(`/api/admin/low-stock?threshold=${threshold}`).then((r) => r.data as { threshold: number; count: number; products: LowStockItem[] });
 
 export const getAdminProducts = (params?: Record<string, string>) =>
   api.get('/api/admin/products', { params }).then((r) => r.data as { products: Product[]; total: number; page: number; totalPages: number });

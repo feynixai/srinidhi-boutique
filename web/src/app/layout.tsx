@@ -8,6 +8,7 @@ import { CartDrawer } from '@/components/CartDrawer';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { BackToTop } from '@/components/BackToTop';
 import { MobileBottomNav } from '@/components/MobileBottomNav';
+import { CompareBar } from '@/components/CompareBar';
 import { Toaster } from 'react-hot-toast';
 
 const playfair = Playfair_Display({
@@ -50,13 +51,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen flex flex-col bg-[#f5f5f0] pb-16 md:pb-0">
         <Providers>
+          {/* Skip to main content — accessibility */}
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:bg-[#1a1a2e] focus:text-[#c5a55a] focus:px-4 focus:py-2 focus:rounded-full focus:text-sm focus:font-semibold"
+          >
+            Skip to main content
+          </a>
           <Header />
-          <main className="flex-1">{children}</main>
+          <main id="main-content" className="flex-1">{children}</main>
           <Footer />
           <CartDrawer />
           <WhatsAppButton />
           <BackToTop />
           <MobileBottomNav />
+          <CompareBar />
           <Toaster
             position="bottom-center"
             toastOptions={{

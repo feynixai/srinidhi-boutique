@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { useCartStore } from '@/lib/cart-store';
-import { getCart, placeOrder, validateCoupon } from '@/lib/api';
+import { getCart, placeOrder, validateCoupon, getBestCoupons, CouponSuggestion } from '@/lib/api';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -82,6 +82,7 @@ export default function CheckoutPage() {
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [couponApplied, setCouponApplied] = useState(false);
   const [couponLoading, setCouponLoading] = useState(false);
+  const [availableCoupons, setAvailableCoupons] = useState<CouponSuggestion[]>([]);
   const [upiOrderId] = useState(`SB${Date.now()}`);
   const [selectedCountry, setSelectedCountry] = useState('IN');
 
@@ -133,15 +134,27 @@ export default function CheckoutPage() {
     }
   }, [searchParams]);
 
-  async function applyCoupon() {
-    if (!couponInput.trim()) return;
+  useEffect(() => {
+    if (subtotal > 0) {
+      getBestCoupons(subtotal)
+        .then((data) => setAvailableCoupons(data.coupons || []))
+        .catch(() => {});
+    }
+  }, [subtotal]);
+
+  async function applyCoupon(overrideCode?: string) {
+    const code = overrideCode ?? couponInput;
+    if (!code.trim()) return;
+    if (overrideCode) setCouponInput(overrideCode);
     setCouponLoading(true);
     try {
-      const result = await validateCoupon(couponInput.trim(), subtotal);
+      const result = await validateCoupon(code.trim(), subtotal);
       if (result.valid) {
-        const discount = Math.round((subtotal * result.discount) / 100);
+        const discount = result.type === 'flat'
+          ? Math.min(result.discount, subtotal)
+          : Math.round((subtotal * result.discount) / 100);
         setCouponDiscount(discount);
-        setCouponCode(couponInput.trim().toUpperCase());
+        setCouponCode(code.trim().toUpperCase());
         setCouponApplied(true);
         toast.success(`Coupon applied! You save ₹${discount}`);
       } else {
@@ -277,23 +290,37 @@ export default function CheckoutPage() {
     await handlePlaceOrder();
   }
 
+  const STEPS: { key: Step; label: string }[] = [
+    { key: 'address', label: 'Delivery' },
+    { key: 'payment', label: 'Payment' },
+    { key: 'confirm', label: 'Confirm' },
+  ];
+  const currentStepIndex = STEPS.findIndex((s) => s.key === step);
+
   const StepIndicator = () => (
-    <div className="flex items-center justify-center mb-10">
-      {(['address', 'payment', 'confirm'] as Step[]).map((s, i) => (
-        <div key={s} className="flex items-center">
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
-            step === s ? 'bg-rose-gold text-white' :
-            (['address', 'payment', 'confirm'].indexOf(step) > i) ? 'bg-green-500 text-white' :
-            'bg-gray-100 text-gray-400'
-          }`}>
-            {(['address', 'payment', 'confirm'].indexOf(step) > i) ? '✓' : i + 1}
-          </div>
-          <span className={`ml-1.5 text-xs capitalize hidden sm:block ${step === s ? 'text-rose-gold font-medium' : 'text-gray-400'}`}>
-            {s === 'address' ? 'Delivery' : s === 'payment' ? 'Payment' : 'Confirm'}
-          </span>
-          {i < 2 && <div className="w-12 h-px bg-gray-200 mx-3" />}
-        </div>
-      ))}
+    <div className="mb-10">
+      {/* Glass progress bar */}
+      <div className="bg-white/60 backdrop-blur-xl border border-white/30 rounded-full px-6 py-3 shadow-sm flex items-center justify-between max-w-sm mx-auto">
+        {STEPS.map((s, i) => {
+          const done = currentStepIndex > i;
+          const active = currentStepIndex === i;
+          return (
+            <div key={s.key} className="flex items-center">
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
+                done ? 'bg-green-500 text-white' : active ? 'bg-[#1a1a2e] text-[#c5a55a]' : 'bg-gray-100 text-gray-400'
+              }`}>
+                {done ? '✓' : i + 1}
+              </div>
+              <span className={`ml-1.5 text-xs hidden sm:block font-medium transition-colors ${active ? 'text-[#1a1a2e]' : done ? 'text-green-600' : 'text-gray-400'}`}>
+                {s.label}
+              </span>
+              {i < 2 && (
+                <div className={`w-10 h-0.5 mx-3 rounded-full transition-all duration-500 ${done ? 'bg-green-400' : 'bg-gray-200'}`} />
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 
@@ -437,26 +464,58 @@ export default function CheckoutPage() {
               </div>
 
               {/* Coupon */}
-              <div className="border border-gray-200 rounded-sm p-4 bg-warm-white">
-                <p className="text-sm font-medium mb-2">Have a coupon?</p>
+              <div className="border border-gray-200 rounded-sm p-4 bg-warm-white space-y-3">
+                <p className="text-sm font-medium">Have a coupon?</p>
                 {couponApplied ? (
                   <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded px-3 py-2">
                     <span className="text-sm text-green-700 font-medium">{couponCode} — ₹{couponDiscount} off</span>
                     <button onClick={removeCoupon} className="text-xs text-red-500 hover:text-red-700">Remove</button>
                   </div>
                 ) : (
-                  <div className="flex gap-2">
-                    <input
-                      value={couponInput}
-                      onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                      placeholder="Enter coupon code"
-                      className="flex-1 border border-gray-200 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-rose-gold"
-                      onKeyDown={(e) => e.key === 'Enter' && applyCoupon()}
-                    />
-                    <button onClick={applyCoupon} disabled={couponLoading} className="btn-outline px-4 py-2 text-sm disabled:opacity-50">
-                      {couponLoading ? '...' : 'Apply'}
-                    </button>
-                  </div>
+                  <>
+                    <div className="flex gap-2">
+                      <input
+                        value={couponInput}
+                        onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                        placeholder="Enter coupon code"
+                        className="flex-1 border border-gray-200 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-rose-gold"
+                        onKeyDown={(e) => e.key === 'Enter' && applyCoupon()}
+                      />
+                      <button onClick={applyCoupon} disabled={couponLoading} className="btn-outline px-4 py-2 text-sm disabled:opacity-50">
+                        {couponLoading ? '...' : 'Apply'}
+                      </button>
+                    </div>
+                    {availableCoupons.length > 0 && (
+                      <div>
+                        <p className="text-xs text-gray-500 mb-2">Available coupons for your order:</p>
+                        <div className="space-y-2">
+                          {availableCoupons.map((c, idx) => (
+                            <div
+                              key={c.code}
+                              className={`flex items-center justify-between rounded px-3 py-2 border ${idx === 0 ? 'border-green-300 bg-green-50' : 'border-gray-200 bg-gray-50'}`}
+                            >
+                              <div className="flex items-center gap-2">
+                                {idx === 0 && (
+                                  <span className="text-xs bg-green-600 text-white px-1.5 py-0.5 rounded font-medium">Best</span>
+                                )}
+                                <span className="text-sm font-mono font-semibold text-[#1a1a2e]">{c.code}</span>
+                                <span className="text-xs text-gray-500">
+                                  {c.type === 'flat' ? `₹${c.discount} off` : `${c.discount}% off`}
+                                  {' '}· saves ₹{Math.round(c.discountAmount)}
+                                </span>
+                              </div>
+                              <button
+                                onClick={() => applyCoupon(c.code)}
+                                className="text-xs font-medium text-[#c5a55a] hover:text-[#1a1a2e] transition-colors"
+                              >
+                                Apply
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
 
@@ -475,24 +534,37 @@ export default function CheckoutPage() {
               <h2 className="font-serif text-xl">Payment Method</h2>
 
               {isIndia ? (
-                // Indian payment options
+                // Indian payment options — glass cards
                 <div className="space-y-3">
                   {[
                     { id: 'upi' as const, label: 'UPI / PhonePe / GPay / Paytm', desc: 'Instant payment via UPI apps — most popular', icon: '📱', badge: 'Recommended' },
                     { id: 'razorpay' as const, label: 'Pay Online (Razorpay)', desc: 'Debit/Credit cards, Net banking, UPI via Razorpay', icon: '💳' },
                     { id: 'cod' as const, label: 'Cash on Delivery', desc: `Pay when your order arrives (+₹${COD_CHARGE} handling charge)`, icon: '💵' },
                   ].map((method) => (
-                    <label key={method.id} className={`flex items-center gap-4 p-4 border-2 rounded-sm cursor-pointer transition-colors ${paymentMethod === method.id ? 'border-rose-gold bg-rose-gold/5' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="payment" value={method.id} checked={paymentMethod === method.id} onChange={() => setPaymentMethod(method.id)} className="accent-rose-gold" />
-                      <span className="text-xl">{method.icon}</span>
+                    <button
+                      key={method.id}
+                      type="button"
+                      onClick={() => setPaymentMethod(method.id)}
+                      className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 text-left ${
+                        paymentMethod === method.id
+                          ? 'border-[#1a1a2e] bg-[#1a1a2e]/5 shadow-md'
+                          : 'border-white/40 bg-white/50 backdrop-blur-xl hover:border-[#1a1a2e]/30 hover:bg-white/70'
+                      }`}
+                    >
+                      <span className="text-2xl">{method.icon}</span>
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <p className="font-medium text-sm">{method.label}</p>
-                          {method.badge && <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">{method.badge}</span>}
+                          <p className="font-semibold text-sm text-[#1a1a2e]">{method.label}</p>
+                          {method.badge && <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">{method.badge}</span>}
                         </div>
-                        <p className="text-xs text-gray-500">{method.desc}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">{method.desc}</p>
                       </div>
-                    </label>
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                        paymentMethod === method.id ? 'border-[#1a1a2e] bg-[#1a1a2e]' : 'border-gray-300'
+                      }`}>
+                        {paymentMethod === method.id && <div className="w-2 h-2 rounded-full bg-[#c5a55a]" />}
+                      </div>
+                    </button>
                   ))}
                 </div>
               ) : (
@@ -502,17 +574,30 @@ export default function CheckoutPage() {
                     { id: 'razorpay' as const, label: 'Credit / Debit Card (Razorpay)', desc: 'Visa, Mastercard — secure international checkout', icon: '💳', badge: 'Recommended' },
                     { id: 'bank_transfer' as const, label: 'Bank Transfer (Wire / SWIFT)', desc: 'Transfer to our HDFC account — confirm by email', icon: '🏦' },
                   ].map((method) => (
-                    <label key={method.id} className={`flex items-center gap-4 p-4 border-2 rounded-sm cursor-pointer transition-colors ${paymentMethod === method.id ? 'border-rose-gold bg-rose-gold/5' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="payment" value={method.id} checked={paymentMethod === method.id} onChange={() => setPaymentMethod(method.id)} className="accent-rose-gold" />
-                      <span className="text-xl">{method.icon}</span>
+                    <button
+                      key={method.id}
+                      type="button"
+                      onClick={() => setPaymentMethod(method.id)}
+                      className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 text-left ${
+                        paymentMethod === method.id
+                          ? 'border-[#1a1a2e] bg-[#1a1a2e]/5 shadow-md'
+                          : 'border-white/40 bg-white/50 backdrop-blur-xl hover:border-[#1a1a2e]/30 hover:bg-white/70'
+                      }`}
+                    >
+                      <span className="text-2xl">{method.icon}</span>
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <p className="font-medium text-sm">{method.label}</p>
-                          {method.badge && <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">{method.badge}</span>}
+                          <p className="font-semibold text-sm text-[#1a1a2e]">{method.label}</p>
+                          {method.badge && <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">{method.badge}</span>}
                         </div>
-                        <p className="text-xs text-gray-500">{method.desc}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">{method.desc}</p>
                       </div>
-                    </label>
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                        paymentMethod === method.id ? 'border-[#1a1a2e] bg-[#1a1a2e]' : 'border-gray-300'
+                      }`}>
+                        {paymentMethod === method.id && <div className="w-2 h-2 rounded-full bg-[#c5a55a]" />}
+                      </div>
+                    </button>
                   ))}
                   <div className="bg-amber-50 border border-amber-200 rounded px-3 py-2 text-xs text-amber-700">
                     All prices in ₹ INR. Your bank will convert to your local currency.
@@ -529,22 +614,30 @@ export default function CheckoutPage() {
                 </div>
               )}
 
-              {/* UPI QR Code Section */}
+              {/* UPI QR Code — Glass Card */}
               {paymentMethod === 'upi' && (
-                <div className="border border-rose-gold/30 rounded-sm p-5 bg-rose-gold/5 text-center">
-                  <p className="font-medium text-sm mb-3">Scan QR Code to Pay ₹{total.toLocaleString('en-IN')}</p>
-                  <img src={buildQrUrl(total, upiOrderId)} alt="UPI QR Code" className="w-48 h-48 mx-auto border border-gray-200 rounded bg-white p-2" />
-                  <p className="text-xs text-gray-500 mt-3 mb-2">Or use UPI ID directly:</p>
-                  <div className="bg-white border border-gray-200 rounded px-3 py-2 inline-flex items-center gap-2">
-                    <span className="font-mono text-sm font-medium">{UPI_ID}</span>
-                    <button onClick={() => { navigator.clipboard.writeText(UPI_ID); toast.success('UPI ID copied!'); }} className="text-xs text-rose-gold hover:underline">Copy</button>
+                <div className="bg-white/60 backdrop-blur-xl border border-white/40 rounded-3xl p-6 text-center shadow-card">
+                  <p className="font-semibold text-sm text-[#1a1a2e] mb-1">Scan QR Code to Pay</p>
+                  <p className="text-2xl font-bold text-[#c5a55a] mb-4">&#x20B9;{total.toLocaleString('en-IN')}</p>
+                  <div className="bg-white rounded-2xl p-3 inline-block shadow-sm border border-white/60 mb-3">
+                    <img src={buildQrUrl(total, upiOrderId)} alt="UPI QR Code" className="w-44 h-44" />
                   </div>
-                  <div className="flex justify-center gap-3 mt-4">
-                    <a href={`phonepe://pay?pa=${UPI_ID}&pn=${STORE_NAME}&am=${total.toFixed(2)}&cu=INR`} className="bg-purple-600 text-white px-3 py-2 rounded text-xs font-medium">PhonePe</a>
-                    <a href={`tez://upi/pay?pa=${UPI_ID}&pn=${STORE_NAME}&am=${total.toFixed(2)}&cu=INR`} className="bg-blue-500 text-white px-3 py-2 rounded text-xs font-medium">GPay</a>
-                    <a href={`paytmmp://pay?pa=${UPI_ID}&pn=${STORE_NAME}&am=${total.toFixed(2)}&cu=INR`} className="bg-blue-400 text-white px-3 py-2 rounded text-xs font-medium">Paytm</a>
+                  <p className="text-xs text-gray-500 mb-2">Or pay directly with UPI ID:</p>
+                  <div className="bg-white/80 border border-white/60 rounded-2xl px-4 py-2.5 inline-flex items-center gap-3">
+                    <span className="font-mono text-sm font-semibold text-[#1a1a2e]">{UPI_ID}</span>
+                    <button
+                      onClick={() => { navigator.clipboard.writeText(UPI_ID); toast.success('UPI ID copied!'); }}
+                      className="text-xs bg-[#1a1a2e] text-[#c5a55a] px-2.5 py-1 rounded-full font-medium"
+                    >
+                      Copy
+                    </button>
                   </div>
-                  <p className="text-xs text-amber-600 mt-3 font-medium">After payment, proceed to place your order below. We&apos;ll verify & confirm within 1 hour.</p>
+                  <div className="flex justify-center gap-2 mt-4">
+                    <a href={`phonepe://pay?pa=${UPI_ID}&pn=${STORE_NAME}&am=${total.toFixed(2)}&cu=INR`} className="bg-purple-600 text-white px-4 py-2 rounded-full text-xs font-semibold">PhonePe</a>
+                    <a href={`tez://upi/pay?pa=${UPI_ID}&pn=${STORE_NAME}&am=${total.toFixed(2)}&cu=INR`} className="bg-blue-500 text-white px-4 py-2 rounded-full text-xs font-semibold">GPay</a>
+                    <a href={`paytmmp://pay?pa=${UPI_ID}&pn=${STORE_NAME}&am=${total.toFixed(2)}&cu=INR`} className="bg-blue-400 text-white px-4 py-2 rounded-full text-xs font-semibold">Paytm</a>
+                  </div>
+                  <p className="text-xs text-amber-600 mt-3 font-medium bg-amber-50 rounded-xl px-3 py-2">After payment, proceed to place your order below. We&apos;ll verify &amp; confirm within 1 hour.</p>
                 </div>
               )}
 
@@ -610,47 +703,51 @@ export default function CheckoutPage() {
           )}
         </div>
 
-        {/* Order Summary Sidebar */}
-        <div className="bg-warm-white rounded-sm p-5 h-fit sticky top-24">
-          <h3 className="font-serif text-lg mb-4">Order Summary</h3>
+        {/* Order Summary Sidebar — Glass */}
+        <div className="bg-white/60 backdrop-blur-xl border border-white/30 rounded-3xl p-5 h-fit sticky top-24 shadow-card">
+          <h3 className="font-serif text-lg text-[#1a1a2e] mb-4">Order Summary</h3>
           <div className="space-y-2 text-sm mb-4">
             {items.map((item) => (
               <div key={item.id} className="flex justify-between">
                 <span className="text-gray-600 line-clamp-1 flex-1">{item.product.name} ×{item.quantity}</span>
-                <span className="ml-2 flex-shrink-0">₹{(Number(item.product.price) * item.quantity).toLocaleString('en-IN')}</span>
+                <span className="ml-2 flex-shrink-0 font-medium">&#x20B9;{(Number(item.product.price) * item.quantity).toLocaleString('en-IN')}</span>
               </div>
             ))}
           </div>
-          <div className="border-t pt-3 space-y-1.5 text-sm">
-            <div className="flex justify-between text-gray-600">
-              <span>Subtotal</span><span>₹{subtotal.toLocaleString('en-IN')}</span>
+          <div className="border-t border-white/40 pt-3 space-y-1.5 text-sm">
+            <div className="flex justify-between text-gray-500">
+              <span>Subtotal</span><span>&#x20B9;{subtotal.toLocaleString('en-IN')}</span>
             </div>
-            <div className="flex justify-between text-gray-600">
+            <div className="flex justify-between text-gray-500">
               <span>Shipping ({country.name})</span>
-              <span className={shipping === 0 ? 'text-green-600' : ''}>{shipping === 0 ? 'FREE' : `₹${shipping.toLocaleString('en-IN')}`}</span>
+              <span className={shipping === 0 ? 'text-green-600 font-medium' : ''}>{shipping === 0 ? 'FREE' : `₹${shipping.toLocaleString('en-IN')}`}</span>
             </div>
             {paymentMethod === 'cod' && (
               <div className="flex justify-between text-amber-600">
-                <span>COD Charge</span><span>₹{COD_CHARGE}</span>
+                <span>COD Charge</span><span>&#x20B9;{COD_CHARGE}</span>
               </div>
             )}
             {couponDiscount > 0 && (
               <div className="flex justify-between text-green-600">
-                <span>Coupon ({couponCode})</span><span>-₹{couponDiscount}</span>
+                <span>Coupon ({couponCode})</span><span>-&#x20B9;{couponDiscount}</span>
               </div>
             )}
-            <div className="flex justify-between font-semibold text-base border-t pt-2 mt-1">
-              <span>Total</span><span>₹{total.toLocaleString('en-IN')}</span>
+            <div className="flex justify-between font-bold text-base border-t border-white/40 pt-2.5 mt-1 text-[#1a1a2e]">
+              <span>Total</span>
+              <span className="text-[#c5a55a]">&#x20B9;{total.toLocaleString('en-IN')}</span>
             </div>
           </div>
           {savings > 0 && (
-            <div className="mt-3 bg-green-50 rounded px-3 py-2 text-center">
-              <p className="text-green-600 text-xs font-medium">You save ₹{savings.toLocaleString('en-IN')}</p>
+            <div className="mt-3 bg-green-50/80 rounded-2xl px-3 py-2 text-center">
+              <p className="text-green-600 text-xs font-semibold">You save &#x20B9;{savings.toLocaleString('en-IN')} on this order!</p>
             </div>
           )}
-          <div className="mt-4 text-xs text-gray-500 space-y-1">
-            <p>✓ Secure checkout · Easy 7-day returns</p>
-            {!isIndia && <p>✓ International shipping available</p>}
+          <div className="mt-4 space-y-1.5">
+            {['Secure checkout', 'Easy 7-day returns', 'Genuine products'].map((t) => (
+              <p key={t} className="text-xs text-gray-400 flex items-center gap-1.5">
+                <span className="text-green-500">✓</span> {t}
+              </p>
+            ))}
           </div>
         </div>
       </div>

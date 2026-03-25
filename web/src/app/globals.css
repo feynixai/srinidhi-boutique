@@ -34,6 +34,13 @@
   box-sizing: border-box;
 }
 
+/* Focus visible — keyboard navigation */
+:focus-visible {
+  outline: 2px solid #c5a55a;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 body {
   font-family: var(--font-inter), system-ui, sans-serif;
   color: var(--text-primary);
@@ -162,4 +169,33 @@ h1, h2, h3, h4 {
 
 .animate-fade-in {
   animation: fadeIn 0.2s ease-out forwards;
+}
+
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.4) 25%,
+    rgba(255,255,255,0.8) 50%,
+    rgba(255,255,255,0.4) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 12px;
+}
+
+.skeleton-dark {
+  background: linear-gradient(
+    90deg,
+    rgba(200,200,200,0.3) 25%,
+    rgba(220,220,220,0.6) 50%,
+    rgba(200,200,200,0.3) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 12px;
 }

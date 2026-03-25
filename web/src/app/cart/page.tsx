@@ -123,19 +123,21 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-20 text-center">
-        <h1 className="font-serif text-3xl mb-4 text-[#1a1a2e]">Your Bag is Empty</h1>
-        <p className="text-gray-500 mb-8">Looks like you haven&apos;t added anything yet</p>
-        <Link href="/shop" className="btn-primary">
-          Start Shopping
-        </Link>
+      <div className="max-w-2xl mx-auto px-4 py-20 text-center">
+        <div className="bg-white/60 backdrop-blur-xl border border-white/30 rounded-3xl shadow-card p-12">
+          <div className="text-6xl mb-4">🛍️</div>
+          <h1 className="font-serif text-2xl md:text-3xl mb-3 text-[#1a1a2e]">Your Bag is Empty</h1>
+          <p className="text-gray-500 text-sm mb-8">Looks like you haven&apos;t added anything yet. Browse our beautiful collection!</p>
+          <Link href="/shop" className="btn-primary px-8 py-3 inline-block tracking-widest text-sm">
+            BROWSE COLLECTION
+          </Link>
+        </div>
         {wishlistItems.length > 0 && (
-          <div className="mt-10">
-            <p className="text-sm text-[#1a1a2e]/50 mb-2">
-              You have {wishlistItems.length} item{wishlistItems.length > 1 ? 's' : ''} saved for
-              later
+          <div className="mt-6 bg-white/40 backdrop-blur-sm border border-white/30 rounded-2xl p-4">
+            <p className="text-sm text-[#1a1a2e]/60 mb-2">
+              You have {wishlistItems.length} item{wishlistItems.length > 1 ? 's' : ''} saved for later
             </p>
-            <Link href="/wishlist" className="text-[#c5a55a] hover:underline text-sm">
+            <Link href="/wishlist" className="text-[#c5a55a] hover:underline text-sm font-medium">
               View Saved Items →
             </Link>
           </div>

@@ -143,6 +143,17 @@ export const getOrder = (id: string) =>
 export const validateCoupon = (code: string, orderAmount: number) =>
   api.post('/api/coupons/validate', { code, orderAmount }).then((r) => r.data);
 
+export interface CouponSuggestion {
+  code: string;
+  discount: number;
+  type: 'percent' | 'flat';
+  discountAmount: number;
+  minOrder?: number;
+}
+
+export const getBestCoupons = (total: number) =>
+  api.get(`/api/coupons/best?total=${total}`).then((r) => r.data as { coupons: CouponSuggestion[]; best: CouponSuggestion | null });
+
 // Reviews
 export interface Review {
   id: string;

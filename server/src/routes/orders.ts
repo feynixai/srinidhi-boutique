@@ -108,7 +108,9 @@ orderRoutes.post('/', async (req: Request, res: Response) => {
       const meetsMinOrder = !coupon.minOrder || subtotalForCoupon >= Number(coupon.minOrder);
 
       if (!isExpired && !isMaxUsed && meetsMinOrder) {
-        discount = (subtotalForCoupon * coupon.discount) / 100;
+        discount = coupon.type === 'flat'
+          ? Math.min(coupon.discount, subtotalForCoupon)
+          : (subtotalForCoupon * coupon.discount) / 100;
         couponCode = data.couponCode.toUpperCase();
         await prisma.coupon.update({
           where: { id: coupon.id },

@@ -2,33 +2,34 @@
 
 Premium Indian ethnic wear e-commerce platform built for Srinidhi Boutique — a women's clothing store in Hyderabad, India.
 
+## Live URLs
+
+| App | URL |
+|-----|-----|
+| Store | https://proofcrest.com |
+| Admin Dashboard | https://admin-cyan-one-44.vercel.app |
+| API | Railway — server/ |
+
 ## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  web/ (Next.js 14)          admin/ (Next.js 14)                 │
-│  Customer Store              Admin Dashboard                      │
-│  :3000                       :3001                               │
-└─────────────────┬───────────────────────────┬───────────────────┘
-                  │ REST API                  │ REST API
-                  ▼                           ▼
-         ┌────────────────────────────────────────┐
-         │  server/ (Express + Prisma)             │
-         │  :4000                                  │
-         └────────────────────┬───────────────────┘
-                              │
-                    ┌─────────┴─────────┐
-                    │   PostgreSQL       │
-                    └───────────────────┘
+│  Customer Store (Next.js 14)    Admin Dashboard (Next.js 14)    │
+│  https://proofcrest.com         https://admin-cyan-one-44...    │
+│  :3000 (local)                  :3001 (local)                   │
+└────────────────┬────────────────────────────┬───────────────────┘
+                 │ REST API                   │ REST API
+                 ▼                            ▼
+        ┌────────────────────────────────────────────┐
+        │  Express API Server (Node.js + Prisma)      │
+        │  :4000 (local) / Railway (production)       │
+        └──────────────────────┬─────────────────────┘
+                               │
+               ┌───────────────┼───────────────┐
+               ▼               ▼               ▼
+         PostgreSQL        Razorpay       WhatsApp API
+         (Neon/Railway)    Payments       Notifications
 ```
-
-## Live
-
-| App | URL |
-|-----|-----|
-| Store | _Vercel — web/_ |
-| Admin Dashboard | _Vercel — admin/_ |
-| API | _Railway/Render — server/_ |
 
 ## Tech Stack
 
@@ -36,22 +37,24 @@ Premium Indian ethnic wear e-commerce platform built for Srinidhi Boutique — a
 |-------|-----------|
 | Store frontend | Next.js 14, Tailwind CSS, Zustand, React Query, next/image |
 | Admin frontend | Next.js 14, Tailwind CSS, React Query |
-| API server | Node.js, Express, Prisma ORM |
+| API server | Node.js, Express, Prisma ORM, TypeScript |
 | Database | PostgreSQL |
 | Payments | Razorpay (UPI, cards, net banking, EMI) + Cash on Delivery |
 | Notifications | WhatsApp Cloud API + Nodemailer (SMTP) |
 | Auth | Google OAuth + Phone OTP |
 | Shipping | Indian pincode zones + international rates |
+| Testing | Vitest, Supertest |
+| Deployment | Vercel (frontend), Railway (API + DB) |
 
 ## Feature List
 
 ### Store (web/)
-- Elegant Indian ethnic theme — rose gold, ivory, warm white palette
+- Apple Liquid Glass UI — glassmorphism, pill shapes, natural rose gold palette
 - Hero carousel with featured collections
 - Mega menu with category navigation
 - Product catalog with filters: category, size, color, price, fabric, occasion
 - Product detail pages: image gallery, size guide, WhatsApp order button
-- Customer reviews with ratings
+- Customer reviews with star ratings
 - Cart drawer with coupon code support
 - 3-step checkout: address → payment → confirm
 - Guest checkout (no forced registration)
@@ -61,13 +64,26 @@ Premium Indian ethnic wear e-commerce platform built for Srinidhi Boutique — a
 - Back-in-stock notification signup
 - Product recommendations (same category + price range)
 - Abandoned cart reminder (shown on return visit)
-- Returns flow
+- Returns flow with reason selection
 - PWA support (offline mode, installable)
 - Newsletter signup
 - Contact form
+- Flash sales with countdown timers
+- Loyalty points programme (earn on purchase, redeem on checkout)
+- Referral system (share link, earn on friend's first order)
+- Lookbook / style guide
+- Product bundles (buy-together deals)
+- Gift cards (purchase + redeem)
+- Pre-order support for out-of-stock items
+- Store credits (returns → credits → redeem)
+- Smart search with autocomplete
+- Hindi language toggle (EN | हिंदी) — key UI strings translated, preference saved to localStorage
+- Product comparison (up to 3 products side-by-side, floating compare bar)
+- Urgency triggers: "Only X left!" badge (stock < 5), "🔥 Trending" badge, weekly sold counter
+- Auto-apply best coupon at checkout — shows eligible coupons ranked by savings, one-click apply
 
 ### Admin Dashboard (admin/)
-- Sales dashboard: today's orders, revenue, pending orders, low stock alerts
+- Glass-design stats dashboard: today's orders, revenue, pending orders, low stock
 - Pro analytics:
   - Revenue chart (daily/weekly/monthly)
   - Conversion funnel (cart → checkout → paid)
@@ -77,22 +93,27 @@ Premium Indian ethnic wear e-commerce platform built for Srinidhi Boutique — a
   - New vs returning customer split
   - Abandoned carts count
 - Orders management: full lifecycle (Placed → Confirmed → Packed → Shipped → Delivered)
+- Bulk order operations (confirm, pack, ship selected)
 - Products CRUD with image upload support
 - Categories management
-- Coupon management (discount %, expiry, max uses, min order)
+- Collections management (wedding, festival, etc.)
+- Coupon management (discount %, expiry, max uses, min order, category-specific)
 - Customer list with order history
 - Inventory management:
   - Stock movement log (who added/removed, when, why)
   - Auto-disable products when stock hits 0
   - Bulk stock update via CSV upload
-  - Low-stock alert panel (threshold: 3 units)
+  - Low-stock alert panel (threshold: 5 units)
 - Invoice generation (HTML, printable)
 - Return requests management
-- Bulk order operations (confirm, pack, ship selected)
+- Q&A moderation
+- Lookbook management
+- Flash sale scheduling
 - WhatsApp + email notifications per order
+- Quick actions: add product, view pending orders, manage coupons
 
 ### API (server/)
-- RESTful Express API — 20+ route groups
+- RESTful Express API — 25+ route groups, fully typed with TypeScript
 - Full products, categories, cart, orders, coupons endpoints
 - Razorpay payment verification (HMAC signature check)
 - International shipping rates by zone
@@ -103,9 +124,22 @@ Premium Indian ethnic wear e-commerce platform built for Srinidhi Boutique — a
 - Analytics queries: revenue aggregation, conversion funnel, top products
 - Google OAuth + Phone OTP authentication
 - Admin authentication (Google OAuth, role-based)
+- Loyalty programme API (earn/redeem points)
+- Referral tracking API
+- Flash sales with automatic expiry
+- Lookbook API
+- Product bundles
+- Gift cards (purchase, redeem, balance check)
+- Pre-orders with booking management
+- Store credits
+- Webhook delivery system
+- CSV data export (products, orders, customers, reviews)
+- GST calculation (intra-state CGST/SGST vs inter-state IGST)
+- Delivery slot selection
+- Order cancellation + store credit refund
 - SEO: sitemap generation
-- Security: Helmet, CORS, input validation (Zod), rate limiting
-- Health check endpoint with database connectivity check
+- Security: Helmet, CORS, Zod validation, rate limiting
+- Health check endpoint with database connectivity
 - Environment variable validation on startup
 - Graceful shutdown (SIGTERM/SIGINT)
 - In-memory response caching for product listings (5 min TTL)
@@ -117,21 +151,22 @@ Premium Indian ethnic wear e-commerce platform built for Srinidhi Boutique — a
 web/
   src/
     app/                   Next.js App Router pages
-    components/            Reusable UI components
-    lib/                   API client, stores, utils
+    components/            Reusable UI components (Header, Cart, ProductCard, etc.)
+    lib/                   API client, Zustand stores, utils
 admin/
   src/
-    app/admin/             Admin pages (analytics, orders, products, etc.)
-    components/            Admin UI components
+    app/admin/             Admin pages (dashboard, analytics, orders, products, etc.)
+    components/            Admin UI components (StatusBadge, etc.)
     lib/                   API client, types
 server/
   src/
-    routes/                Express route handlers
+    routes/                Express route handlers (25+ route files)
     lib/                   Prisma client, cache, email, WhatsApp, env validation
     middleware/            Error handler, rate limiter, admin auth
-    __tests__/             Vitest tests (901+)
+    __tests__/             Vitest tests (1175+)
+    scripts/               seed.ts
   prisma/
-    schema.prisma          Database schema
+    schema.prisma          Database schema (30+ models)
 ```
 
 ## Getting Started
@@ -153,7 +188,7 @@ cp server/.env.example server/.env
 # 3. Push database schema
 cd server && npx prisma db push
 
-# 4. Seed with sample data (optional)
+# 4. Seed with sample data
 npm run db:seed
 
 # 5. Start all services
@@ -204,10 +239,10 @@ NEXT_PUBLIC_WHATSAPP_NUMBER=+919876543210
 ## Tests
 
 ```bash
-npm test          # Run all 901+ tests
+npm test          # Run all 1126 tests (singleFork mode, ~2 min)
 ```
 
-Test coverage:
+Test coverage includes:
 - Products, categories, cart, orders, coupons
 - Payments (Razorpay verification, COD)
 - Auth (Google OAuth, Phone OTP)
@@ -230,35 +265,64 @@ Test coverage:
 - Loyalty, referrals, flash sales, lookbook, chat
 - Bundles, gift cards, pre-orders, store credits
 - Abandoned cart recovery, webhooks
+- Seed data validation (categories, products, coupons)
 
 ## API Endpoint Reference
 
-See [API.md](./API.md) for a complete reference of all endpoints.
+See [API.md](./API.md) for the full reference.
 
 ### Quick Reference
 
 | Method | Path | Description |
 |--------|------|-------------|
 | GET | `/health` | Health check + DB connectivity |
-| GET | `/api/products` | List products with filters |
-| GET | `/api/products/featured` | Featured products (cached 5m) |
-| GET | `/api/products/:slug` | Single product |
+| GET | `/api/products` | List products (filters: category, size, color, price, fabric, occasion) |
+| GET | `/api/products/featured` | Featured products (cached 5 min) |
+| GET | `/api/products/search` | Full-text search with autocomplete |
+| GET | `/api/products/:slug` | Single product detail |
 | GET | `/api/products/:slug/recommendations` | Similar products |
 | GET | `/api/categories` | All categories |
+| GET | `/api/collections` | All collections |
 | POST | `/api/cart` | Add to cart |
 | GET | `/api/cart/:sessionId` | Get cart |
+| DELETE | `/api/cart/:sessionId/item/:itemId` | Remove cart item |
 | POST | `/api/orders` | Place order |
 | GET | `/api/orders/track` | Track order by number + phone |
+| GET | `/api/orders/:id` | Order detail |
 | POST | `/api/payments/razorpay/create` | Create Razorpay order |
 | POST | `/api/payments/razorpay/verify` | Verify payment signature |
+| POST | `/api/auth/otp/send` | Send phone OTP |
+| POST | `/api/auth/otp/verify` | Verify OTP + issue token |
+| POST | `/api/auth/google` | Google OAuth login |
+| GET | `/api/coupons/validate` | Validate coupon code |
 | POST | `/api/notifications/send-order-confirmation` | Send order notification |
 | POST | `/api/notifications/send-shipping-update` | Send shipping notification |
 | GET | `/api/inventory/low-stock` | Low stock products |
 | POST | `/api/inventory/movements` | Log stock adjustment |
 | POST | `/api/inventory/bulk-update` | Bulk CSV stock update |
 | POST | `/api/inventory/back-in-stock` | Subscribe to back-in-stock |
+| GET | `/api/loyalty/:userId` | Get loyalty balance |
+| POST | `/api/loyalty/:userId/redeem` | Redeem loyalty points |
+| GET | `/api/lookbook` | Lookbook entries |
+| GET | `/api/flash-sales/active` | Active flash sales |
+| POST | `/api/gift-cards/purchase` | Purchase gift card |
+| POST | `/api/gift-cards/redeem` | Redeem gift card |
+| GET | `/api/shipping/rates` | Shipping rates by pincode |
+| GET | `/api/sitemap` | SEO sitemap |
 | GET | `/api/admin/dashboard` | Admin dashboard stats |
-| GET | `/api/admin/analytics` | Pro analytics |
+| GET | `/api/admin/analytics` | Pro analytics data |
+| GET | `/api/admin/orders` | All orders with filters |
+| PATCH | `/api/admin/orders/:id/status` | Update order status |
+| GET | `/api/admin/products` | All products (admin view) |
+| POST | `/api/admin/products` | Create product |
+| PATCH | `/api/admin/products/:id` | Update product |
+| DELETE | `/api/admin/products/:id` | Delete product |
+| GET | `/api/admin/customers` | Customer list |
+| POST | `/api/admin/coupons` | Create coupon |
+| GET | `/api/admin/returns` | Return requests |
+| PATCH | `/api/admin/returns/:id` | Update return status |
+| GET | `/api/admin/export/orders` | Export orders CSV |
+| GET | `/api/admin/export/products` | Export products CSV |
 
 ## Deployment
 
@@ -285,25 +349,35 @@ For `admin/`:
 ```bash
 # After deploying, run migrations
 DATABASE_URL=your_production_url npx prisma db push
+
+# Seed sample data
+DATABASE_URL=your_production_url npx ts-node src/scripts/seed.ts
 ```
 
-## Screenshots
-
-_Coming soon — to be added after production launch_
-
-## Design System
+## Design System — Apple Liquid Glass
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| Rose Gold | `#B76E79` | Primary, CTAs, accents |
-| Ivory | `#FFFFF0` | Page background |
-| Soft Pink | `#FFB6C1` | Hover states |
-| Warm White | `#FFF8F5` | Card backgrounds |
-| Charcoal | `#3C3C3C` | Body text |
-| Playfair Display | serif | Headings |
-| Inter | sans-serif | Body text |
+| Gold | `#c5a55a` | CTAs, accents, prices |
+| Navy | `#1a1a2e` | Primary text, buttons |
+| Ivory | `#f5f5f0` | Page background |
+| Glass BG | `rgba(255,255,255,0.6)` | Card backgrounds (blur-xl) |
+| Playfair Display | serif | Headings, product names |
+| Inter | sans-serif | Body text, UI |
+
+All cards use `backdrop-blur-xl` with `bg-white/60` and `border border-white/30` — the Liquid Glass style.
 
 Mobile-first — 80%+ of Indian shoppers browse on phones.
+
+## Screenshots
+
+| Page | Description |
+|------|-------------|
+| Store home | Hero carousel, trust badge pills, category grid, featured products |
+| Product detail | Image gallery with hover swap, size selector, WhatsApp order |
+| Cart | Glass cards, free shipping progress, save-for-later |
+| Checkout | Glass progress bar, glass payment cards, UPI QR glass modal |
+| Admin dashboard | Bento grid, glass stat cards, weekly chart, low stock alerts |
 
 ---
 
@@ -323,5 +397,10 @@ Mobile-first — 80%+ of Indian shoppers browse on phones.
 | Build 10 | 2026-01-10 | Bundles, gift cards, pre-orders, store credits, webhooks | 825+ |
 | Build 11 | 2026-01-11 | Abandoned cart, bundles, gift cards, pre-orders, webhooks | 825+ |
 | Build 12 | 2026-03-25 | GST system, bulk product ops, delivery slots, order cancellation, coupon enhancements, stock alerts, data export | 901+ |
+| Build 13 | 2026-03-25 | Admin power tools, order workflow, product analytics | 1000+ |
+| Build 14 | 2026-03-25 | Admin power tools, order workflow, product analytics | 1050+ |
+| Build 15 | 2026-03-25 | Admin power tools, order workflow, product analytics | 1126 |
+| Build 16 | 2026-03-25 | Apple Liquid Glass UI overhaul — glassmorphism, pill shapes | 1126 |
+| Build 17 | 2026-03-25 | Admin bento dashboard, product image hover, trust badge pills, glass checkout, skeleton loaders, 404/500 pages, accessibility | 1126 |
 
 Built with care for Srinidhi Boutique, Hyderabad.

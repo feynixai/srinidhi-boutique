@@ -1,13 +1,8 @@
-import { PrismaClient } from '@prisma/client';
 import slugify from 'slugify';
+import { prisma } from '../lib/prisma';
 
-export const testPrisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL || 'postgresql://arun@localhost:5432/srinidhi_test',
-    },
-  },
-});
+// Use the app's own Prisma client — avoids deadlocks from competing connection pools
+export const testPrisma = prisma;
 
 export async function createTestCategory(name = 'Test Category') {
   const slug = slugify(name, { lower: true, strict: true });
@@ -129,18 +124,60 @@ export async function createTestAdminUser(overrides: Record<string, unknown> = {
 }
 
 export async function cleanupTest() {
-  // Dynamic TRUNCATE — queries pg_tables so it never breaks when new models are added
-  const tables = await testPrisma.$queryRaw<Array<{ tablename: string }>>`
-    SELECT tablename FROM pg_tables WHERE schemaname = 'public'
-  `;
-  const tableNames = tables
-    .map(t => t.tablename)
-    .filter(t => t !== '_prisma_migrations');
-  if (tableNames.length > 0) {
-    await testPrisma.$executeRawUnsafe(
-      `TRUNCATE TABLE ${tableNames.map(t => `"${t}"`).join(', ')} CASCADE`
-    );
-  }
+  // Use sequential DELETE (not TRUNCATE) to avoid AccessExclusiveLock deadlocks
+  // with the Express app's Prisma connection pool. DELETE only acquires
+  // RowExclusiveLock, which is compatible with concurrent RowShareLock (SELECTs).
+  // Order: children with required FKs first, then parents.
+
+  // Phase 1: children with required (Restrict) FK to Product or User
+  await testPrisma.orderItem.deleteMany();
+  await testPrisma.cartItem.deleteMany();
+  await testPrisma.review.deleteMany();
+  await testPrisma.referral.deleteMany();
+
+  // Phase 2: children with Cascade FK (safe to delete explicitly)
+  await testPrisma.loyaltyHistory.deleteMany();
+  await testPrisma.wishlistItem.deleteMany();
+  await testPrisma.recentlyViewed.deleteMany();
+  await testPrisma.stockMovement.deleteMany();
+  await testPrisma.backInStockNotification.deleteMany();
+  await testPrisma.flashSaleProduct.deleteMany();
+  await testPrisma.productVariant.deleteMany();
+  await testPrisma.productTag.deleteMany();
+  await testPrisma.userNotification.deleteMany();
+  await testPrisma.productQA.deleteMany();
+  await testPrisma.giftCardTransaction.deleteMany();
+  await testPrisma.webhookDelivery.deleteMany();
+  await testPrisma.preOrderBooking.deleteMany();
+  await testPrisma.customerAddress.deleteMany();
+
+  // Phase 3: mid-level parents
+  await testPrisma.loyaltyAccount.deleteMany();
+  await testPrisma.order.deleteMany();
+  await testPrisma.product.deleteMany();
+  await testPrisma.flashSale.deleteMany();
+  await testPrisma.giftCard.deleteMany();
+  await testPrisma.preOrder.deleteMany();
+  await testPrisma.webhook.deleteMany();
+  await testPrisma.tag.deleteMany();
+
+  // Phase 4: top-level / standalone tables
+  await testPrisma.category.deleteMany();
+  await testPrisma.user.deleteMany();
+  await testPrisma.coupon.deleteMany();
+  await testPrisma.adminUser.deleteMany();
+  await testPrisma.collection.deleteMany();
+  await testPrisma.lookbook.deleteMany();
+  await testPrisma.bundle.deleteMany();
+  await testPrisma.abandonedCart.deleteMany();
+  await testPrisma.storeCredit.deleteMany();
+  await testPrisma.storeSale.deleteMany();
+  await testPrisma.otpCode.deleteMany();
+  await testPrisma.pincodeZone.deleteMany();
+  await testPrisma.newsletter.deleteMany();
+  await testPrisma.contactSubmission.deleteMany();
+  await testPrisma.returnRequest.deleteMany();
+  await testPrisma.chatMessage.deleteMany();
 }
 
 export async function createTestNewsletter(email: string, overrides: Record<string, unknown> = {}) {

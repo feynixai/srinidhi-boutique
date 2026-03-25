@@ -2,11 +2,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
-import { FiHeart, FiShoppingBag } from 'react-icons/fi';
+import { FiHeart, FiShoppingBag, FiBarChart2 } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 import { Product, addToCart } from '@/lib/api';
 import { useCartStore } from '@/lib/cart-store';
 import { useWishlistStore } from '@/lib/wishlist-store';
+import { useCompareStore } from '@/lib/compare-store';
+import { useLanguage } from '@/lib/language-context';
 
 interface ProductCardProps {
   product: Product;
@@ -16,6 +18,8 @@ export function ProductCard({ product }: ProductCardProps) {
   const [adding, setAdding] = useState(false);
   const { toggle: toggleWishlist, has: inWishlist } = useWishlistStore();
   const { sessionId, itemCount, setItemCount, openCart } = useCartStore();
+  const { add: addCompare, remove: removeCompare, has: inCompare } = useCompareStore();
+  const { t } = useLanguage();
 
   const salePrice = product.salePrice;
   const displayPrice = salePrice ?? Number(product.price);
@@ -58,16 +62,30 @@ export function ProductCard({ product }: ProductCardProps) {
       {/* Image area */}
       <div className="relative aspect-[3/4] overflow-hidden bg-[#f5f0eb]">
         {product.images[0] ? (
-          <Image
-            src={product.images[0]}
-            alt={product.name}
-            fill
-            loading="lazy"
-            placeholder="blur"
-            blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2Y1ZjVmMCIvPjwvc3ZnPg=="
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          />
+          <>
+            <Image
+              src={product.images[0]}
+              alt={product.name}
+              fill
+              loading="lazy"
+              placeholder="blur"
+              blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2Y1ZjVmMCIvPjwvc3ZnPg=="
+              className={`object-cover transition-all duration-500 ${product.images[1] ? 'group-hover:opacity-0' : 'group-hover:scale-105'}`}
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            />
+            {product.images[1] && (
+              <Image
+                src={product.images[1]}
+                alt={`${product.name} — alternate view`}
+                fill
+                loading="lazy"
+                placeholder="blur"
+                blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI2Y1ZjVmMCIvPjwvc3ZnPg=="
+                className="object-cover opacity-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              />
+            )}
+          </>
         ) : (
           <div className="w-full h-full bg-[#f5e8d8] flex items-center justify-center">
             <span className="text-[#c5a55a] font-serif text-lg">SB</span>
@@ -82,14 +100,28 @@ export function ProductCard({ product }: ProductCardProps) {
 
         {product.bestSeller && !discountPct && (
           <span className="absolute top-3 left-3 bg-[#c5a55a] text-[#1a1a2e] text-xs px-3 py-1 rounded-full font-semibold z-10">
-            Best Seller
+            {t.bestSeller}
+          </span>
+        )}
+
+        {/* Urgency: Trending */}
+        {(product as Product & { trending?: boolean }).trending && !product.bestSeller && !discountPct && (
+          <span className="absolute top-3 left-3 bg-orange-500 text-white text-xs px-3 py-1 rounded-full font-semibold z-10 flex items-center gap-1">
+            🔥 {t.trending}
+          </span>
+        )}
+
+        {/* Urgency: Low stock */}
+        {product.stock > 0 && product.stock < 5 && (
+          <span className="absolute bottom-14 left-3 bg-red-500 text-white text-xs px-3 py-1 rounded-full font-semibold z-10 shadow-sm">
+            {t.onlyLeft(product.stock)}
           </span>
         )}
 
         {product.stock === 0 && (
           <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center">
             <span className="bg-white/80 text-[#1a1a2e] font-medium text-sm px-4 py-1.5 rounded-full border border-black/10">
-              Out of Stock
+              {t.outOfStock}
             </span>
           </div>
         )}
@@ -102,25 +134,45 @@ export function ProductCard({ product }: ProductCardProps) {
             className="w-full bg-[#1a1a2e] text-white py-3 text-xs font-semibold tracking-wider hover:bg-[#2d2d4e] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
           >
             <FiShoppingBag size={14} />
-            {adding ? 'Adding...' : 'Quick Add'}
+            {adding ? '...' : t.quickAdd}
           </button>
         </div>
 
-        {/* Wishlist heart button */}
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            toggleWishlist({ id: product.id, name: product.name, slug: product.slug, price: Number(product.price), comparePrice: product.comparePrice ? Number(product.comparePrice) : undefined, images: product.images });
-            toast(inWishlist(product.id) ? 'Removed from wishlist' : 'Added to wishlist');
-          }}
-          className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition-all z-10"
-          aria-label="Add to wishlist"
-        >
-          <FiHeart
-            size={16}
-            className={inWishlist(product.id) ? 'fill-[#c5a55a] text-[#c5a55a]' : 'text-[#1a1a2e]'}
-          />
-        </button>
+        {/* Wishlist + Compare buttons */}
+        <div className="absolute top-3 right-3 flex flex-col gap-1.5 z-10">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              toggleWishlist({ id: product.id, name: product.name, slug: product.slug, price: Number(product.price), comparePrice: product.comparePrice ? Number(product.comparePrice) : undefined, images: product.images });
+              toast(inWishlist(product.id) ? 'Removed from wishlist' : 'Added to wishlist');
+            }}
+            className="p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition-all"
+            aria-label="Add to wishlist"
+          >
+            <FiHeart
+              size={16}
+              className={inWishlist(product.id) ? 'fill-[#c5a55a] text-[#c5a55a]' : 'text-[#1a1a2e]'}
+            />
+          </button>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              if (inCompare(product.id)) {
+                removeCompare(product.id);
+                toast('Removed from compare');
+              } else {
+                addCompare(product);
+                toast('Added to compare');
+              }
+            }}
+            className={`p-2 backdrop-blur-sm rounded-full shadow-sm transition-all ${
+              inCompare(product.id) ? 'bg-[#1a1a2e] text-white' : 'bg-white/80 hover:bg-white text-[#1a1a2e]'
+            }`}
+            aria-label="Compare product"
+          >
+            <FiBarChart2 size={16} />
+          </button>
+        </div>
       </div>
 
       {/* Product info */}

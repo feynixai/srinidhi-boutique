@@ -110,7 +110,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
 
       {/* WhatsApp Notify Store — shown on new order */}
       {order.status === 'placed' && (
-        <div className="mb-8 bg-green-50 border border-green-200 rounded-sm p-4">
+        <div className="mb-4 bg-green-50 border border-green-200 rounded-sm p-4">
           <p className="text-sm font-semibold text-green-800 mb-1">Let us know you've ordered!</p>
           <p className="text-xs text-green-700 mb-3">
             Tap below to send your order confirmation on WhatsApp. We'll confirm and pack your order faster.
@@ -124,6 +124,32 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
             <FaWhatsapp size={18} />
             Notify on WhatsApp: Order #{order.orderNumber} · ₹{Number(order.total).toLocaleString('en-IN')}
           </a>
+        </div>
+      )}
+
+      {/* Share purchase */}
+      {order.status === 'placed' && (
+        <div className="mb-8 bg-white/60 backdrop-blur-xl border border-white/30 rounded-2xl p-4">
+          <p className="text-sm font-semibold text-[#1a1a2e] mb-1">Share the love! 💕</p>
+          <p className="text-xs text-gray-500 mb-3">Tell your friends about your new find from Srinidhi Boutique.</p>
+          {(() => {
+            const firstItem = order.items[0];
+            const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://proofcrest.com';
+            const shareMsg = encodeURIComponent(
+              `Just ordered "${firstItem?.name || 'something beautiful'}" from Srinidhi Boutique! Check out their amazing collection at ${siteUrl} 🛍️`
+            );
+            return (
+              <a
+                href={`https://wa.me/?text=${shareMsg}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 border border-green-400 text-green-600 py-2.5 text-sm font-medium hover:bg-green-50 transition-colors rounded-xl"
+              >
+                <FaWhatsapp size={16} />
+                Share on WhatsApp
+              </a>
+            );
+          })()}
         </div>
       )}
 

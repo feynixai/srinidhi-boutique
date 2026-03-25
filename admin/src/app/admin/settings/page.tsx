@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { toast } from 'react-hot-toast';
-import { FiUserPlus, FiTrash2 } from 'react-icons/fi';
+import { FiUserPlus, FiTrash2, FiMegaphone } from 'react-icons/fi';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -33,10 +33,22 @@ export default function SettingsPage() {
   const [newRole, setNewRole] = useState<'OWNER' | 'STAFF'>('STAFF');
   const [addingAdmin, setAddingAdmin] = useState(false);
 
+  const [announcement, setAnnouncement] = useState({
+    text: 'Free Shipping on orders above ₹999 | Use code WELCOME10 for 10% off your first order',
+    link: '/shop',
+    active: true,
+  });
+  const [savingAnnouncement, setSavingAnnouncement] = useState(false);
+
   useEffect(() => {
     fetch(`${API_URL}/api/auth/admin/users`)
       .then((r) => r.json())
       .then((data) => Array.isArray(data) && setAdmins(data))
+      .catch(() => {});
+
+    fetch(`${API_URL}/api/announcements`)
+      .then((r) => r.json())
+      .then((data) => data && setAnnouncement(data))
       .catch(() => {});
   }, []);
 
@@ -66,6 +78,23 @@ export default function SettingsPage() {
       toast.error('Failed to add staff');
     } finally {
       setAddingAdmin(false);
+    }
+  }
+
+  async function saveAnnouncement() {
+    setSavingAnnouncement(true);
+    try {
+      const res = await fetch(`${API_URL}/api/announcements`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(announcement),
+      });
+      if (res.ok) toast.success('Announcement updated!');
+      else toast.error('Failed to save announcement');
+    } catch {
+      toast.error('Failed to save announcement');
+    } finally {
+      setSavingAnnouncement(false);
     }
   }
 
@@ -154,6 +183,57 @@ export default function SettingsPage() {
           Mon–Sat: 10 AM – 8 PM · Sunday: 11 AM – 7 PM<br />
           WhatsApp orders accepted 24/7
         </div>
+      </Section>
+
+      {/* Store Announcement */}
+      <Section title="Store Announcement Bar">
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-sm text-gray-600">Shown as an animated banner at the top of the store.</p>
+          <div className="flex items-center gap-2">
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${announcement.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+              {announcement.active ? 'Active' : 'Hidden'}
+            </span>
+            <button
+              onClick={() => setAnnouncement((a) => ({ ...a, active: !a.active }))}
+              className={`relative w-12 h-6 rounded-full transition-colors ${announcement.active ? 'bg-rose-gold' : 'bg-gray-200'}`}
+            >
+              <span className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${announcement.active ? 'left-7' : 'left-1'}`} />
+            </button>
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Announcement Text</label>
+          <input
+            type="text"
+            value={announcement.text}
+            onChange={(e) => setAnnouncement((a) => ({ ...a, text: e.target.value }))}
+            placeholder="Free Shipping on orders above ₹999"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-rose-gold"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Link (optional)</label>
+          <input
+            type="text"
+            value={announcement.link}
+            onChange={(e) => setAnnouncement((a) => ({ ...a, link: e.target.value }))}
+            placeholder="/shop or /offers"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-rose-gold"
+          />
+        </div>
+        {announcement.active && announcement.text && (
+          <div className="bg-[#1a1a2e] text-[#c5a55a] text-xs rounded-lg px-4 py-2.5 flex items-center gap-2">
+            <FiMegaphone size={13} />
+            <span className="truncate">{announcement.text}</span>
+          </div>
+        )}
+        <button
+          onClick={saveAnnouncement}
+          disabled={savingAnnouncement}
+          className="w-full py-2 bg-[#1a1a2e] text-[#c5a55a] rounded-lg text-sm font-medium hover:bg-[#2d2d4e] disabled:opacity-60 transition-colors"
+        >
+          {savingAnnouncement ? 'Saving...' : 'Save Announcement'}
+        </button>
       </Section>
 
       {/* Staff Management */}

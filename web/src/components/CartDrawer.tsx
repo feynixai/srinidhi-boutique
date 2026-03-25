@@ -6,7 +6,7 @@ import { FiX, FiTrash2, FiPlus, FiMinus, FiTag } from 'react-icons/fi';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { useCartStore } from '@/lib/cart-store';
-import { getCart, updateCartItem, removeCartItem } from '@/lib/api';
+import { getCart, updateCartItem, removeCartItem, getBestSellers } from '@/lib/api';
 
 export function CartDrawer() {
   const { sessionId, isCartOpen, closeCart, setItemCount } = useCartStore();
@@ -42,6 +42,16 @@ export function CartDrawer() {
   const items = cart?.items || [];
   const subtotal = cart?.subtotal || 0;
   const shipping = subtotal >= 999 ? 0 : 99;
+  const FREE_SHIPPING_THRESHOLD = 999;
+  const amountToFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+  const freeShippingPct = Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
+
+  const { data: upsellProducts } = useQuery({
+    queryKey: ['cart-upsell'],
+    queryFn: () => getBestSellers(),
+    enabled: isCartOpen && items.length > 0,
+    staleTime: 5 * 60 * 1000,
+  });
 
   return (
     <>
@@ -66,6 +76,29 @@ export function CartDrawer() {
             <FiX size={20} />
           </button>
         </div>
+
+        {/* Free shipping progress */}
+        {items.length > 0 && (
+          <div className="px-5 pt-3 pb-1">
+            {shipping === 0 ? (
+              <p className="text-xs text-center text-green-600 font-semibold bg-green-50 rounded-full py-1.5 px-3">
+                🎉 You've unlocked FREE shipping!
+              </p>
+            ) : (
+              <div>
+                <p className="text-xs text-[#1a1a2e]/60 mb-1.5 text-center">
+                  Add <span className="font-semibold text-[#c5a55a]">₹{amountToFreeShipping.toLocaleString('en-IN')}</span> more for FREE shipping
+                </p>
+                <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-[#c5a55a] to-[#B76E79] rounded-full transition-all duration-500"
+                    style={{ width: `${freeShippingPct}%` }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Items */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
@@ -149,6 +182,33 @@ export function CartDrawer() {
           )}
         </div>
 
+        {/* Frequently Bought Together / Upsell */}
+        {items.length > 0 && upsellProducts && upsellProducts.length > 0 && (
+          <div className="px-5 pb-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-[#1a1a2e]/50 mb-2">You may also like</p>
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+              {upsellProducts
+                .filter((p) => !items.some((i) => i.productId === p.id))
+                .slice(0, 4)
+                .map((p) => (
+                  <div key={p.id} className="flex-shrink-0 w-28 bg-white/60 backdrop-blur-lg border border-white/30 rounded-2xl overflow-hidden">
+                    <Link href={`/shop/${p.slug}`} onClick={closeCart}>
+                      <div className="relative w-28 h-32 bg-gray-50">
+                        {p.images[0] && (
+                          <Image src={p.images[0]} alt={p.name} fill className="object-cover" sizes="112px" />
+                        )}
+                      </div>
+                      <div className="p-2">
+                        <p className="text-xs font-medium line-clamp-1 text-[#1a1a2e]">{p.name}</p>
+                        <p className="text-xs font-bold text-[#c5a55a] mt-0.5">₹{Number(p.price).toLocaleString('en-IN')}</p>
+                      </div>
+                    </Link>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
+
         {/* Footer summary */}
         {items.length > 0 && (
           <div className="px-5 py-4 bg-white/70 backdrop-blur-lg border-t border-white/30">
@@ -163,11 +223,6 @@ export function CartDrawer() {
                   {shipping === 0 ? 'FREE' : `₹${shipping}`}
                 </span>
               </div>
-              {shipping > 0 && (
-                <p className="text-xs text-[#c5a55a]">
-                  Add &#x20B9;{(999 - subtotal).toLocaleString('en-IN')} more for free shipping
-                </p>
-              )}
               <div className="flex justify-between font-bold text-base border-t border-black/5 pt-2 mt-2 text-[#1a1a2e]">
                 <span>Total</span>
                 <span>&#x20B9;{(subtotal + shipping).toLocaleString('en-IN')}</span>

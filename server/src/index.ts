@@ -38,6 +38,7 @@ import { storeCreditRoutes } from './routes/storeCredits';
 import { customerSegmentRoutes } from './routes/customerSegments';
 import { webhookRoutes } from './routes/webhooks';
 import { performanceMetricsRoutes } from './routes/performanceMetrics';
+import { announcementRoutes } from './routes/announcements';
 import { errorHandler } from './middleware/errorHandler';
 import { validateEnv } from './lib/validateEnv';
 import { prisma } from './lib/prisma';
@@ -89,6 +90,7 @@ app.use('/api/store-credits', storeCreditRoutes);
 app.use('/api/customer-segments', customerSegmentRoutes);
 app.use('/api/webhooks', webhookRoutes);
 app.use('/api/performance-metrics', performanceMetricsRoutes);
+app.use('/api/announcements', announcementRoutes);
 
 app.get('/health', async (_req, res) => {
   try {

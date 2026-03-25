@@ -800,6 +800,29 @@ export default function CheckoutPage() {
                 </div>
               )}
 
+              {/* Payment Trust Signals */}
+              <div className="bg-white/50 backdrop-blur-sm border border-white/40 rounded-2xl p-4 space-y-2.5">
+                <p className="text-xs font-semibold uppercase tracking-wider text-[#1a1a2e]/50 mb-1">Safe & Secure Checkout</p>
+                <p className="flex items-center gap-2 text-xs text-[#1a1a2e]/70">
+                  <span className="text-green-500 font-bold">🔒</span> Your information is encrypted and secure
+                </p>
+                <p className="flex items-center gap-2 text-xs text-[#1a1a2e]/70">
+                  <span className="font-bold">✓</span> 100% Money Back Guarantee on all orders
+                </p>
+                <p className="flex items-center gap-2 text-xs text-[#1a1a2e]/70">
+                  <span className="font-bold">✓</span> Trusted by 10,000+ customers across India
+                </p>
+                <div className="flex items-center gap-3 pt-1 flex-wrap">
+                  <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Accepted payments:</span>
+                  {['UPI', 'PhonePe', 'GPay', 'Paytm', 'Visa', 'Mastercard', 'COD'].map((p) => (
+                    <span key={p} className="text-[10px] font-semibold bg-gray-100 text-gray-600 px-2 py-0.5 rounded border border-gray-200">
+                      {p}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-[10px] text-gray-400 pt-1">Powered by Razorpay · PCI-DSS Compliant</p>
+              </div>
+
               <div className="flex gap-3 mt-4">
                 <button onClick={() => setStep('address')} className="btn-outline flex-1 py-3 text-sm">Back</button>
                 <button onClick={() => setStep('confirm')} className="btn-primary flex-1 py-3 text-sm tracking-widest">REVIEW ORDER</button>

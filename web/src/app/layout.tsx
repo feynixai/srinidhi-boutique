@@ -11,6 +11,8 @@ import { MobileBottomNav } from '@/components/MobileBottomNav';
 import { CompareBar } from '@/components/CompareBar';
 import { PageTransition } from '@/components/PageTransition';
 import { CookieConsent } from '@/components/CookieConsent';
+import { AnnouncementBar } from '@/components/AnnouncementBar';
+import { ExitIntentPopup } from '@/components/ExitIntentPopup';
 import { Toaster } from 'react-hot-toast';
 
 const playfair = Playfair_Display({
@@ -85,6 +87,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           >
             Skip to main content
           </a>
+          <AnnouncementBar />
           <Header />
           <main id="main-content" className="flex-1">
             <PageTransition>{children}</PageTransition>
@@ -96,6 +99,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <MobileBottomNav />
           <CompareBar />
           <CookieConsent />
+          <ExitIntentPopup />
           <Toaster
             position="bottom-center"
             toastOptions={{

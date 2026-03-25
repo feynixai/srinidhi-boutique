@@ -71,6 +71,21 @@ function AnimatedNumber({ value, prefix = '', className = '' }: { value: number;
   return <span className={className}>{prefix}{count.toLocaleString('en-IN')}</span>;
 }
 
+function TrendArrow({ value, baseline }: { value: number; baseline: number }) {
+  if (baseline === 0) return null;
+  const pct = Math.round(((value - baseline) / baseline) * 100);
+  if (Math.abs(pct) < 1) return null;
+  const up = pct > 0;
+  return (
+    <span className={`flex items-center gap-0.5 text-xs font-semibold ${up ? 'text-green-600' : 'text-red-500'}`}>
+      <svg viewBox="0 0 10 10" className={`w-3 h-3 ${up ? '' : 'rotate-180'}`} fill="currentColor">
+        <polygon points="5,1 9,9 1,9" />
+      </svg>
+      {Math.abs(pct)}%
+    </span>
+  );
+}
+
 function SkeletonBento() {
   return (
     <div className="space-y-6">
@@ -138,46 +153,58 @@ export default function DashboardPage() {
       </div>
 
       {/* Bento Row 1 — 4 stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="glass-card p-5 flex flex-col gap-2 border-t-4 border-[#c5a55a]">
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold">Orders</p>
-            <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" title="Live" />
-              <span className="text-xl">📦</span>
+      {(() => {
+        const avgDailyOrders = stats.totalOrders > 0 ? Math.round(stats.totalOrders / 7) : 0;
+        const avgDailyRevenue = Number(stats.totalRevenue) > 0 ? Math.round(Number(stats.totalRevenue) / 7) : 0;
+        return (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="glass-card p-5 flex flex-col gap-2 border-t-4 border-[#c5a55a]">
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold">Orders</p>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" title="Live" />
+                  <span className="text-xl">📦</span>
+                </div>
+              </div>
+              <AnimatedNumber value={stats.todayOrders} className="text-4xl font-bold text-[#c5a55a]" />
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-gray-400">Today · updates every 30s</p>
+                <TrendArrow value={stats.todayOrders} baseline={avgDailyOrders} />
+              </div>
+            </div>
+
+            <div className="glass-card p-5 flex flex-col gap-2 border-t-4 border-emerald-500">
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold">Revenue</p>
+                <span className="text-xl">💰</span>
+              </div>
+              <AnimatedNumber value={Number(stats.todayRevenue)} prefix="&#x20B9;" className="text-2xl font-bold text-emerald-600" />
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-gray-400">Today</p>
+                <TrendArrow value={Number(stats.todayRevenue)} baseline={avgDailyRevenue} />
+              </div>
+            </div>
+
+            <div className={`glass-card p-5 flex flex-col gap-2 border-t-4 ${stats.lowStockProducts > 0 ? 'border-red-400' : 'border-gray-200'}`}>
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold">Low Stock</p>
+                <span className="text-xl">⚠️</span>
+              </div>
+              <AnimatedNumber value={stats.lowStockProducts} className={`text-4xl font-bold ${stats.lowStockProducts > 0 ? 'text-red-500' : 'text-gray-400'}`} />
+              <p className="text-xs text-gray-400">{stats.lowStockProducts > 0 ? 'Items need restocking' : 'All stocked up'}</p>
+            </div>
+
+            <div className={`glass-card p-5 flex flex-col gap-2 border-t-4 ${stats.pendingOrders > 0 ? 'border-orange-400' : 'border-gray-200'}`}>
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold">Pending</p>
+                <span className="text-xl">⏳</span>
+              </div>
+              <AnimatedNumber value={stats.pendingOrders} className={`text-4xl font-bold ${stats.pendingOrders > 0 ? 'text-orange-500' : 'text-gray-400'}`} />
+              <p className="text-xs text-gray-400">Orders need action</p>
             </div>
           </div>
-          <AnimatedNumber value={stats.todayOrders} className="text-4xl font-bold text-[#c5a55a]" />
-          <p className="text-xs text-gray-400">Today · updates every 30s</p>
-        </div>
-
-        <div className="glass-card p-5 flex flex-col gap-2 border-t-4 border-emerald-500">
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold">Revenue</p>
-            <span className="text-xl">💰</span>
-          </div>
-          <AnimatedNumber value={Number(stats.todayRevenue)} prefix="&#x20B9;" className="text-2xl font-bold text-emerald-600" />
-          <p className="text-xs text-gray-400">Today</p>
-        </div>
-
-        <div className={`glass-card p-5 flex flex-col gap-2 border-t-4 ${stats.lowStockProducts > 0 ? 'border-red-400' : 'border-gray-200'}`}>
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold">Low Stock</p>
-            <span className="text-xl">⚠️</span>
-          </div>
-          <AnimatedNumber value={stats.lowStockProducts} className={`text-4xl font-bold ${stats.lowStockProducts > 0 ? 'text-red-500' : 'text-gray-400'}`} />
-          <p className="text-xs text-gray-400">{stats.lowStockProducts > 0 ? 'Items need restocking' : 'All stocked up'}</p>
-        </div>
-
-        <div className={`glass-card p-5 flex flex-col gap-2 border-t-4 ${stats.pendingOrders > 0 ? 'border-orange-400' : 'border-gray-200'}`}>
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold">Pending</p>
-            <span className="text-xl">⏳</span>
-          </div>
-          <AnimatedNumber value={stats.pendingOrders} className={`text-4xl font-bold ${stats.pendingOrders > 0 ? 'text-orange-500' : 'text-gray-400'}`} />
-          <p className="text-xs text-gray-400">Orders need action</p>
-        </div>
-      </div>
+        );
+      })()}
 
       {/* Bento Row 2 — Chart (2/3) + Quick Actions (1/3) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

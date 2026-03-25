@@ -5,7 +5,7 @@ import { useState, use, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { FaWhatsapp } from 'react-icons/fa';
-import { FiShare2, FiHeart, FiChevronDown, FiChevronUp, FiCopy } from 'react-icons/fi';
+import { FiShare2, FiHeart, FiChevronDown, FiChevronUp, FiCopy, FiShoppingBag } from 'react-icons/fi';
 import { getProduct, addToCart, getProducts } from '@/lib/api';
 import { useCartStore } from '@/lib/cart-store';
 import { useWishlistStore } from '@/lib/wishlist-store';
@@ -13,6 +13,8 @@ import { SizeGuideModal } from '@/components/SizeGuideModal';
 import { ProductReviews } from '@/components/ProductReviews';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductQA } from '@/components/ProductQA';
+
+const API_URL_INTERNAL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -111,6 +113,8 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const [adding, setAdding] = useState(false);
   const [zoomed, setZoomed] = useState(false);
   const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
+  const [showStickyBar, setShowStickyBar] = useState(false);
+  const addToCartButtonRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef<number | null>(null);
   const { sessionId, itemCount, setItemCount, openCart } = useCartStore();
   const { toggle: toggleWishlist, has: inWishlist } = useWishlistStore();
@@ -125,6 +129,26 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
     queryFn: () => getProducts({ category: product!.category?.slug || '', limit: '5' }),
     enabled: !!product?.category?.slug,
   });
+
+  const { data: alsoBought } = useQuery({
+    queryKey: ['also-bought', slug],
+    queryFn: async () => {
+      const res = await fetch(`${API_URL_INTERNAL}/api/products/${slug}/also-bought`);
+      if (!res.ok) return [];
+      return res.json();
+    },
+    enabled: !!product,
+  });
+
+  // Sticky add-to-cart bar: show when main button scrolls off screen
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowStickyBar(!entry.isIntersecting),
+      { threshold: 0 }
+    );
+    if (addToCartButtonRef.current) observer.observe(addToCartButtonRef.current);
+    return () => observer.disconnect();
+  }, [product]);
 
   // Track recently viewed
   useEffect(() => {
@@ -160,10 +184,15 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
     <div className="text-center py-20 text-charcoal/40 font-serif text-xl">Product not found</div>
   );
 
-  const discountPct = product.onOffer && product.offerPercent
+  // Sale price from store-wide sale or product-level offer
+  const displayPrice = product.salePrice ?? Number(product.price);
+  const originalPrice = Number(product.price);
+  const discountPct = product.salePct && product.salePct > 0
+    ? product.salePct
+    : product.onOffer && product.offerPercent
     ? product.offerPercent
     : product.comparePrice
-    ? Math.round(((Number(product.comparePrice) - Number(product.price)) / Number(product.comparePrice)) * 100)
+    ? Math.round(((Number(product.comparePrice) - originalPrice) / Number(product.comparePrice)) * 100)
     : null;
 
   const jsonLd = {
@@ -332,11 +361,11 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             <h1 className="font-serif text-2xl md:text-3xl lg:text-4xl leading-tight text-charcoal">{product.name}</h1>
 
             {/* Price */}
-            <div className="flex items-center gap-4">
-              <span className="text-3xl font-bold text-charcoal">₹{Number(product.price).toLocaleString('en-IN')}</span>
-              {product.comparePrice && (
+            <div className="flex items-center gap-4 flex-wrap">
+              <span className="text-3xl font-bold text-charcoal">₹{displayPrice.toLocaleString('en-IN')}</span>
+              {(displayPrice < originalPrice || product.comparePrice) && (
                 <span className="text-lg text-charcoal/40 line-through">
-                  ₹{Number(product.comparePrice).toLocaleString('en-IN')}
+                  ₹{(displayPrice < originalPrice ? originalPrice : Number(product.comparePrice)).toLocaleString('en-IN')}
                 </span>
               )}
               {discountPct && (
@@ -344,9 +373,9 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               )}
             </div>
 
-            {product.comparePrice && Number(product.comparePrice) > Number(product.price) && (
+            {displayPrice < originalPrice && (
               <p className="text-green-600 text-sm font-medium">
-                You save ₹{(Number(product.comparePrice) - Number(product.price)).toLocaleString('en-IN')}!
+                You save ₹{(originalPrice - displayPrice).toLocaleString('en-IN')}! {product.salePct ? '(Sale)' : ''}
               </p>
             )}
 
@@ -408,7 +437,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             )}
 
             {/* CTA Buttons */}
-            <div className="space-y-3 pt-2">
+            <div className="space-y-3 pt-2" ref={addToCartButtonRef}>
               <div className="flex gap-3">
                 <button
                   onClick={handleAddToCart}
@@ -513,6 +542,16 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
         <ProductQA productId={product.id} />
       </div>
 
+      {/* Customers Also Bought */}
+      {alsoBought && alsoBought.length > 0 && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-12">
+          <h2 className="font-serif text-2xl mb-6">Customers Also Bought</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {alsoBought.map((p: Record<string, unknown>) => <ProductCard key={p.id as string} product={p as Parameters<typeof ProductCard>[0]['product']} />)}
+          </div>
+        </div>
+      )}
+
       {/* Related Products */}
       {relatedProducts.length > 0 && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
@@ -520,6 +559,29 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {relatedProducts.map((p) => <ProductCard key={p.id} product={p} />)}
           </div>
+        </div>
+      )}
+
+      {/* Sticky Add-to-Cart Bar */}
+      {showStickyBar && product.stock > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-xl px-4 py-3 flex items-center gap-3 md:hidden animate-slide-up">
+          {product.images[0] && (
+            <div className="relative w-12 h-14 flex-shrink-0 overflow-hidden">
+              <Image src={product.images[0]} alt={product.name} fill className="object-cover" sizes="48px" />
+            </div>
+          )}
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-charcoal truncate">{product.name}</p>
+            <p className="text-rose-gold font-bold">₹{displayPrice.toLocaleString('en-IN')}</p>
+          </div>
+          <button
+            onClick={handleAddToCart}
+            disabled={adding}
+            className="flex items-center gap-2 bg-rose-gold text-white px-5 py-3 text-sm font-semibold tracking-wide flex-shrink-0 disabled:opacity-70"
+          >
+            <FiShoppingBag size={16} />
+            {adding ? 'Adding...' : 'Add to Bag'}
+          </button>
         </div>
       )}
     </div>

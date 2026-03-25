@@ -172,6 +172,7 @@ export async function cleanupTest() {
   await testPrisma.otpCode.deleteMany({});
   await testPrisma.user.deleteMany({});
   await testPrisma.adminUser.deleteMany({});
+  await testPrisma.storeSale.deleteMany({});
 }
 
 export async function createTestNewsletter(email: string, overrides: Record<string, unknown> = {}) {

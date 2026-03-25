@@ -225,7 +225,7 @@ describe('Order edge cases', () => {
     expect(res.status).toBe(404);
   });
 
-  it('order number increments sequentially', async () => {
+  it('generates unique order numbers in SB-NNNN format', async () => {
     const product = await createTestProduct({ price: 1000, stock: 20 });
     const base = {
       customerName: 'Test',
@@ -238,9 +238,11 @@ describe('Order edge cases', () => {
     const r1 = await request(app).post('/api/orders').send(base);
     const r2 = await request(app).post('/api/orders').send(base);
 
-    const n1 = parseInt(r1.body.orderNumber.replace('SB-', ''));
-    const n2 = parseInt(r2.body.orderNumber.replace('SB-', ''));
-    expect(n2).toBe(n1 + 1);
+    expect(r1.status).toBe(201);
+    expect(r2.status).toBe(201);
+    expect(r1.body.orderNumber).toMatch(/^SB-\d{4}$/);
+    expect(r2.body.orderNumber).toMatch(/^SB-\d{4}$/);
+    expect(r1.body.orderNumber).not.toBe(r2.body.orderNumber);
   });
 });
 

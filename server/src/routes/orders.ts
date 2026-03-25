@@ -48,8 +48,14 @@ const placeOrderSchema = z.object({
 });
 
 async function generateOrderNumber(): Promise<string> {
-  const count = await prisma.order.count();
-  return `SB-${String(count + 1).padStart(4, '0')}`;
+  // Use random 4-digit number + existence check to avoid race conditions in concurrent environments
+  for (let attempt = 0; attempt < 50; attempt++) {
+    const n = 1000 + Math.floor(Math.random() * 9000);
+    const candidate = `SB-${n}`;
+    const exists = await prisma.order.findUnique({ where: { orderNumber: candidate } });
+    if (!exists) return candidate;
+  }
+  throw new Error('Could not generate unique order number');
 }
 
 // In-memory idempotency store (for single-process, replace with Redis in production)
@@ -119,9 +125,9 @@ orderRoutes.post('/', async (req: Request, res: Response) => {
 
   const shipping = calculateShipping(subtotal, country);
   const total = subtotal + shipping - discount;
-  const orderNumber = await generateOrderNumber();
+  let orderNumber = await generateOrderNumber();
 
-  const order = await prisma.order.create({
+  let order = await prisma.order.create({
     data: {
       orderNumber,
       customerName: data.customerName,

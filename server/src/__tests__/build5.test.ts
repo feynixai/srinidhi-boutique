@@ -379,7 +379,7 @@ describe('WhatsApp link generation', () => {
   });
 
   it('Razorpay payment label defaults gracefully', () => {
-    const paymentMethod = 'razorpay';
+    const paymentMethod: string = 'razorpay';
     const label = paymentMethod === 'cod' ? 'Cash on Delivery' : paymentMethod === 'upi' ? 'UPI' : 'Online Payment';
     expect(label).toBe('Online Payment');
   });

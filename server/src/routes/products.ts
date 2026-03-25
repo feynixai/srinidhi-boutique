@@ -5,6 +5,34 @@ import { cache, TTL } from '../lib/cache';
 
 export const productRoutes = Router();
 
+async function getActiveSaleDiscount(): Promise<number> {
+  const now = new Date();
+  const sale = await prisma.storeSale.findFirst({
+    where: {
+      active: true,
+      OR: [
+        { startAt: null },
+        { startAt: { lte: now } },
+      ],
+      AND: [
+        { OR: [{ endAt: null }, { endAt: { gte: now } }] },
+      ],
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+  return sale ? sale.discountPct : 0;
+}
+
+function applySale<T extends { price: unknown; comparePrice?: unknown }>(
+  product: T,
+  discountPct: number
+): T & { salePrice: number | null; salePct: number } {
+  if (discountPct <= 0) return { ...product, salePrice: null, salePct: 0 };
+  const originalPrice = Number(product.price);
+  const salePrice = Math.round(originalPrice * (1 - discountPct / 100));
+  return { ...product, salePrice, salePct: discountPct };
+}
+
 productRoutes.get('/', async (req: Request, res: Response) => {
   const {
     category,
@@ -51,38 +79,40 @@ productRoutes.get('/', async (req: Request, res: Response) => {
     sort === 'popular' ? { bestSeller: 'desc' } :
     { createdAt: 'desc' };
 
-  const [products, total] = await Promise.all([
-    prisma.product.findMany({
-      where,
-      include: { category: true },
-      orderBy,
-      skip,
-      take: limitNum,
-    }),
-    prisma.product.count({ where }),
+  const [[products, total], discountPct] = await Promise.all([
+    Promise.all([
+      prisma.product.findMany({
+        where,
+        include: { category: true },
+        orderBy,
+        skip,
+        take: limitNum,
+      }),
+      prisma.product.count({ where }),
+    ]),
+    getActiveSaleDiscount(),
   ]);
 
   res.json({
-    products,
+    products: products.map((p) => applySale(p, discountPct)),
     total,
     page: pageNum,
     totalPages: Math.ceil(total / limitNum),
+    activeSaleDiscountPct: discountPct || undefined,
   });
 });
 
 productRoutes.get('/featured', async (_req: Request, res: Response) => {
-  const cacheKey = 'products:featured';
-  const cached = cache.get(cacheKey);
-  if (cached) return res.json(cached);
-
-  const products = await prisma.product.findMany({
-    where: { featured: true, active: true },
-    include: { category: true },
-    orderBy: { createdAt: 'desc' },
-    take: 12,
-  });
-  cache.set(cacheKey, products, TTL.FEATURED);
-  res.json(products);
+  const [products, discountPct] = await Promise.all([
+    prisma.product.findMany({
+      where: { featured: true, active: true },
+      include: { category: true },
+      orderBy: { createdAt: 'desc' },
+      take: 12,
+    }),
+    getActiveSaleDiscount(),
+  ]);
+  res.json(products.map((p) => applySale(p, discountPct)));
 });
 
 productRoutes.get('/best-sellers', async (_req: Request, res: Response) => {
@@ -145,11 +175,88 @@ productRoutes.get('/:slug/recommendations', async (req: Request, res: Response) 
   res.json(recommendations);
 });
 
-productRoutes.get('/:slug', async (req: Request, res: Response) => {
-  const product = await prisma.product.findUnique({
-    where: { slug: req.params.slug },
-    include: { category: true, reviews: { where: { approved: true } } },
+// GET /api/products/:slug/also-bought — co-occurrence recommendations
+productRoutes.get('/:slug/also-bought', async (req: Request, res: Response) => {
+  const product = await prisma.product.findUnique({ where: { slug: req.params.slug } });
+  if (!product) throw new AppError(404, 'Product not found');
+
+  // Find orders that contain this product
+  const ordersWithProduct = await prisma.orderItem.findMany({
+    where: { productId: product.id },
+    select: { orderId: true },
+    take: 200,
   });
+
+  if (ordersWithProduct.length === 0) {
+    res.json([]);
+    return;
+  }
+
+  const orderIds = ordersWithProduct.map((o) => o.orderId);
+
+  // Find other products in those orders
+  const coItems = await prisma.orderItem.findMany({
+    where: { orderId: { in: orderIds }, productId: { not: product.id } },
+    select: { productId: true },
+  });
+
+  // Count co-occurrences
+  const countMap = new Map<string, number>();
+  for (const item of coItems) {
+    countMap.set(item.productId, (countMap.get(item.productId) ?? 0) + 1);
+  }
+
+  if (countMap.size === 0) {
+    res.json([]);
+    return;
+  }
+
+  // Sort by frequency, take top 8
+  const topIds = Array.from(countMap.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([id]) => id);
+
+  const products = await prisma.product.findMany({
+    where: { id: { in: topIds }, active: true },
+    include: { category: true },
+  });
+
+  // Preserve order by frequency
+  const sorted = topIds
+    .map((id) => products.find((p) => p.id === id))
+    .filter(Boolean);
+
+  res.json(sorted);
+});
+
+// GET /api/products/:slug/related — same category, exclude self
+productRoutes.get('/:slug/related', async (req: Request, res: Response) => {
+  const product = await prisma.product.findUnique({ where: { slug: req.params.slug } });
+  if (!product) throw new AppError(404, 'Product not found');
+
+  const related = await prisma.product.findMany({
+    where: {
+      active: true,
+      id: { not: product.id },
+      categoryId: product.categoryId || undefined,
+    },
+    include: { category: true },
+    orderBy: { bestSeller: 'desc' },
+    take: 8,
+  });
+
+  res.json(related);
+});
+
+productRoutes.get('/:slug', async (req: Request, res: Response) => {
+  const [product, discountPct] = await Promise.all([
+    prisma.product.findUnique({
+      where: { slug: req.params.slug },
+      include: { category: true, reviews: { where: { approved: true } } },
+    }),
+    getActiveSaleDiscount(),
+  ]);
 
   if (!product || !product.active) {
     throw new AppError(404, 'Product not found');
@@ -167,9 +274,10 @@ productRoutes.get('/:slug', async (req: Request, res: Response) => {
     : null;
 
   const { reviews: _r, ...productData } = product;
+  const withSale = applySale(productData, discountPct);
 
   res.json({
-    ...productData,
+    ...withSale,
     trending: product.bestSeller,
     lowStock: product.stock > 0 && product.stock < 5,
     outOfStock: product.stock === 0,

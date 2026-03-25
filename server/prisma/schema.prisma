@@ -599,3 +599,16 @@ model WebhookDelivery {
   @@index([webhookId])
   @@index([event])
 }
+
+// ── Build 12.5 models ─────────────────────────────────────────────────────────
+
+model StoreSale {
+  id          String   @id @default(cuid())
+  active      Boolean  @default(false)
+  discountPct Int
+  label       String?
+  startAt     DateTime?
+  endAt       DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

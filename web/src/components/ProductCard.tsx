@@ -17,7 +17,12 @@ export function ProductCard({ product }: ProductCardProps) {
   const { toggle: toggleWishlist, has: inWishlist } = useWishlistStore();
   const { sessionId, itemCount, setItemCount, openCart } = useCartStore();
 
-  const discountPct = product.onOffer && product.offerPercent
+  const salePrice = (product as Record<string, unknown>).salePrice as number | undefined;
+  const displayPrice = salePrice ?? Number(product.price);
+  const salePct = (product as Record<string, unknown>).salePct as number | undefined;
+  const discountPct = salePct && salePct > 0
+    ? salePct
+    : product.onOffer && product.offerPercent
     ? product.offerPercent
     : product.comparePrice
     ? Math.round(((Number(product.comparePrice) - Number(product.price)) / Number(product.comparePrice)) * 100)
@@ -53,6 +58,9 @@ export function ProductCard({ product }: ProductCardProps) {
             src={product.images[0]}
             alt={product.name}
             fill
+            loading="lazy"
+            placeholder="blur"
+            blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iI0ZGRjBGMyIvPjwvc3ZnPg=="
             className="object-cover group-hover:scale-105 transition-transform duration-500"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
@@ -109,11 +117,11 @@ export function ProductCard({ product }: ProductCardProps) {
           {product.category?.name || product.occasion[0]}
         </p>
         <h3 className="text-sm font-medium text-charcoal line-clamp-2 leading-snug">{product.name}</h3>
-        <div className="flex items-center gap-2 mt-1.5">
-          <span className="font-semibold text-charcoal">₹{Number(product.price).toLocaleString('en-IN')}</span>
-          {product.comparePrice && (
+        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+          <span className="font-semibold text-charcoal">₹{displayPrice.toLocaleString('en-IN')}</span>
+          {(displayPrice < Number(product.price) || product.comparePrice) && (
             <span className="text-gray-400 text-sm line-through">
-              ₹{Number(product.comparePrice).toLocaleString('en-IN')}
+              ₹{(displayPrice < Number(product.price) ? Number(product.price) : Number(product.comparePrice)).toLocaleString('en-IN')}
             </span>
           )}
         </div>

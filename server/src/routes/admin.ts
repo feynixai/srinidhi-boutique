@@ -14,6 +14,12 @@ adminRoutes.get('/dashboard', async (_req: Request, res: Response) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
+  const weekStart = new Date(today);
+  weekStart.setDate(today.getDate() - 6); // last 7 days
+
+  const monthStart = new Date(today);
+  monthStart.setDate(1); // 1st of current month
+
   const [
     todayOrders,
     totalOrders,
@@ -23,6 +29,10 @@ adminRoutes.get('/dashboard', async (_req: Request, res: Response) => {
     totalRevenue,
     totalProducts,
     lowStockProducts,
+    weekOrdersAgg,
+    weekRevenueAgg,
+    monthOrdersAgg,
+    monthRevenueAgg,
   ] = await Promise.all([
     prisma.order.count({ where: { createdAt: { gte: today } } }),
     prisma.order.count(),
@@ -42,11 +52,25 @@ adminRoutes.get('/dashboard', async (_req: Request, res: Response) => {
     }),
     prisma.product.count({ where: { active: true } }),
     prisma.product.count({ where: { stock: { lte: 5 }, active: true } }),
+    prisma.order.count({ where: { createdAt: { gte: weekStart } } }),
+    prisma.order.aggregate({
+      where: { createdAt: { gte: weekStart }, paymentStatus: 'paid' },
+      _sum: { total: true },
+    }),
+    prisma.order.count({ where: { createdAt: { gte: monthStart } } }),
+    prisma.order.aggregate({
+      where: { createdAt: { gte: monthStart }, paymentStatus: 'paid' },
+      _sum: { total: true },
+    }),
   ]);
 
   res.json({
     todayOrders,
     todayRevenue: todayRevenue._sum.total || 0,
+    weekOrders: weekOrdersAgg,
+    weekRevenue: weekRevenueAgg._sum.total || 0,
+    monthOrders: monthOrdersAgg,
+    monthRevenue: monthRevenueAgg._sum.total || 0,
     totalOrders,
     totalRevenue: totalRevenue._sum.total || 0,
     pendingOrders,
@@ -174,14 +198,28 @@ adminRoutes.get('/orders', async (req: Request, res: Response) => {
   res.json({ orders, total, page: pageNum, totalPages: Math.ceil(total / limitNum) });
 });
 
-adminRoutes.get('/orders/export', async (_req: Request, res: Response) => {
+adminRoutes.get('/orders/export', async (req: Request, res: Response) => {
+  const { startDate, endDate } = req.query;
+
+  const where: Record<string, unknown> = {};
+  if (startDate || endDate) {
+    where.createdAt = {};
+    if (startDate) (where.createdAt as Record<string, unknown>).gte = new Date(startDate as string);
+    if (endDate) {
+      const end = new Date(endDate as string);
+      end.setHours(23, 59, 59, 999);
+      (where.createdAt as Record<string, unknown>).lte = end;
+    }
+  }
+
   const orders = await prisma.order.findMany({
+    where,
     orderBy: { createdAt: 'desc' },
-    include: { items: true },
+    include: { items: { include: { product: true } } },
   });
 
   const rows = [
-    ['Order Number', 'Customer', 'Phone', 'Email', 'Status', 'Payment', 'Total', 'Shipping', 'Discount', 'Date', 'Items'].join(','),
+    ['Order Number', 'Customer', 'Phone', 'Email', 'Status', 'Payment', 'Total', 'Shipping', 'Discount', 'GST', 'Date', 'Items', 'Item Details'].join(','),
     ...orders.map((o) => [
       o.orderNumber,
       `"${o.customerName}"`,
@@ -192,8 +230,10 @@ adminRoutes.get('/orders/export', async (_req: Request, res: Response) => {
       Number(o.total).toFixed(2),
       Number(o.shipping).toFixed(2),
       Number(o.discount).toFixed(2),
+      Number((o as Record<string, unknown>).gstAmount ?? 0).toFixed(2),
       new Date(o.createdAt).toLocaleDateString('en-IN'),
       o.items.length,
+      `"${o.items.map((i) => `${i.product?.name ?? 'Unknown'} x${i.quantity}`).join('; ')}"`,
     ].join(',')),
   ].join('\n');
 
@@ -293,6 +333,72 @@ adminRoutes.delete('/coupons/:id', async (req: Request, res: Response) => {
   res.json({ success: true });
 });
 
+// Coupon analytics
+adminRoutes.get('/coupons/analytics', async (_req: Request, res: Response) => {
+  const coupons = await prisma.coupon.findMany({ orderBy: { usedCount: 'desc' } });
+  const totalOrders = await prisma.order.count();
+
+  const analytics = coupons.map((c) => ({
+    id: c.id,
+    code: c.code,
+    discount: c.discount,
+    usedCount: c.usedCount,
+    maxUses: c.maxUses,
+    active: c.active,
+    expiresAt: c.expiresAt,
+    usageRate: c.maxUses ? Math.round((c.usedCount / c.maxUses) * 100) : null,
+    orderUsageRate: totalOrders > 0 ? Math.round((c.usedCount / totalOrders) * 100) : 0,
+  }));
+
+  const totalCouponsUsed = coupons.reduce((sum, c) => sum + c.usedCount, 0);
+  res.json({ analytics, totalCouponsUsed, totalCoupons: coupons.length });
+});
+
+// Store-wide sale
+adminRoutes.get('/store-sale', async (_req: Request, res: Response) => {
+  const sale = await prisma.storeSale.findFirst({ orderBy: { createdAt: 'desc' } });
+  res.json(sale || null);
+});
+
+adminRoutes.post('/store-sale', async (req: Request, res: Response) => {
+  const { discountPct, label, startAt, endAt } = z.object({
+    discountPct: z.number().int().min(1).max(90),
+    label: z.string().optional(),
+    startAt: z.string().optional().transform((v) => v ? new Date(v) : undefined),
+    endAt: z.string().optional().transform((v) => v ? new Date(v) : undefined),
+  }).parse(req.body);
+
+  // Deactivate any existing active sales
+  await prisma.storeSale.updateMany({ where: { active: true }, data: { active: false } });
+
+  const sale = await prisma.storeSale.create({
+    data: { discountPct, label, startAt, endAt, active: true },
+  });
+  res.status(201).json(sale);
+});
+
+adminRoutes.patch('/store-sale/:id', async (req: Request, res: Response) => {
+  const existing = await prisma.storeSale.findUnique({ where: { id: req.params.id } });
+  if (!existing) throw new AppError(404, 'Store sale not found');
+
+  const data = z.object({
+    active: z.boolean().optional(),
+    discountPct: z.number().int().min(1).max(90).optional(),
+    label: z.string().optional(),
+    endAt: z.string().optional().transform((v) => v ? new Date(v) : undefined),
+  }).parse(req.body);
+
+  const updated = await prisma.storeSale.update({ where: { id: req.params.id }, data });
+  res.json(updated);
+});
+
+adminRoutes.delete('/store-sale/:id', async (req: Request, res: Response) => {
+  const existing = await prisma.storeSale.findUnique({ where: { id: req.params.id } });
+  if (!existing) throw new AppError(404, 'Store sale not found');
+  await prisma.storeSale.delete({ where: { id: req.params.id } });
+  res.json({ success: true });
+});
+
 // Order detail
 adminRoutes.get('/orders/:id', async (req: Request, res: Response) => {
   const order = await prisma.order.findUnique({
@@ -327,7 +433,7 @@ adminRoutes.get('/customers', async (req: Request, res: Response) => {
     },
   });
 
-  // Group by phone to get unique customers
+  // Group by phone to get unique customers with CLV
   const customerMap = new Map<string, {
     phone: string; name: string; email?: string | null;
     totalSpend: number; orderCount: number; lastOrder: Date; firstOrder: Date;
@@ -354,6 +460,17 @@ adminRoutes.get('/customers', async (req: Request, res: Response) => {
   }
 
   const customers = Array.from(customerMap.values())
+    .map((c) => {
+      const avgOrderValue = c.totalSpend / c.orderCount;
+      let clv = avgOrderValue; // default: single order
+      if (c.orderCount > 1) {
+        const daySpan = (c.lastOrder.getTime() - c.firstOrder.getTime()) / (1000 * 60 * 60 * 24);
+        const daysBetweenOrders = daySpan / (c.orderCount - 1);
+        const annualOrders = daysBetweenOrders > 0 ? Math.min(365 / daysBetweenOrders, 52) : 1;
+        clv = avgOrderValue * annualOrders * 2; // 2-year projected lifespan
+      }
+      return { ...c, clv: Math.round(clv) };
+    })
     .sort((a, b) => b.totalSpend - a.totalSpend);
 
   const total = customers.length;

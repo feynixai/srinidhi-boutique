@@ -7,6 +7,7 @@ import { Footer } from '@/components/Footer';
 import { CartDrawer } from '@/components/CartDrawer';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { BackToTop } from '@/components/BackToTop';
+import { MobileBottomNav } from '@/components/MobileBottomNav';
 import { Toaster } from 'react-hot-toast';
 
 const playfair = Playfair_Display({
@@ -47,7 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
-      <body className="min-h-screen flex flex-col bg-white">
+      <body className="min-h-screen flex flex-col bg-white pb-16 md:pb-0">
         <Providers>
           <Header />
           <main className="flex-1">{children}</main>
@@ -55,6 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <CartDrawer />
           <WhatsAppButton />
           <BackToTop />
+          <MobileBottomNav />
           <Toaster
             position="bottom-center"
             toastOptions={{

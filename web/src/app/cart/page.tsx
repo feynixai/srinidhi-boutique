@@ -10,6 +10,7 @@ import { useCartStore } from '@/lib/cart-store';
 import { useWishlistStore } from '@/lib/wishlist-store';
 import { getCart, updateCartItem, removeCartItem, validateCoupon, getProducts } from '@/lib/api';
 import { ProductCard } from '@/components/ProductCard';
+import { useAbandonedCartTracker } from '@/hooks/useAbandonedCartTracker';
 
 const FREE_SHIPPING_THRESHOLD = 999;
 
@@ -96,6 +97,20 @@ export default function CartPage() {
   }
 
   const items = cart?.items || [];
+
+  // Track abandoned carts
+  useAbandonedCartTracker(
+    items.map((i) => ({
+      productId: i.product.id,
+      name: i.product.name,
+      price: Number(i.product.price),
+      quantity: i.quantity,
+      size: i.size,
+      color: i.color,
+      image: i.product.images[0],
+    })),
+  );
+
   const subtotal = cart?.subtotal || 0;
   const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 99;
   const discount = appliedCoupon?.discountAmount || 0;

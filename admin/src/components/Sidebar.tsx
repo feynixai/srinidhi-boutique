@@ -13,6 +13,7 @@ import {
   FiUsers,
   FiBarChart2,
   FiSettings,
+  FiShoppingCart,
   FiRefreshCw,
   FiLogOut,
   FiUploadCloud,
@@ -32,6 +33,7 @@ interface NavItem {
 const NAV: NavItem[] = [
   { href: '/admin', label: 'Dashboard', icon: FiGrid },
   { href: '/admin/orders', label: 'Orders', icon: FiShoppingBag },
+  { href: '/admin/abandoned-carts', label: 'Abandoned Carts', icon: FiShoppingCart },
   { href: '/admin/products', label: 'Products', icon: FiPackage },
   { href: '/admin/products/bulk-upload', label: 'Bulk Upload', icon: FiUploadCloud },
   {

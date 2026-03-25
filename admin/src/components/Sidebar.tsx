@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import {
   FiGrid,
@@ -15,12 +15,14 @@ import {
   FiSettings,
   FiRefreshCw,
   FiLogOut,
+  FiUploadCloud,
 } from 'react-icons/fi';
 
 const NAV = [
   { href: '/admin', label: 'Dashboard', icon: FiGrid },
   { href: '/admin/orders', label: 'Orders', icon: FiShoppingBag },
   { href: '/admin/products', label: 'Products', icon: FiPackage },
+  { href: '/admin/products/bulk-upload', label: 'Bulk Upload', icon: FiUploadCloud },
   { href: '/admin/customers', label: 'Customers', icon: FiUsers },
   { href: '/admin/coupons', label: 'Coupons', icon: FiTag },
   { href: '/admin/returns', label: 'Returns', icon: FiRefreshCw },
@@ -30,8 +32,34 @@ const NAV = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { data: session } = useSession();
   const [open, setOpen] = useState(false);
+  const [jwtUser, setJwtUser] = useState<{ name?: string; email?: string } | null>(null);
+
+  useEffect(() => {
+    if (!session) {
+      try {
+        const stored = localStorage.getItem('admin_user');
+        if (stored) setJwtUser(JSON.parse(stored));
+      } catch {}
+    }
+  }, [session]);
+
+  function handleSignOut() {
+    // Clear JWT auth
+    localStorage.removeItem('admin_token');
+    localStorage.removeItem('admin_user');
+    document.cookie = 'admin_token=; path=/; max-age=0';
+    // If NextAuth session exists, sign out via NextAuth too
+    if (session) {
+      signOut({ callbackUrl: '/login' });
+    } else {
+      router.push('/login');
+    }
+  }
+
+  const currentUser = session?.user || jwtUser;
 
   const NavContent = () => (
     <nav className="p-4 space-y-1 flex flex-col h-full">
@@ -60,24 +88,24 @@ export function Sidebar() {
         })}
       </div>
       {/* User section */}
-      {session?.user && (
+      {currentUser && (
         <div className="border-t border-black/5 pt-4 mt-2">
           <div className="flex items-center gap-3 px-3 py-2 bg-white/40 rounded-2xl">
-            {session.user.image ? (
-              <img src={session.user.image} alt="avatar" className="w-9 h-9 rounded-full" />
+            {(session?.user as { image?: string })?.image ? (
+              <img src={(session!.user as { image: string }).image} alt="avatar" className="w-9 h-9 rounded-full" />
             ) : (
               <div className="w-9 h-9 rounded-full bg-[#c5a55a] flex items-center justify-center text-white font-bold text-sm">
-                {(session.user.name || session.user.email || 'A')[0].toUpperCase()}
+                {(currentUser.name || currentUser.email || 'A')[0].toUpperCase()}
               </div>
             )}
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-[#1a1a2e] truncate">
-                {session.user.name || 'Admin'}
+                {currentUser.name || 'Admin'}
               </p>
-              <p className="text-xs text-gray-400 truncate">{session.user.email}</p>
+              <p className="text-xs text-gray-400 truncate">{currentUser.email}</p>
             </div>
             <button
-              onClick={() => signOut({ callbackUrl: '/login' })}
+              onClick={handleSignOut}
               className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
               title="Sign out"
             >

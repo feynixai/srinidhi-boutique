@@ -1,6 +1,8 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import { AppError } from '../middleware/errorHandler';
 import { rateLimit } from '../middleware/rateLimiter';
 
@@ -197,4 +199,64 @@ authRoutes.delete('/admin/users/:id', async (req: Request, res: Response) => {
     data: { active: false },
   });
   res.json({ success: true });
+});
+
+// POST /api/auth/admin/login — email/password login for admin
+const JWT_SECRET = process.env.JWT_SECRET || 'srinidhi-boutique-admin-jwt-secret-2026';
+
+authRoutes.post('/admin/login', loginLimiter, async (req: Request, res: Response) => {
+  const { email, password } = z
+    .object({
+      email: z.string().email(),
+      password: z.string().min(1),
+    })
+    .parse(req.body);
+
+  const admin = await prisma.adminUser.findUnique({ where: { email } });
+  if (!admin) {
+    throw new AppError(401, 'Invalid email or password');
+  }
+  if (!admin.active) {
+    throw new AppError(403, 'Admin account is deactivated');
+  }
+  if (!admin.passwordHash) {
+    throw new AppError(400, 'Password login not set up for this account. Use Google sign-in.');
+  }
+
+  const valid = await bcrypt.compare(password, admin.passwordHash);
+  if (!valid) {
+    throw new AppError(401, 'Invalid email or password');
+  }
+
+  const token = jwt.sign(
+    { adminId: admin.id, email: admin.email, role: admin.role },
+    JWT_SECRET,
+    { expiresIn: '7d' }
+  );
+
+  res.json({
+    success: true,
+    token,
+    admin: { id: admin.id, email: admin.email, name: admin.name, role: admin.role },
+  });
+});
+
+// GET /api/auth/admin/verify — verify JWT token
+authRoutes.get('/admin/verify', async (req: Request, res: Response) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith('Bearer ')) {
+    throw new AppError(401, 'No token provided');
+  }
+
+  try {
+    const decoded = jwt.verify(authHeader.slice(7), JWT_SECRET) as { adminId: string; email: string; role: string };
+    const admin = await prisma.adminUser.findUnique({ where: { id: decoded.adminId } });
+    if (!admin || !admin.active) {
+      throw new AppError(401, 'Invalid or deactivated account');
+    }
+    res.json({ success: true, admin: { id: admin.id, email: admin.email, name: admin.name, role: admin.role } });
+  } catch (err) {
+    if (err instanceof AppError) throw err;
+    throw new AppError(401, 'Invalid or expired token');
+  }
 });

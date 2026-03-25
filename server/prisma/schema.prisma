@@ -86,15 +86,16 @@ model User {
 }
 
 model AdminUser {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  googleId  String?  @unique
-  avatar    String?
-  role      String   @default("STAFF")
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  googleId     String?  @unique
+  avatar       String?
+  passwordHash String?
+  role         String   @default("STAFF")
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model OtpCode {

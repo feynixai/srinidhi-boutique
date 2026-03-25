@@ -1286,6 +1286,49 @@ adminRoutes.post('/products/import-csv', upload.single('file'), async (req: Requ
   res.json({ created: created.length, errors, createdNames: created });
 });
 
+// ── Bulk Product Create (Natural Language Upload) ────────────────────────────
+
+const bulkProductCreateSchema = z.object({
+  products: z.array(z.object({
+    name: z.string().min(1),
+    description: z.string().optional(),
+    price: z.number().positive(),
+    comparePrice: z.number().positive().optional(),
+    images: z.array(z.string()).default([]),
+    categoryId: z.string().optional(),
+    sizes: z.array(z.string()).default([]),
+    colors: z.array(z.string()).default([]),
+    fabric: z.string().optional(),
+    occasion: z.array(z.string()).default([]),
+    stock: z.number().int().min(0).default(0),
+    featured: z.boolean().default(false),
+    bestSeller: z.boolean().default(false),
+    active: z.boolean().default(true),
+  })).min(1),
+});
+
+adminRoutes.post('/products/bulk-create', async (req: Request, res: Response) => {
+  const { products } = bulkProductCreateSchema.parse(req.body);
+
+  const created = await prisma.$transaction(async (tx) => {
+    const results = [];
+    for (const data of products) {
+      const baseSlug = slugify(data.name, { lower: true, strict: true });
+      const existing = await tx.product.findUnique({ where: { slug: baseSlug } });
+      const finalSlug = existing ? `${baseSlug}-${Date.now()}` : baseSlug;
+
+      const product = await tx.product.create({
+        data: { ...data, slug: finalSlug },
+        include: { category: true },
+      });
+      results.push(product);
+    }
+    return results;
+  });
+
+  res.status(201).json({ success: true, count: created.length, products: created });
+});
+
 // ── Build 12: Bulk Product Operations ───────────────────────────────────────
 
 const bulkProductSchema = z.object({

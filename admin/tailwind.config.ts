@@ -5,8 +5,9 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        'rose-gold': '#B76E79',
-        'charcoal': '#2C2C2C',
+        'rose-gold': '#8B1A4A',
+        'gold': '#D4A853',
+        'charcoal': '#1A1A2E',
       },
       fontSize: {
         'base': ['16px', '24px'],

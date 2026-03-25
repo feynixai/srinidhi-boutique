@@ -1,15 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --rose-gold: #B76E79;
-  --ivory: #FFFFF0;
-  --soft-pink: #FFB6C1;
-  --warm-white: #FFF8F5;
-  --charcoal: #2C2C2C;
+  --rose-gold: #8B1A4A;
+  --maroon: #8B1A4A;
+  --gold: #D4A853;
+  --cream: #FFF8F0;
+  --ivory: #FFF8F0;
+  --warm-white: #FFF8F0;
+  --soft-pink: #D4A853;
+  --charcoal: #1A1A2E;
+  --emerald: #059669;
 }
 
 * {
@@ -17,26 +19,34 @@
 }
 
 body {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
   color: var(--charcoal);
   background-color: #ffffff;
 }
 
 h1, h2, h3, h4 {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: var(--font-playfair), Georgia, serif;
 }
 
 .font-serif {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: var(--font-playfair), Georgia, serif;
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-rose-gold text-white px-6 py-3 rounded-sm font-medium hover:bg-opacity-90 transition-all duration-200 tracking-wide;
+    @apply bg-emerald text-white px-6 py-3 font-semibold hover:bg-opacity-90 transition-all duration-200 tracking-wide;
+  }
+
+  .btn-maroon {
+    @apply bg-rose-gold text-white px-6 py-3 font-semibold hover:bg-opacity-90 transition-all duration-200 tracking-wide;
   }
 
   .btn-outline {
-    @apply border border-rose-gold text-rose-gold px-6 py-3 rounded-sm font-medium hover:bg-rose-gold hover:text-white transition-all duration-200 tracking-wide;
+    @apply border border-rose-gold text-rose-gold px-6 py-3 font-semibold hover:bg-rose-gold hover:text-white transition-all duration-200 tracking-wide;
+  }
+
+  .btn-gold {
+    @apply bg-gold text-charcoal px-6 py-3 font-semibold hover:bg-opacity-90 transition-all duration-200 tracking-wide;
   }
 
   .product-card {
@@ -44,10 +54,18 @@ h1, h2, h3, h4 {
   }
 
   .badge-offer {
-    @apply absolute top-2 left-2 bg-rose-gold text-white text-xs px-2 py-1 rounded-sm font-medium z-10;
+    @apply absolute top-2 left-2 bg-rose-gold text-white text-xs px-2 py-1 font-semibold z-10;
   }
 
   .badge-bestseller {
-    @apply absolute top-2 right-2 bg-charcoal text-white text-xs px-2 py-1 rounded-sm font-medium z-10;
+    @apply absolute top-2 right-2 bg-gold text-charcoal text-xs px-2 py-1 font-semibold z-10;
+  }
+
+  .section-heading {
+    @apply font-serif text-3xl md:text-4xl text-charcoal;
+  }
+
+  .divider-gold {
+    @apply w-16 h-0.5 bg-gold mx-auto my-3;
   }
 }

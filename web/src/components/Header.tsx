@@ -147,11 +147,12 @@ export function Header() {
 
   return (
     <>
+      <div className="sticky top-0 z-50 px-3 sm:px-4 pt-2">
       <header
-        className={`sticky top-0 z-50 transition-all duration-300 ${
+        className={`transition-all duration-300 rounded-2xl ${
           scrolled
-            ? 'bg-white/85 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.06)] border-b border-white/30'
-            : 'bg-white/60 backdrop-blur-lg border-b border-white/20'
+            ? 'bg-white/85 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-white/40'
+            : 'bg-white/60 backdrop-blur-lg border border-white/30'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -363,6 +364,7 @@ export function Header() {
           </div>
         )}
       </header>
+      </div>
     </>
   );
 }

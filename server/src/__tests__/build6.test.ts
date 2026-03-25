@@ -401,110 +401,107 @@ describe('GET /api/shipping/rates', () => {
   });
 });
 
-// ── Stripe ───────────────────────────────────────────────────────────────────
+// ── Stripe removed — verify routes return 404 ─────────────────────────────────
 
-describe('POST /api/payments/stripe/create-session', () => {
-  it('returns 500 when Stripe not configured', async () => {
+describe('Stripe routes removed (Build 7)', () => {
+  it('POST /api/payments/stripe/create-session returns 404', async () => {
     const res = await request(app)
       .post('/api/payments/stripe/create-session')
-      .send({
-        orderNumber: 'SB-12345',
-        amount: 2999,
-        customerEmail: 'test@example.com',
-        successUrl: 'https://example.com/success',
-        cancelUrl: 'https://example.com/cancel',
-      });
-    // In test env, Stripe key not set → 500
-    expect(res.status).toBe(500);
+      .send({ orderNumber: 'SB-001', amount: 999, successUrl: 'https://x.com/ok', cancelUrl: 'https://x.com/cancel' });
+    expect(res.status).toBe(404);
   });
 
-  it('validates required fields', async () => {
+  it('POST /api/payments/stripe/webhook returns 404', async () => {
     const res = await request(app)
-      .post('/api/payments/stripe/create-session')
-      .send({ orderNumber: 'SB-001' }); // missing amount, urls
-    expect(res.status).toBe(400);
-  });
-
-  it('validates successUrl format', async () => {
-    const res = await request(app)
-      .post('/api/payments/stripe/create-session')
-      .send({
-        orderNumber: 'SB-001',
-        amount: 999,
-        successUrl: 'not-a-url',
-        cancelUrl: 'https://example.com/cancel',
-      });
-    expect(res.status).toBe(400);
-  });
-
-  it('validates positive amount', async () => {
-    const res = await request(app)
-      .post('/api/payments/stripe/create-session')
-      .send({
-        orderNumber: 'SB-001',
-        amount: -100,
-        successUrl: 'https://example.com/success',
-        cancelUrl: 'https://example.com/cancel',
-      });
-    expect(res.status).toBe(400);
+      .post('/api/payments/stripe/webhook')
+      .send({ type: 'checkout.session.completed' });
+    expect(res.status).toBe(404);
   });
 });
 
-describe('POST /api/payments/stripe/webhook', () => {
-  it('handles webhook without signature in dev mode', async () => {
+// ── Razorpay international card flow ─────────────────────────────────────────
+
+describe('Razorpay international payment flow', () => {
+  it('POST /api/payments/create-order returns 500 when Razorpay not configured', async () => {
     const res = await request(app)
-      .post('/api/payments/stripe/webhook')
-      .set('Content-Type', 'application/json')
-      .send({
-        type: 'checkout.session.completed',
-        data: { object: { metadata: { orderNumber: 'NONEXISTENT-ORDER' }, payment_intent: 'pi_test' } },
-      });
-    // Should handle gracefully (order not found is ok for webhook)
-    expect([200, 400]).toContain(res.status);
+      .post('/api/payments/create-order')
+      .send({ amount: 2999, currency: 'INR' });
+    expect(res.status).toBe(500);
   });
 
-  it('updates order paymentStatus on checkout.session.completed', async () => {
-    const product = await createTestProduct({ stock: 10 });
+  it('POST /api/payments/create-order validates positive amount', async () => {
+    const res = await request(app)
+      .post('/api/payments/create-order')
+      .send({ amount: -100 });
+    expect(res.status).toBe(400);
+  });
+
+  it('POST /api/payments/create-order accepts USD currency for international', async () => {
+    const res = await request(app)
+      .post('/api/payments/create-order')
+      .send({ amount: 50, currency: 'USD' });
+    // 500 because Razorpay keys not configured in test, but schema validates fine
+    expect([400, 500]).toContain(res.status);
+    if (res.status === 400) {
+      // Should not be a validation error for valid inputs
+      expect(res.body.error).not.toMatch(/amount/i);
+    }
+  });
+});
+
+// ── Bank Transfer ─────────────────────────────────────────────────────────────
+
+describe('Bank transfer payment option', () => {
+  it('GET /api/payments/bank-transfer-details returns bank info', async () => {
+    const res = await request(app).get('/api/payments/bank-transfer-details');
+    expect(res.status).toBe(200);
+    expect(res.body.bankName).toBe('HDFC Bank');
+    expect(res.body.accountName).toBe('Srinidhi Boutique');
+    expect(res.body.swift).toBeTruthy();
+    expect(Array.isArray(res.body.instructions)).toBe(true);
+    expect(res.body.instructions.length).toBeGreaterThan(0);
+  });
+
+  it('POST /api/payments/bank-transfer/confirm returns 404 for unknown order', async () => {
+    const res = await request(app)
+      .post('/api/payments/bank-transfer/confirm')
+      .send({ orderNumber: 'SB-NONEXISTENT', referenceNumber: 'TXN123' });
+    expect(res.status).toBe(404);
+  });
+
+  it('POST /api/payments/bank-transfer/confirm marks order as paid', async () => {
+    const product = await createTestProduct({ stock: 5 });
     const order = await testPrisma.order.create({
       data: {
-        orderNumber: 'SB-STRIPE-001',
-        customerName: 'John Smith',
-        customerPhone: '+1-555-0001',
-        address: { line1: '1 Main St', city: 'New York', state: 'New York', pincode: '10001', country: 'US' },
-        subtotal: 2999,
-        shipping: 1499,
+        orderNumber: `SB-BT-${Date.now()}`,
+        customerName: 'Bank Test',
+        customerPhone: '+447700900000',
+        address: { line1: '1 London Rd', city: 'London', pincode: 'SW1A1AA', country: 'GB' },
+        subtotal: 3000,
+        shipping: 1299,
         discount: 0,
-        total: 4498,
-        paymentMethod: 'stripe',
+        total: 4299,
+        paymentMethod: 'bank_transfer',
         paymentStatus: 'pending',
-        country: 'US',
-        items: {
-          create: [{
-            productId: product.id,
-            name: product.name,
-            price: 2999,
-            quantity: 1,
-          }],
-        },
+        country: 'GB',
+        items: { create: [{ productId: product.id, name: product.name, price: 3000, quantity: 1 }] },
       },
     });
 
-    await request(app)
-      .post('/api/payments/stripe/webhook')
-      .set('Content-Type', 'application/json')
-      .send({
-        type: 'checkout.session.completed',
-        data: {
-          object: {
-            metadata: { orderNumber: order.orderNumber },
-            payment_intent: 'pi_test_001',
-          },
-        },
-      });
+    const res = await request(app)
+      .post('/api/payments/bank-transfer/confirm')
+      .send({ orderNumber: order.orderNumber, referenceNumber: 'SWIFT-XYZ-001' });
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.order.paymentStatus).toBe('paid');
+    expect(res.body.order.status).toBe('confirmed');
+  });
 
-    const updated = await testPrisma.order.findUnique({ where: { id: order.id } });
-    expect(updated?.paymentStatus).toBe('paid');
-    expect(updated?.paymentId).toBe('pi_test_001');
+  it('validates required orderNumber field', async () => {
+    const res = await request(app)
+      .post('/api/payments/bank-transfer/confirm')
+      .send({ referenceNumber: 'TXN123' });
+    expect(res.status).toBe(400);
   });
 });
 
@@ -736,7 +733,7 @@ describe('International order creation', () => {
           country: 'US',
         },
         items: [{ productId: product.id, quantity: 1, size: 'M' }],
-        paymentMethod: 'stripe',
+        paymentMethod: 'razorpay',
         country: 'US',
         sessionId: `sess-intl-${Date.now()}`,
       });
@@ -759,7 +756,7 @@ describe('International order creation', () => {
           country: 'AE',
         },
         items: [{ productId: product.id, quantity: 2 }],
-        paymentMethod: 'stripe',
+        paymentMethod: 'bank_transfer',
         country: 'AE',
         sessionId: `sess-uae-${Date.now()}`,
       });

@@ -6,6 +6,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { CartDrawer } from '@/components/CartDrawer';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
+import { BackToTop } from '@/components/BackToTop';
 import { Toaster } from 'react-hot-toast';
 
 const playfair = Playfair_Display({
@@ -28,6 +29,14 @@ export const metadata: Metadata = {
   keywords: 'sarees, kurtis, lehengas, women ethnic fashion, Hyderabad boutique, Indian ethnic wear, festival collection',
   manifest: '/manifest.json',
   themeColor: '#B76E79',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://srinidhiboutique.com'),
+  alternates: { canonical: '/' },
+  openGraph: {
+    siteName: 'Srinidhi Boutique',
+    type: 'website',
+    locale: 'en_IN',
+  },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -45,6 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Footer />
           <CartDrawer />
           <WhatsAppButton />
+          <BackToTop />
           <Toaster
             position="bottom-center"
             toastOptions={{

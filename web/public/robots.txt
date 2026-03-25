@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+Disallow: /checkout
+Disallow: /cart
+Disallow: /account
+Disallow: /orders
+Disallow: /api/
+
+Sitemap: https://srinidhiboutique.com/sitemap.xml

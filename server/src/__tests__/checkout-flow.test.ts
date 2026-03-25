@@ -215,7 +215,7 @@ describe('Order validation edge cases', () => {
     const res = await request(app).post('/api/orders').send({
       customerName: 'Bad Pincode',
       customerPhone: '9000004447',
-      address: { ...addr, pincode: '123' },
+      address: { ...addr, pincode: '12' },
       items: [{ productId: product.id, quantity: 1 }],
       paymentMethod: 'cod',
     });

@@ -11,7 +11,7 @@ const addressSchema = z.object({
   line2: z.string().optional(),
   city: z.string().min(1),
   state: z.string().optional(),
-  pincode: z.string().min(6).max(10),
+  pincode: z.string().min(3).max(10),
   country: z.string().optional(),
 });
 
@@ -28,7 +28,7 @@ const placeOrderSchema = z.object({
   customerEmail: z.string().email().optional(),
   address: addressSchema,
   items: z.array(orderItemSchema).min(1),
-  paymentMethod: z.enum(['razorpay', 'cod', 'upi', 'stripe']),
+  paymentMethod: z.enum(['razorpay', 'cod', 'upi', 'bank_transfer']),
   paymentId: z.string().optional(),
   couponCode: z.string().optional(),
   notes: z.string().optional(),

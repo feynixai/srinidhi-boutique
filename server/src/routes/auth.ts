@@ -2,9 +2,17 @@ import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { PrismaClient } from '@prisma/client';
 import { AppError } from '../middleware/errorHandler';
+import { rateLimit } from '../middleware/rateLimiter';
 
 export const authRoutes = Router();
 const prisma = new PrismaClient();
+
+// 5 OTP sends per 15 minutes per IP
+const otpSendLimiter = rateLimit(5, 15 * 60 * 1000);
+// 10 OTP verify attempts per 15 minutes per IP
+const otpVerifyLimiter = rateLimit(10, 15 * 60 * 1000);
+// 10 login attempts per 10 minutes per IP
+const loginLimiter = rateLimit(10, 10 * 60 * 1000);
 
 // Simple in-memory OTP store (keyed by phone)
 // In production, use Redis or DB. Here we use OtpCode model.
@@ -13,7 +21,7 @@ function generateOtp(): string {
 }
 
 // POST /api/auth/otp/send
-authRoutes.post('/otp/send', async (req: Request, res: Response) => {
+authRoutes.post('/otp/send', otpSendLimiter, async (req: Request, res: Response) => {
   const { phone } = z.object({ phone: z.string().min(10).max(15) }).parse(req.body);
 
   const code = generateOtp();
@@ -39,7 +47,7 @@ authRoutes.post('/otp/send', async (req: Request, res: Response) => {
 });
 
 // POST /api/auth/otp/verify
-authRoutes.post('/otp/verify', async (req: Request, res: Response) => {
+authRoutes.post('/otp/verify', otpVerifyLimiter, async (req: Request, res: Response) => {
   const { phone, code } = z
     .object({ phone: z.string().min(10).max(15), code: z.string().length(6) })
     .parse(req.body);
@@ -109,7 +117,7 @@ authRoutes.put('/user/:id/addresses', async (req: Request, res: Response) => {
 });
 
 // POST /api/auth/google — upsert user from Google profile
-authRoutes.post('/google', async (req: Request, res: Response) => {
+authRoutes.post('/google', loginLimiter, async (req: Request, res: Response) => {
   const { googleId, email, name, avatar } = z
     .object({
       googleId: z.string(),
@@ -131,7 +139,7 @@ authRoutes.post('/google', async (req: Request, res: Response) => {
 // ── Admin auth ───────────────────────────────────────────────────────────────
 
 // POST /api/auth/admin/google — upsert admin from Google, check whitelist
-authRoutes.post('/admin/google', async (req: Request, res: Response) => {
+authRoutes.post('/admin/google', loginLimiter, async (req: Request, res: Response) => {
   const { googleId, email, name, avatar } = z
     .object({
       googleId: z.string(),

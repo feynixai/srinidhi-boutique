@@ -1,8 +1,11 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import slugify from 'slugify';
+import multer from 'multer';
 import { prisma } from '../lib/prisma';
 import { AppError } from '../middleware/errorHandler';
+
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
 export const adminRoutes = Router();
 
@@ -601,4 +604,166 @@ adminRoutes.put('/categories/:id', async (req: Request, res: Response) => {
 
   const updated = await prisma.category.update({ where: { id: req.params.id }, data });
   res.json(updated);
+});
+
+// Packing slip — simplified HTML for warehouse/warehouse printing
+adminRoutes.get('/orders/:id/packing-slip', async (req: Request, res: Response) => {
+  const order = await prisma.order.findUnique({
+    where: { id: req.params.id },
+    include: { items: { include: { product: true } } },
+  });
+  if (!order) throw new AppError(404, 'Order not found');
+
+  const address = order.address as { line1: string; line2?: string; city: string; state?: string; pincode: string; country?: string };
+
+  const itemRows = order.items.map((item) => `
+    <tr>
+      <td style="padding:8px;border:1px solid #ddd;">${item.name}</td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:center;">${item.size || '—'}</td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:center;">${item.color || '—'}</td>
+      <td style="padding:8px;border:1px solid #ddd;text-align:center;font-weight:bold;">${item.quantity}</td>
+    </tr>`).join('');
+
+  const html = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Packing Slip ${order.orderNumber}</title>
+<style>body{font-family:Arial,sans-serif;font-size:13px;margin:20px;}h1{font-size:18px;}table{width:100%;border-collapse:collapse;margin-top:12px;}.box{border:1px solid #ccc;padding:10px;margin:10px 0;border-radius:4px;}@media print{.no-print{display:none;}}</style>
+</head><body>
+<div style="display:flex;justify-content:space-between;align-items:center;">
+  <div><h1>PACKING SLIP</h1><p style="color:#666;">Srinidhi Boutique · Hyderabad</p></div>
+  <div style="text-align:right;"><strong>${order.orderNumber}</strong><br/>${new Date(order.createdAt).toLocaleDateString('en-IN')}</div>
+</div>
+<div class="box">
+  <strong>Ship To:</strong><br/>
+  ${order.customerName}<br/>
+  ${order.customerPhone}<br/>
+  ${address.line1}${address.line2 ? ', ' + address.line2 : ''}<br/>
+  ${address.city}${address.state ? ', ' + address.state : ''} — ${address.pincode}
+  ${address.country && address.country !== 'IN' ? '<br/>' + address.country : ''}
+</div>
+<div class="box"><strong>Payment:</strong> ${order.paymentMethod.toUpperCase()} · <strong>Status:</strong> ${order.paymentStatus}</div>
+<table><thead><tr>
+  <th style="padding:8px;border:1px solid #ddd;background:#f5f5f5;text-align:left;">Item</th>
+  <th style="padding:8px;border:1px solid #ddd;background:#f5f5f5;">Size</th>
+  <th style="padding:8px;border:1px solid #ddd;background:#f5f5f5;">Color</th>
+  <th style="padding:8px;border:1px solid #ddd;background:#f5f5f5;">Qty</th>
+</tr></thead><tbody>${itemRows}</tbody></table>
+<p style="margin-top:16px;font-size:12px;color:#666;">Total items: ${order.items.reduce((s, i) => s + i.quantity, 0)} · Order total: ₹${Number(order.total).toLocaleString('en-IN')}</p>
+<script class="no-print">if(window.location.search.includes('print=1'))window.print();</script>
+</body></html>`;
+
+  res.setHeader('Content-Type', 'text/html');
+  res.send(html);
+});
+
+// Daily email summary template — actual email sending is wired up later
+adminRoutes.get('/daily-summary', async (_req: Request, res: Response) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const [todayOrders, todayRevenue, lowStockProducts, pendingOrders] = await Promise.all([
+    prisma.order.findMany({
+      where: { createdAt: { gte: today } },
+      include: { items: true },
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.order.aggregate({
+      where: { createdAt: { gte: today }, paymentStatus: 'paid' },
+      _sum: { total: true },
+    }),
+    prisma.product.findMany({
+      where: { stock: { lte: 5, gt: 0 }, active: true },
+      select: { name: true, stock: true },
+      orderBy: { stock: 'asc' },
+    }),
+    prisma.order.count({ where: { status: 'placed' } }),
+  ]);
+
+  res.json({
+    date: today.toISOString().slice(0, 10),
+    todayOrderCount: todayOrders.length,
+    todayRevenue: todayRevenue._sum.total || 0,
+    pendingOrders,
+    lowStockProducts,
+    recentOrders: todayOrders.map((o) => ({
+      orderNumber: o.orderNumber,
+      customerName: o.customerName,
+      total: o.total,
+      status: o.status,
+      paymentMethod: o.paymentMethod,
+    })),
+  });
+});
+
+// Low stock alerts — products with stock <= threshold
+adminRoutes.get('/low-stock', async (req: Request, res: Response) => {
+  const threshold = parseInt((req.query.threshold as string) || '5', 10);
+  const products = await prisma.product.findMany({
+    where: { stock: { lte: threshold }, active: true },
+    select: { id: true, name: true, stock: true, category: { select: { name: true } } },
+    orderBy: { stock: 'asc' },
+  });
+  res.json({ threshold, count: products.length, products });
+});
+
+// CSV product import — parses uploaded CSV and bulk-creates products
+adminRoutes.post('/products/import-csv', upload.single('file'), async (req: Request, res: Response) => {
+  if (!req.file) throw new AppError(400, 'No file uploaded');
+  if (!req.file.mimetype.includes('csv') && !req.file.originalname.endsWith('.csv')) {
+    throw new AppError(400, 'File must be a CSV');
+  }
+
+  const text = req.file.buffer.toString('utf-8');
+  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+  if (lines.length < 2) throw new AppError(400, 'CSV must have a header row and at least one data row');
+
+  const headers = lines[0].split(',').map((h) => h.trim().toLowerCase().replace(/"/g, ''));
+  const required = ['name', 'price'];
+  for (const r of required) {
+    if (!headers.includes(r)) throw new AppError(400, `CSV missing required column: ${r}`);
+  }
+
+  const created: string[] = [];
+  const errors: string[] = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const values = lines[i].split(',').map((v) => v.trim().replace(/^"|"$/g, ''));
+    const row: Record<string, string> = {};
+    headers.forEach((h, idx) => { row[h] = values[idx] || ''; });
+
+    try {
+      const name = row['name'];
+      const price = parseFloat(row['price']);
+      if (!name || isNaN(price) || price <= 0) {
+        errors.push(`Row ${i + 1}: invalid name or price`);
+        continue;
+      }
+
+      const slug = slugify(name, { lower: true, strict: true });
+      const existing = await prisma.product.findUnique({ where: { slug } });
+      const finalSlug = existing ? `${slug}-${Date.now()}` : slug;
+
+      await prisma.product.create({
+        data: {
+          name,
+          slug: finalSlug,
+          price,
+          comparePrice: row['compare_price'] ? parseFloat(row['compare_price']) : undefined,
+          description: row['description'] || undefined,
+          stock: row['stock'] ? parseInt(row['stock'], 10) : 0,
+          fabric: row['fabric'] || undefined,
+          images: row['image'] ? row['image'].split('|') : row['images'] ? row['images'].split('|') : [],
+          sizes: row['sizes'] ? row['sizes'].split('|') : [],
+          colors: row['colors'] ? row['colors'].split('|') : [],
+          featured: row['featured'] === 'true',
+          bestSeller: row['best_seller'] === 'true',
+          active: row['active'] !== 'false',
+        },
+      });
+      created.push(name);
+    } catch {
+      errors.push(`Row ${i + 1}: failed to create product`);
+    }
+  }
+
+  res.json({ created: created.length, errors, createdNames: created });
 });

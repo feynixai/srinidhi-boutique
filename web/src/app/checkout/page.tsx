@@ -99,12 +99,12 @@ export default function CheckoutPage() {
     pincode: '',
   });
 
-  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'razorpay' | 'upi' | 'stripe'>('cod');
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'razorpay' | 'upi' | 'bank_transfer'>('cod');
 
   // Reset payment method when country changes
   useEffect(() => {
     if (!isIndia) {
-      setPaymentMethod('stripe');
+      setPaymentMethod('razorpay');
     } else {
       setPaymentMethod('cod');
     }
@@ -171,7 +171,7 @@ export default function CheckoutPage() {
     return true;
   }
 
-  async function handlePlaceOrder(razorpayPaymentId?: string, stripeSessionId?: string) {
+  async function handlePlaceOrder(razorpayPaymentId?: string) {
     if (items.length === 0) { toast.error('Your cart is empty'); return; }
     setSubmitting(true);
     try {
@@ -194,7 +194,7 @@ export default function CheckoutPage() {
           color: i.color,
         })),
         paymentMethod,
-        paymentId: razorpayPaymentId || stripeSessionId,
+        paymentId: razorpayPaymentId,
         couponCode: couponCode || undefined,
         sessionId,
         country: selectedCountry,
@@ -272,31 +272,9 @@ export default function CheckoutPage() {
     }
   }
 
-  async function handleStripePayment() {
-    if (items.length === 0) { toast.error('Your cart is empty'); return; }
-    setSubmitting(true);
-    try {
-      const orderNum = `SB-${Date.now()}`;
-      const origin = window.location.origin;
-      const res = await fetch(`${API_URL}/api/payments/stripe/create-session`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          orderNumber: orderNum,
-          amount: total,
-          customerEmail: address.customerEmail || undefined,
-          successUrl: `${origin}/order/confirmation?method=stripe&order=${orderNum}`,
-          cancelUrl: `${origin}/checkout`,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Could not create Stripe session');
-      // Redirect to Stripe Checkout
-      window.location.href = data.url;
-    } catch (err: unknown) {
-      toast.error((err as Error).message || 'Stripe checkout failed');
-      setSubmitting(false);
-    }
+  async function handleBankTransfer() {
+    // Bank transfer: place order with pending payment status, customer sends proof separately
+    await handlePlaceOrder();
   }
 
   const StepIndicator = () => (
@@ -518,18 +496,36 @@ export default function CheckoutPage() {
                   ))}
                 </div>
               ) : (
-                // International: Stripe only
-                <div>
-                  <div className="flex items-center gap-4 p-4 border-2 border-rose-gold bg-rose-gold/5 rounded-sm">
-                    <span className="text-xl">💳</span>
-                    <div>
-                      <p className="font-medium text-sm">International Card Payment (Stripe)</p>
-                      <p className="text-xs text-gray-500">Visa, Mastercard, Amex — secure checkout</p>
-                    </div>
-                  </div>
-                  <div className="mt-3 bg-amber-50 border border-amber-200 rounded px-3 py-2 text-xs text-amber-700">
+                // International: Razorpay (cards) + Bank Transfer
+                <div className="space-y-3">
+                  {[
+                    { id: 'razorpay' as const, label: 'Credit / Debit Card (Razorpay)', desc: 'Visa, Mastercard — secure international checkout', icon: '💳', badge: 'Recommended' },
+                    { id: 'bank_transfer' as const, label: 'Bank Transfer (Wire / SWIFT)', desc: 'Transfer to our HDFC account — confirm by email', icon: '🏦' },
+                  ].map((method) => (
+                    <label key={method.id} className={`flex items-center gap-4 p-4 border-2 rounded-sm cursor-pointer transition-colors ${paymentMethod === method.id ? 'border-rose-gold bg-rose-gold/5' : 'border-gray-200 hover:border-gray-300'}`}>
+                      <input type="radio" name="payment" value={method.id} checked={paymentMethod === method.id} onChange={() => setPaymentMethod(method.id)} className="accent-rose-gold" />
+                      <span className="text-xl">{method.icon}</span>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-sm">{method.label}</p>
+                          {method.badge && <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">{method.badge}</span>}
+                        </div>
+                        <p className="text-xs text-gray-500">{method.desc}</p>
+                      </div>
+                    </label>
+                  ))}
+                  <div className="bg-amber-50 border border-amber-200 rounded px-3 py-2 text-xs text-amber-700">
                     All prices in ₹ INR. Your bank will convert to your local currency.
                   </div>
+                  {paymentMethod === 'bank_transfer' && (
+                    <div className="border border-blue-200 rounded-sm p-4 bg-blue-50 text-sm space-y-1">
+                      <p className="font-medium text-blue-800 mb-2">Bank Transfer Details</p>
+                      <p><span className="text-gray-600">Bank:</span> HDFC Bank</p>
+                      <p><span className="text-gray-600">Account Name:</span> Srinidhi Boutique</p>
+                      <p><span className="text-gray-600">SWIFT / BIC:</span> HDFCINBB</p>
+                      <p className="text-xs text-blue-700 mt-2">After placing your order, you will receive the full account details. Email payment proof to srinidhiboutique@gmail.com with your order number.</p>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -575,8 +571,8 @@ export default function CheckoutPage() {
                 <h3 className="text-sm font-medium mb-1">Payment Method</h3>
                 <p className="text-sm">
                   {paymentMethod === 'cod' ? `Cash on Delivery (+₹${COD_CHARGE} handling)` :
-                   paymentMethod === 'razorpay' ? 'Razorpay (Online)' :
-                   paymentMethod === 'stripe' ? 'International Card (Stripe)' : 'UPI Direct'}
+                   paymentMethod === 'razorpay' ? 'Razorpay (Cards / UPI / Net Banking)' :
+                   paymentMethod === 'bank_transfer' ? 'Bank Transfer (Wire / SWIFT)' : 'UPI Direct'}
                 </p>
               </div>
               <div className="space-y-3">
@@ -597,13 +593,17 @@ export default function CheckoutPage() {
               <div className="flex gap-3 mt-4">
                 <button onClick={() => setStep('payment')} className="btn-outline flex-1 py-3 text-sm">Back</button>
                 <button
-                  onClick={paymentMethod === 'razorpay' ? handleRazorpayPayment : paymentMethod === 'stripe' ? handleStripePayment : () => handlePlaceOrder()}
+                  onClick={
+                    paymentMethod === 'razorpay' ? handleRazorpayPayment :
+                    paymentMethod === 'bank_transfer' ? handleBankTransfer :
+                    () => handlePlaceOrder()
+                  }
                   disabled={submitting}
                   className="btn-primary flex-1 py-3 text-sm tracking-widest disabled:opacity-50"
                 >
                   {submitting
-                    ? (paymentMethod === 'razorpay' ? 'OPENING PAYMENT...' : paymentMethod === 'stripe' ? 'REDIRECTING...' : 'PLACING ORDER...')
-                    : (paymentMethod === 'razorpay' ? 'PAY NOW' : paymentMethod === 'stripe' ? 'PAY WITH CARD' : 'PLACE ORDER')}
+                    ? (paymentMethod === 'razorpay' ? 'OPENING PAYMENT...' : 'PLACING ORDER...')
+                    : (paymentMethod === 'razorpay' ? 'PAY NOW' : paymentMethod === 'bank_transfer' ? 'PLACE ORDER (BANK TRANSFER)' : 'PLACE ORDER')}
                 </button>
               </div>
             </div>

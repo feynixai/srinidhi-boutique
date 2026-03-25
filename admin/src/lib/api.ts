@@ -11,6 +11,7 @@ export interface Product {
   id: string;
   name: string;
   slug: string;
+  description?: string;
   price: number;
   comparePrice?: number;
   images: string[];
@@ -91,7 +92,7 @@ export const getDashboard = () =>
   api.get('/api/admin/dashboard').then((r) => r.data as DashboardStats);
 
 export const getAdminProducts = (params?: Record<string, string>) =>
-  api.get('/api/admin/products', { params }).then((r) => r.data);
+  api.get('/api/admin/products', { params }).then((r) => r.data as { products: Product[]; total: number; page: number; totalPages: number });
 
 export const createProduct = (data: Record<string, unknown>) =>
   api.post('/api/admin/products', data).then((r) => r.data as Product);
@@ -103,7 +104,7 @@ export const deleteProduct = (id: string) =>
   api.delete(`/api/admin/products/${id}`).then((r) => r.data);
 
 export const getAdminOrders = (params?: Record<string, string>) =>
-  api.get('/api/admin/orders', { params }).then((r) => r.data);
+  api.get('/api/admin/orders', { params }).then((r) => r.data as { orders: Order[]; total: number; page: number; totalPages: number });
 
 export const updateOrderStatus = (id: string, status: string, trackingId?: string) =>
   api.put(`/api/admin/orders/${id}/status`, { status, trackingId }).then((r) => r.data as Order);

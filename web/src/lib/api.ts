@@ -94,25 +94,95 @@ export interface Address {
   pincode: string;
 }
 
-// Products
+// ── Demo products (shown when backend is offline) ─────────────────────────
+const DEMO_PRODUCTS: Product[] = [
+  {
+    id: 'demo-1', name: 'Red Kanjivaram Silk Saree', slug: 'red-kanjivaram-silk-saree',
+    description: 'Exquisite handwoven Kanjivaram silk saree in rich red with gold zari border. Traditional temple motifs woven by master artisans from Kanchipuram. Comes with matching blouse piece. Perfect for weddings, festivals, and auspicious occasions.',
+    price: 12500, comparePrice: 15000,
+    images: ['https://picsum.photos/seed/kanjivaram-red/600/800', 'https://picsum.photos/seed/kanjivaram-red-2/600/800', 'https://picsum.photos/seed/kanjivaram-red-3/600/800'],
+    sizes: ['Free Size'], colors: ['Red', 'Gold'], fabric: 'Pure Silk', occasion: ['wedding', 'festival', 'pooja'],
+    stock: 5, featured: true, bestSeller: true, onOffer: false, active: true, createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'demo-2', name: 'Blue Cotton Office Kurti', slug: 'blue-cotton-office-kurti',
+    description: 'Elegant blue cotton kurti with delicate white thread embroidery. Comfortable for all-day wear at the office or casual outings. A-line silhouette flatters all body types. Machine washable.',
+    price: 1200, comparePrice: 1800,
+    images: ['https://picsum.photos/seed/kurti-blue/600/800', 'https://picsum.photos/seed/kurti-blue-2/600/800'],
+    sizes: ['S', 'M', 'L', 'XL'], colors: ['Blue', 'White'], fabric: 'Cotton', occasion: ['office', 'casual'],
+    stock: 20, featured: true, bestSeller: false, onOffer: true, offerPercent: 33, active: true, createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'demo-3', name: 'Bridal Lehenga - Scarlet Red', slug: 'bridal-lehenga-scarlet-red',
+    description: 'Stunning bridal lehenga in scarlet red with intricate gold zardozi embroidery. Heavy work dupatta with scalloped border. Includes lehenga skirt, blouse, and dupatta. Made to order — allow 2-3 weeks.',
+    price: 25000, comparePrice: 35000,
+    images: ['https://picsum.photos/seed/lehenga-bridal/600/800', 'https://picsum.photos/seed/lehenga-bridal-2/600/800'],
+    sizes: ['S', 'M', 'L', 'XL'], colors: ['Scarlet Red', 'Gold'], fabric: 'Silk Georgette', occasion: ['wedding', 'party'],
+    stock: 3, featured: true, bestSeller: true, onOffer: false, active: true, createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'demo-4', name: 'Organza Saree - Dusty Rose', slug: 'organza-saree-dusty-rose',
+    description: 'Lightweight organza saree in beautiful dusty rose with delicate floral prints. Perfect for parties and evening events. Easy to drape and carry. Comes with unstitched blouse piece.',
+    price: 3500, comparePrice: 4500,
+    images: ['https://picsum.photos/seed/organza-rose/600/800', 'https://picsum.photos/seed/organza-rose-2/600/800'],
+    sizes: ['Free Size'], colors: ['Dusty Rose', 'Pink'], fabric: 'Organza', occasion: ['party', 'festival'],
+    stock: 8, featured: false, bestSeller: true, onOffer: true, offerPercent: 22, active: true, createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'demo-5', name: 'Mirror Work Kurti - Teal', slug: 'mirror-work-kurti-teal',
+    description: 'Vibrant teal kurti with traditional mirror work (abhla bharat). Perfect for Navratri garba nights or festive occasions. Cotton base keeps you cool while you dance! Pairs beautifully with white palazzo.',
+    price: 1800, comparePrice: 2200,
+    images: ['https://picsum.photos/seed/mirror-kurti/600/800', 'https://picsum.photos/seed/mirror-kurti-2/600/800'],
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'], colors: ['Teal', 'Mirror'], fabric: 'Cotton', occasion: ['festival', 'casual'],
+    stock: 15, featured: true, bestSeller: false, onOffer: false, active: true, createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'demo-6', name: 'Lucknowi Chikankari Kurti Set', slug: 'lucknowi-chikankari-kurti-set',
+    description: 'Elegant white Lucknowi chikankari kurti with matching dupatta. Intricate hand embroidery by skilled artisans. Pure cotton, breathable and comfortable. Includes kurti + dupatta (pants sold separately).',
+    price: 2800, comparePrice: 3500,
+    images: ['https://picsum.photos/seed/chikankari/600/800', 'https://picsum.photos/seed/chikankari-2/600/800'],
+    sizes: ['S', 'M', 'L', 'XL'], colors: ['White', 'Ivory'], fabric: 'Cotton', occasion: ['office', 'casual', 'pooja'],
+    stock: 10, featured: true, bestSeller: true, onOffer: true, offerPercent: 20, active: true, createdAt: new Date().toISOString(),
+  },
+];
+
+const DEMO_CATEGORIES: Category[] = [
+  { id: 'cat-1', name: 'Sarees', slug: 'sarees', image: 'https://picsum.photos/seed/cat-sarees/600/600', _count: { products: 3 } },
+  { id: 'cat-2', name: 'Kurtis', slug: 'kurtis', image: 'https://picsum.photos/seed/cat-kurtis/600/600', _count: { products: 3 } },
+  { id: 'cat-3', name: 'Lehengas', slug: 'lehengas', image: 'https://picsum.photos/seed/cat-lehengas/600/600', _count: { products: 1 } },
+  { id: 'cat-4', name: 'Blouses', slug: 'blouses', image: 'https://picsum.photos/seed/cat-blouses/600/600', _count: { products: 0 } },
+  { id: 'cat-5', name: 'Accessories', slug: 'accessories', image: 'https://picsum.photos/seed/cat-accessories/600/600', _count: { products: 0 } },
+];
+
+// ── Products ──────────────────────────────────────────────────────────────
 export const getProducts = (params?: Record<string, string>) =>
-  api.get('/api/products', { params }).then((r) => r.data as { products: Product[]; total: number; page: number; totalPages: number });
+  api.get('/api/products', { params }).then((r) => r.data as { products: Product[]; total: number; page: number; totalPages: number })
+    .catch(() => ({ products: DEMO_PRODUCTS, total: DEMO_PRODUCTS.length, page: 1, totalPages: 1 }));
 
 export const getProduct = (slug: string) =>
-  api.get(`/api/products/${slug}`).then((r) => r.data as Product);
+  api.get(`/api/products/${slug}`).then((r) => r.data as Product)
+    .catch(() => {
+      const found = DEMO_PRODUCTS.find(p => p.slug === slug);
+      if (found) return found;
+      throw new Error('Product not found');
+    });
 
 export const getFeaturedProducts = () =>
-  api.get('/api/products/featured').then((r) => r.data as Product[]);
+  api.get('/api/products/featured').then((r) => r.data as Product[])
+    .catch(() => DEMO_PRODUCTS.filter(p => p.featured));
 
 export const getBestSellers = () =>
-  api.get('/api/products/best-sellers').then((r) => r.data as Product[]);
+  api.get('/api/products/best-sellers').then((r) => r.data as Product[])
+    .catch(() => DEMO_PRODUCTS.filter(p => p.bestSeller));
 
 export const getOffers = () =>
-  api.get('/api/products/offers').then((r) => r.data as Product[]);
+  api.get('/api/products/offers').then((r) => r.data as Product[])
+    .catch(() => DEMO_PRODUCTS.filter(p => p.onOffer));
 
 // Categories
 export const getCategories = () =>
-  api.get('/api/categories').then((r) => r.data as Category[]);
+  api.get('/api/categories').then((r) => r.data as Category[])
+    .catch(() => DEMO_CATEGORIES);
 
 // Cart
 export const getCart = (sessionId: string) =>

@@ -25,7 +25,7 @@ export function MobileBottomNav() {
       aria-label="Mobile navigation"
     >
       {/* Glass pill container with proper spacing from edge */}
-      <div className="mx-3 mb-2 bg-[#1a1a2e]/90 backdrop-blur-xl rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.2)]">
+      <div className="mx-3 mb-1 bg-white/80 backdrop-blur-xl border border-white/40 rounded-full shadow-[0_4px_24px_rgba(0,0,0,0.08)]">
         <div className="flex items-center justify-around h-14 px-2">
           {navItems.map(({ href, label, Icon }) => {
             const isCart = href === '/cart';
@@ -38,23 +38,23 @@ export function MobileBottomNav() {
                 <span className="relative">
                   <Icon
                     size={18}
-                    className={isActive ? 'text-[#c5a55a]' : 'text-white/50'}
+                    className={isActive ? 'text-[#1a1a2e]' : 'text-[#1a1a2e]/40'}
                     strokeWidth={isActive ? 2.5 : 1.5}
                   />
                   {badge > 0 && (
-                    <span className="absolute -top-1.5 -right-2 bg-[#c5a55a] text-[#1a1a2e] text-[8px] font-bold rounded-full w-4 h-4 flex items-center justify-center leading-none">
+                    <span className="absolute -top-1.5 -right-2 bg-[#c5a55a] text-white text-[8px] font-bold rounded-full w-4 h-4 flex items-center justify-center leading-none">
                       {badge > 9 ? '9+' : badge}
                     </span>
                   )}
                 </span>
-                <span className={`text-[9px] font-semibold tracking-wide ${isActive ? 'text-[#c5a55a]' : 'text-white/40'}`}>
+                <span className={`text-[9px] font-semibold tracking-wide ${isActive ? 'text-[#1a1a2e]' : 'text-[#1a1a2e]/40'}`}>
                   {label}
                 </span>
               </>
             );
 
             const className = `flex flex-col items-center justify-center gap-0.5 min-w-[48px] py-1.5 px-2 rounded-full transition-all ${
-              isActive ? 'bg-white/10' : ''
+              isActive ? 'bg-[#1a1a2e]/5' : ''
             }`;
 
             if (isCart) {

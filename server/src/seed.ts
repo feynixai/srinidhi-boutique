@@ -427,6 +427,18 @@ async function main() {
   });
 
   await prisma.coupon.upsert({
+    where: { code: 'SRINIDHI20' },
+    update: {},
+    create: {
+      code: 'SRINIDHI20',
+      discount: 20,
+      minOrder: 2000,
+      maxUses: 500,
+      active: true,
+    },
+  });
+
+  await prisma.coupon.upsert({
     where: { code: 'FESTIVE20' },
     update: {},
     create: {

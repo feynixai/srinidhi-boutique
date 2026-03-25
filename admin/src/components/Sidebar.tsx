@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { FiGrid, FiShoppingBag, FiPackage, FiTag, FiMenu, FiX, FiUsers, FiBarChart2, FiSettings } from 'react-icons/fi';
+import { FiGrid, FiShoppingBag, FiPackage, FiTag, FiMenu, FiX, FiUsers, FiBarChart2, FiSettings, FiRefreshCw } from 'react-icons/fi';
 
 const NAV = [
   { href: '/admin', label: 'Dashboard', icon: FiGrid },
@@ -10,6 +10,7 @@ const NAV = [
   { href: '/admin/products', label: 'Products', icon: FiPackage },
   { href: '/admin/customers', label: 'Customers', icon: FiUsers },
   { href: '/admin/coupons', label: 'Coupons', icon: FiTag },
+  { href: '/admin/returns', label: 'Returns', icon: FiRefreshCw },
   { href: '/admin/analytics', label: 'Analytics', icon: FiBarChart2 },
   { href: '/admin/settings', label: 'Settings', icon: FiSettings },
 ];

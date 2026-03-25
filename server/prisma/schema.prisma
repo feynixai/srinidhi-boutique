@@ -144,3 +144,15 @@ model ContactSubmission {
   message   String
   createdAt DateTime @default(now())
 }
+
+model ReturnRequest {
+  id          String   @id @default(cuid())
+  orderNumber String
+  customerName String
+  customerPhone String
+  reason      String
+  description String?
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

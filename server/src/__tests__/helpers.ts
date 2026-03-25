@@ -87,8 +87,23 @@ export async function createTestPincodeZone(overrides: Record<string, unknown> =
   });
 }
 
+export async function createTestReturnRequest(overrides: Record<string, unknown> = {}) {
+  return testPrisma.returnRequest.create({
+    data: {
+      orderNumber: `SB-${Date.now()}`,
+      customerName: 'Test Customer',
+      customerPhone: '9876543210',
+      reason: 'defective',
+      description: 'Item arrived damaged',
+      status: 'pending',
+      ...(overrides as Record<string, unknown>),
+    },
+  });
+}
+
 export async function cleanupTest() {
   // Delete in FK-safe order
+  await testPrisma.returnRequest.deleteMany({});
   await testPrisma.review.deleteMany({});
   await testPrisma.orderItem.deleteMany({});
   await testPrisma.cartItem.deleteMany({});

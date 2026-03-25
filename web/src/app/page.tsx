@@ -28,6 +28,23 @@ export default async function HomePage() {
       {/* Hero Carousel */}
       <HeroCarousel />
 
+      {/* Active Coupon Offers Strip */}
+      <div className="bg-rose-gold/10 border-b border-rose-gold/20">
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <div className="flex flex-wrap gap-4 justify-center text-sm">
+            <div className="flex items-center gap-2">
+              <span className="font-mono font-bold bg-rose-gold text-white px-2 py-0.5 text-xs tracking-wider">WELCOME10</span>
+              <span className="text-charcoal/70">10% off on orders above ₹500</span>
+            </div>
+            <span className="text-charcoal/30 hidden sm:block">|</span>
+            <div className="flex items-center gap-2">
+              <span className="font-mono font-bold bg-charcoal text-gold px-2 py-0.5 text-xs tracking-wider">SRINIDHI20</span>
+              <span className="text-charcoal/70">20% off on orders above ₹2000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Trust Badges Strip */}
       <div className="bg-cream border-y border-gold/20">
         <div className="max-w-7xl mx-auto px-4 py-4">

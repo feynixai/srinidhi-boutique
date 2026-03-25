@@ -574,6 +574,22 @@ adminRoutes.get('/orders/:id/invoice', async (req: Request, res: Response) => {
   res.send(html);
 });
 
+// Returns
+adminRoutes.get('/returns', async (_req: Request, res: Response) => {
+  const requests = await prisma.returnRequest.findMany({ orderBy: { createdAt: 'desc' } });
+  res.json(requests);
+});
+
+adminRoutes.patch('/returns/:id/status', async (req: Request, res: Response) => {
+  const { status } = z.object({
+    status: z.enum(['pending', 'approved', 'rejected', 'completed']),
+  }).parse(req.body);
+  const existing = await prisma.returnRequest.findUnique({ where: { id: req.params.id } });
+  if (!existing) throw new AppError(404, 'Return request not found');
+  const updated = await prisma.returnRequest.update({ where: { id: req.params.id }, data: { status } });
+  res.json(updated);
+});
+
 adminRoutes.put('/categories/:id', async (req: Request, res: Response) => {
   const { name, image } = z.object({ name: z.string().optional(), image: z.string().optional() }).parse(req.body);
   const existing = await prisma.category.findUnique({ where: { id: req.params.id } });

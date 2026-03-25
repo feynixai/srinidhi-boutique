@@ -13,6 +13,7 @@ productRoutes.get('/', async (req: Request, res: Response) => {
     search,
     size,
     color,
+    fabric,
     sort,
     page = '1',
     limit = '20',
@@ -40,6 +41,7 @@ productRoutes.get('/', async (req: Request, res: Response) => {
   }
   if (size) where.sizes = { has: size };
   if (color) where.colors = { has: color };
+  if (fabric) where.fabric = { contains: fabric as string, mode: 'insensitive' };
 
   type OrderBy = Record<string, 'asc' | 'desc'>;
   const orderBy: OrderBy =

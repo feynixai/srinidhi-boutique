@@ -41,24 +41,43 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
   const currentStepIndex = STATUS_STEPS.indexOf(order.status);
   const address = order.address as { line1: string; line2?: string; city: string; state: string; pincode: string };
 
-  const waMsg = encodeURIComponent(`Hi! I'd like to track my order ${order.orderNumber}. Can you help?`);
-  const waLink = `https://wa.me/${waNumber}?text=${waMsg}`;
+  const paymentLabel = order.paymentMethod === 'cod' ? 'Cash on Delivery' : order.paymentMethod === 'upi' ? 'UPI' : 'Online Payment';
+  const notifyMsg = encodeURIComponent(
+    `Hi, I just placed order #${order.orderNumber} on Srinidhi Boutique. Total: ₹${Number(order.total).toLocaleString('en-IN')}. Payment: ${paymentLabel}.`
+  );
+  const notifyLink = `https://wa.me/${waNumber}?text=${notifyMsg}`;
+  const trackMsg = encodeURIComponent(`Hi! I'd like to track my order ${order.orderNumber}. Can you help?`);
+  const waLink = `https://wa.me/${waNumber}?text=${trackMsg}`;
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
       {/* Success Header */}
-      <div className="text-center mb-10">
+      <div className="text-center mb-8">
         <div className="text-5xl mb-4">{order.status === 'cancelled' ? '❌' : '🎉'}</div>
         <h1 className="font-serif text-3xl mb-2">
           {order.status === 'placed' ? 'Order Placed!' : `Order ${STATUS_LABELS[order.status] || order.status}`}
         </h1>
         <p className="text-gray-500">Order #{order.orderNumber}</p>
-        {order.status === 'placed' && (
-          <p className="text-sm text-gray-500 mt-2">
-            We'll confirm your order via WhatsApp soon.
-          </p>
-        )}
       </div>
+
+      {/* WhatsApp Notify Store — shown on new order */}
+      {order.status === 'placed' && (
+        <div className="mb-8 bg-green-50 border border-green-200 rounded-sm p-4">
+          <p className="text-sm font-semibold text-green-800 mb-1">Let us know you've ordered!</p>
+          <p className="text-xs text-green-700 mb-3">
+            Tap below to send your order confirmation on WhatsApp. We'll confirm and pack your order faster.
+          </p>
+          <a
+            href={notifyLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 bg-green-500 text-white py-3 text-sm font-semibold hover:bg-green-600 transition-colors rounded-sm"
+          >
+            <FaWhatsapp size={18} />
+            Notify on WhatsApp: Order #{order.orderNumber} · ₹{Number(order.total).toLocaleString('en-IN')}
+          </a>
+        </div>
+      )}
 
       {/* Tracking */}
       {!['cancelled', 'returned'].includes(order.status) && (

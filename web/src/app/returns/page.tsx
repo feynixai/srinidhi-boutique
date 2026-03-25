@@ -1,17 +1,13 @@
-import type { Metadata } from 'next';
+'use client';
+import { useState } from 'react';
 import Link from 'next/link';
 import { FaWhatsapp } from 'react-icons/fa';
 
-export const metadata: Metadata = {
-  title: 'Returns & Exchange Policy | Srinidhi Boutique',
-  description: '7-day hassle-free returns and exchange policy at Srinidhi Boutique.',
-};
-
 const STEPS = [
-  { step: '01', title: 'Contact Us Within 7 Days', desc: 'WhatsApp or call us within 7 days of delivery with your order number and reason for return.' },
-  { step: '02', title: 'Share Photos', desc: 'Send us photos of the item showing the issue. This helps us process your request faster.' },
+  { step: '01', title: 'Fill the Form Below', desc: 'Submit your return request with your order number and reason.' },
+  { step: '02', title: 'Share Photos', desc: 'We\'ll contact you to collect photos of the item. This helps us process faster.' },
   { step: '03', title: 'Ship It Back', desc: 'Pack the item securely and ship it to our address. We\'ll share the details via WhatsApp.' },
-  { step: '04', title: 'Refund or Exchange', desc: 'Once we receive and verify the item, we\'ll process your exchange or refund within 3–5 business days.' },
+  { step: '04', title: 'Refund or Exchange', desc: 'Once we receive and verify, we\'ll process your exchange or refund within 3–5 business days.' },
 ];
 
 const ACCEPTED = [
@@ -30,9 +26,56 @@ const NOT_ACCEPTED = [
   'Discounted or sale items (unless defective)',
 ];
 
+const REASONS = [
+  { value: 'defective', label: 'Defective / Damaged item' },
+  { value: 'wrong_item', label: 'Wrong item delivered' },
+  { value: 'size_issue', label: 'Size issue' },
+  { value: 'not_as_described', label: 'Not as described' },
+  { value: 'other', label: 'Other' },
+];
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+
 export default function ReturnsPage() {
   const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+919876543210';
   const waLink = `https://wa.me/${whatsappNumber.replace('+', '')}?text=Hi! I'd like to initiate a return for my order.`;
+
+  const [form, setForm] = useState({
+    orderNumber: '',
+    customerName: '',
+    customerPhone: '',
+    reason: '',
+    description: '',
+  });
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMsg, setErrorMsg] = useState('');
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form.orderNumber || !form.customerName || !form.customerPhone || !form.reason) {
+      setErrorMsg('Please fill all required fields.');
+      return;
+    }
+    setStatus('loading');
+    setErrorMsg('');
+    try {
+      const res = await fetch(`${API_URL}/api/returns`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setErrorMsg(data.error || data.message || 'Something went wrong.');
+        setStatus('error');
+        return;
+      }
+      setStatus('success');
+    } catch {
+      setErrorMsg('Failed to submit. Please try again or contact us on WhatsApp.');
+      setStatus('error');
+    }
+  }
 
   return (
     <div className="bg-white">
@@ -62,9 +105,117 @@ export default function ReturnsPage() {
           ))}
         </div>
 
+        {/* Return Request Form */}
+        <div className="border border-gold/20 rounded-sm p-6 md:p-8">
+          <h2 className="font-serif text-2xl text-charcoal mb-2">Request a Return or Exchange</h2>
+          <p className="text-charcoal/50 text-sm mb-6">Fill the form and we'll get back to you within 24 hours.</p>
+
+          {status === 'success' ? (
+            <div className="text-center py-10">
+              <div className="text-5xl mb-4">✅</div>
+              <h3 className="font-serif text-2xl text-charcoal mb-2">Request Submitted!</h3>
+              <p className="text-charcoal/60 text-sm mb-6">
+                We've received your return request. Our team will contact you within 24 hours via WhatsApp.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <a href={waLink} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 bg-green-500 text-white px-6 py-3 text-sm font-medium hover:bg-green-600 transition-colors">
+                  <FaWhatsapp size={16} /> Chat with Us
+                </a>
+                <Link href="/shop" className="inline-flex items-center justify-center px-6 py-3 text-sm border border-charcoal/20 hover:border-charcoal transition-colors">
+                  Continue Shopping
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-charcoal/60 mb-1.5">
+                    Order Number <span className="text-rose-gold">*</span>
+                  </label>
+                  <input
+                    value={form.orderNumber}
+                    onChange={(e) => setForm({ ...form, orderNumber: e.target.value.toUpperCase() })}
+                    placeholder="e.g. SB-0042"
+                    className="w-full border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:border-rose-gold rounded-sm font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-charcoal/60 mb-1.5">
+                    Your Name <span className="text-rose-gold">*</span>
+                  </label>
+                  <input
+                    value={form.customerName}
+                    onChange={(e) => setForm({ ...form, customerName: e.target.value })}
+                    placeholder="Full name"
+                    className="w-full border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:border-rose-gold rounded-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-charcoal/60 mb-1.5">
+                    Phone Number <span className="text-rose-gold">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    value={form.customerPhone}
+                    onChange={(e) => setForm({ ...form, customerPhone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                    placeholder="10-digit mobile number"
+                    maxLength={10}
+                    className="w-full border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:border-rose-gold rounded-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-charcoal/60 mb-1.5">
+                    Reason <span className="text-rose-gold">*</span>
+                  </label>
+                  <select
+                    value={form.reason}
+                    onChange={(e) => setForm({ ...form, reason: e.target.value })}
+                    className="w-full border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:border-rose-gold rounded-sm bg-white"
+                  >
+                    <option value="">Select a reason</option>
+                    {REASONS.map((r) => (
+                      <option key={r.value} value={r.value}>{r.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-charcoal/60 mb-1.5">
+                  Additional Details
+                </label>
+                <textarea
+                  value={form.description}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  placeholder="Describe the issue in detail..."
+                  rows={3}
+                  className="w-full border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:border-rose-gold rounded-sm resize-none"
+                />
+              </div>
+              {errorMsg && (
+                <p className="text-red-500 text-sm">{errorMsg}</p>
+              )}
+              <button
+                type="submit"
+                disabled={status === 'loading'}
+                className="btn-primary w-full py-3.5 text-sm tracking-widest disabled:opacity-50"
+              >
+                {status === 'loading' ? 'SUBMITTING...' : 'SUBMIT RETURN REQUEST'}
+              </button>
+              <p className="text-xs text-charcoal/40 text-center">
+                Or contact us directly on{' '}
+                <a href={waLink} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline">
+                  WhatsApp
+                </a>
+              </p>
+            </form>
+          )}
+        </div>
+
         {/* How It Works */}
         <div>
-          <h2 className="font-serif text-2xl text-charcoal mb-6">How to Return or Exchange</h2>
+          <h2 className="font-serif text-2xl text-charcoal mb-6">How It Works</h2>
           <div className="space-y-4">
             {STEPS.map((s) => (
               <div key={s.step} className="flex gap-5">
@@ -114,22 +265,6 @@ export default function ReturnsPage() {
             <p><strong className="text-charcoal">Cash on Delivery:</strong> Refunded as store credit or bank transfer (NEFT/IMPS) within 3–5 business days.</p>
             <p><strong className="text-charcoal">Shipping charges:</strong> Non-refundable unless the item was defective or wrong.</p>
           </div>
-        </div>
-
-        {/* CTA */}
-        <div className="text-center">
-          <p className="text-charcoal/60 text-sm mb-4">Ready to start a return or have questions?</p>
-          <a
-            href={waLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-green-500 text-white px-10 py-3.5 text-sm font-medium tracking-widest hover:bg-green-600 transition-colors"
-          >
-            <FaWhatsapp size={18} /> CONTACT US ON WHATSAPP
-          </a>
-          <p className="text-charcoal/40 text-xs mt-3">
-            Or email us at <a href="mailto:hello@srinidhiboutique.com" className="underline">hello@srinidhiboutique.com</a>
-          </p>
         </div>
       </div>
     </div>

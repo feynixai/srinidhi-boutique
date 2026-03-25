@@ -541,7 +541,7 @@ export default function CheckoutPage() {
                         className="flex-1 border border-gray-200 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-rose-gold"
                         onKeyDown={(e) => e.key === 'Enter' && applyCoupon()}
                       />
-                      <button onClick={applyCoupon} disabled={couponLoading} className="btn-outline px-4 py-2 text-sm disabled:opacity-50">
+                      <button onClick={() => applyCoupon()} disabled={couponLoading} className="btn-outline px-4 py-2 text-sm disabled:opacity-50">
                         {couponLoading ? '...' : 'Apply'}
                       </button>
                     </div>

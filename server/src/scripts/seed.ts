@@ -920,16 +920,21 @@ async function main() {
   for (const review of reviewData) {
     const productId = createdProducts[review.productIdx];
     if (productId) {
-      await prisma.review.create({
-        data: {
-          productId,
-          customerName: review.customerName,
-          rating: review.rating,
-          title: review.title,
-          body: review.body,
-          approved: true,
-        },
+      const existing = await prisma.review.findFirst({
+        where: { productId, customerName: review.customerName },
       });
+      if (!existing) {
+        await prisma.review.create({
+          data: {
+            productId,
+            customerName: review.customerName,
+            rating: review.rating,
+            title: review.title,
+            body: review.body,
+            approved: true,
+          },
+        });
+      }
     }
   }
 
@@ -970,7 +975,10 @@ async function main() {
   ];
 
   for (const entry of lookbookEntries) {
-    await prisma.lookbook.create({ data: entry });
+    const existing = await prisma.lookbook.findFirst({ where: { title: entry.title } });
+    if (!existing) {
+      await prisma.lookbook.create({ data: entry });
+    }
   }
 
   // ── Collections ─────────────────────────────────────────────────────────────

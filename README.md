@@ -1,6 +1,6 @@
 # Srinidhi Boutique
 
-Premium Indian ethnic wear e-commerce platform built for Srinidhi Boutique — a women's clothing store in Hyderabad, India.
+Premium Indian ethnic wear e-commerce platform built for Srinidhi Boutique — a women's clothing store in Hyderabad, India. 27 commits, store live at proofcrest.com.
 
 ## Live URLs
 
@@ -79,7 +79,7 @@ Premium Indian ethnic wear e-commerce platform built for Srinidhi Boutique — a
 - Smart search with autocomplete
 - Hindi language toggle (EN | हिंदी) — key UI strings translated, preference saved to localStorage
 - Product comparison (up to 3 products side-by-side, floating compare bar)
-- Urgency triggers: "Only X left!" badge (stock < 5), "🔥 Trending" badge, weekly sold counter
+- Urgency triggers: "Only X left!" badge (stock < 5), "Trending" badge, weekly sold counter
 - Auto-apply best coupon at checkout — shows eligible coupons ranked by savings, one-click apply
 
 ### Admin Dashboard (admin/)
@@ -163,19 +163,33 @@ server/
     routes/                Express route handlers (25+ route files)
     lib/                   Prisma client, cache, email, WhatsApp, env validation
     middleware/            Error handler, rate limiter, admin auth
-    __tests__/             Vitest tests (1175+)
+    __tests__/             Vitest tests (1324+)
     scripts/               seed.ts
   prisma/
     schema.prisma          Database schema (30+ models)
+scripts/
+  setup.sh                 One-command dev environment setup
 ```
 
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - PostgreSQL 14+
+- npm 9+
 
-### Setup
+### Quick Setup (automated)
+
+```bash
+git clone https://github.com/yourusername/srinidhi-boutique.git
+cd srinidhi-boutique
+bash scripts/setup.sh
+```
+
+The setup script checks prerequisites, installs dependencies, copies `.env.example`, runs `prisma db push`, and seeds the database.
+
+### Manual Setup
 
 ```bash
 # 1. Install all dependencies
@@ -183,12 +197,12 @@ npm install
 
 # 2. Configure environment
 cp server/.env.example server/.env
-# Edit server/.env with your DATABASE_URL and other credentials
+# Edit server/.env with your DATABASE_URL and credentials
 
 # 3. Push database schema
-cd server && npx prisma db push
+npm run db:push
 
-# 4. Seed with sample data
+# 4. Seed with sample data (35 products, 9 categories, 10 coupons)
 npm run db:seed
 
 # 5. Start all services
@@ -204,72 +218,44 @@ Access at:
 
 ### server/.env
 
-```env
-# Required
-DATABASE_URL=postgresql://user:password@localhost:5432/srinidhi_boutique
+| Variable | Required | Description | Example |
+|----------|----------|-------------|---------|
+| `DATABASE_URL` | Yes | PostgreSQL connection string | `postgresql://user:pass@localhost:5432/srinidhi` |
+| `PORT` | No | API server port (default: 4000) | `4000` |
+| `FRONTEND_URL` | No | Store URL for CORS | `http://localhost:3000` |
+| `RAZORPAY_KEY_ID` | No* | Razorpay key — payments disabled without this | `rzp_test_xxx` |
+| `RAZORPAY_KEY_SECRET` | No* | Razorpay secret | `xxxxxxxxxxxxxxxx` |
+| `WHATSAPP_API_TOKEN` | No | WhatsApp Cloud API token | `EAAxxxxx` |
+| `WHATSAPP_PHONE_NUMBER_ID` | No | WhatsApp sender phone number ID | `123456789` |
+| `ADMIN_WHATSAPP_PHONE` | No | Admin phone for order alerts | `919876543210` |
+| `SMTP_HOST` | No | SMTP server host | `smtp.gmail.com` |
+| `SMTP_PORT` | No | SMTP port | `587` |
+| `SMTP_USER` | No | SMTP login email | `orders@yourdomain.com` |
+| `SMTP_PASS` | No | SMTP app password | `your_app_password` |
+| `SMTP_FROM` | No | From name + address | `Srinidhi Boutique <orders@...>` |
+| `GOOGLE_CLIENT_ID` | No | Google OAuth client ID | `xxx.apps.googleusercontent.com` |
+| `JWT_SECRET` | No | JWT signing secret | `your_jwt_secret` |
 
-# Optional — payments disabled without these
-RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxxxx
-RAZORPAY_KEY_SECRET=xxxxxxxxxxxxxxxxxxxxxxxx
-
-# Optional — WhatsApp notifications
-WHATSAPP_API_TOKEN=
-WHATSAPP_PHONE_NUMBER_ID=
-ADMIN_WHATSAPP_PHONE=919876543210
-
-# Optional — Email notifications
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=youremail@gmail.com
-SMTP_PASS=your_app_password
-SMTP_FROM=Srinidhi Boutique <orders@srinidhiboutique.in>
-
-# Optional
-PORT=4000
-FRONTEND_URL=http://localhost:3000
-```
+*Payments silently fall back to COD if Razorpay keys are absent.
 
 ### web/.env.local and admin/.env.local
 
-```env
-NEXT_PUBLIC_API_URL=http://localhost:4000
-NEXT_PUBLIC_WHATSAPP_NUMBER=+919876543210
-```
+| Variable | Required | Description | Example |
+|----------|----------|-------------|---------|
+| `NEXT_PUBLIC_API_URL` | Yes | API server base URL | `http://localhost:4000` |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER` | No | WhatsApp click-to-chat number | `+919876543210` |
 
 ## Tests
 
 ```bash
-npm test          # Run all 1126 tests (singleFork mode, ~2 min)
+npm test          # Run all 1324 tests (singleFork mode, ~2 min)
 ```
 
-Test coverage includes:
-- Products, categories, cart, orders, coupons
-- Payments (Razorpay verification, COD)
-- Auth (Google OAuth, Phone OTP)
-- Admin CRUD, bulk operations, bulk product actions
-- International shipping + pincode zones
-- Returns flow
-- WhatsApp notification generation
-- Email template rendering
-- Analytics queries
-- Stock movement logging + back-in-stock notifications
-- Cache behavior
-- Health check
-- Environment validation
-- Inventory management
-- GST calculation (intra-state CGST/SGST vs inter-state IGST)
-- Delivery slot selection
-- Order cancellation + store credit refund
-- Enhanced coupons (category-specific, first-order, user-specific, countdown)
-- CSV data export (products, orders, customers, reviews)
-- Loyalty, referrals, flash sales, lookbook, chat
-- Bundles, gift cards, pre-orders, store credits
-- Abandoned cart recovery, webhooks
-- Seed data validation (categories, products, coupons)
+Test coverage includes products, categories, cart, orders, coupons, payments (Razorpay + COD), auth (Google OAuth + Phone OTP), admin CRUD + bulk operations, international shipping + pincode zones, returns, WhatsApp + email notifications, analytics, stock movement + back-in-stock, cache, health check, env validation, GST calculation, delivery slots, order cancellation + store credits, coupons (category-specific, first-order, countdown), CSV export, loyalty, referrals, flash sales, lookbook, chat, bundles, gift cards, pre-orders, abandoned cart recovery, webhooks, and seed data validation.
 
 ## API Endpoint Reference
 
-See [API.md](./API.md) for the full reference.
+See [API.md](./API.md) for the full reference with request/response examples.
 
 ### Quick Reference
 
@@ -278,6 +264,7 @@ See [API.md](./API.md) for the full reference.
 | GET | `/health` | Health check + DB connectivity |
 | GET | `/api/products` | List products (filters: category, size, color, price, fabric, occasion) |
 | GET | `/api/products/featured` | Featured products (cached 5 min) |
+| GET | `/api/products/best-sellers` | Best-selling products |
 | GET | `/api/products/search` | Full-text search with autocomplete |
 | GET | `/api/products/:slug` | Single product detail |
 | GET | `/api/products/:slug/recommendations` | Similar products |
@@ -285,15 +272,18 @@ See [API.md](./API.md) for the full reference.
 | GET | `/api/collections` | All collections |
 | POST | `/api/cart` | Add to cart |
 | GET | `/api/cart/:sessionId` | Get cart |
-| DELETE | `/api/cart/:sessionId/item/:itemId` | Remove cart item |
+| PATCH | `/api/cart/:id` | Update cart item quantity |
+| DELETE | `/api/cart/:id` | Remove cart item |
+| DELETE | `/api/cart/session/:sessionId` | Clear cart |
 | POST | `/api/orders` | Place order |
 | GET | `/api/orders/track` | Track order by number + phone |
 | GET | `/api/orders/:id` | Order detail |
+| POST | `/api/orders/:id/status` | Update order status |
 | POST | `/api/payments/razorpay/create` | Create Razorpay order |
 | POST | `/api/payments/razorpay/verify` | Verify payment signature |
-| POST | `/api/auth/otp/send` | Send phone OTP |
-| POST | `/api/auth/otp/verify` | Verify OTP + issue token |
 | POST | `/api/auth/google` | Google OAuth login |
+| POST | `/api/auth/send-otp` | Send phone OTP |
+| POST | `/api/auth/verify-otp` | Verify OTP + issue token |
 | GET | `/api/coupons/validate` | Validate coupon code |
 | POST | `/api/notifications/send-order-confirmation` | Send order notification |
 | POST | `/api/notifications/send-shipping-update` | Send shipping notification |
@@ -313,18 +303,32 @@ See [API.md](./API.md) for the full reference.
 | GET | `/api/admin/analytics` | Pro analytics data |
 | GET | `/api/admin/orders` | All orders with filters |
 | PATCH | `/api/admin/orders/:id/status` | Update order status |
+| POST | `/api/admin/orders/bulk-action` | Bulk order status update |
 | GET | `/api/admin/products` | All products (admin view) |
 | POST | `/api/admin/products` | Create product |
-| PATCH | `/api/admin/products/:id` | Update product |
-| DELETE | `/api/admin/products/:id` | Delete product |
+| PUT | `/api/admin/products/:id` | Update product |
+| DELETE | `/api/admin/products/:id` | Delete product (soft) |
 | GET | `/api/admin/customers` | Customer list |
 | POST | `/api/admin/coupons` | Create coupon |
 | GET | `/api/admin/returns` | Return requests |
 | PATCH | `/api/admin/returns/:id` | Update return status |
 | GET | `/api/admin/export/orders` | Export orders CSV |
 | GET | `/api/admin/export/products` | Export products CSV |
+| GET | `/api/admin/orders/:id/invoice` | Generate HTML invoice |
 
 ## Deployment
+
+### Quick Deploy — Vercel
+
+```bash
+# Store
+cd web && npx vercel --prod
+
+# Admin
+cd admin && npx vercel --prod
+```
+
+Set `NEXT_PUBLIC_API_URL` to your deployed API URL in each Vercel project's environment variables.
 
 ### API Server (Railway / Render)
 
@@ -334,24 +338,22 @@ See [API.md](./API.md) for the full reference.
 4. **Start command**: `npm start`
 5. Add all environment variables from `server/.env.example`
 
-### Store & Admin (Vercel)
+### Store & Admin (Vercel — manual)
 
-For `web/`:
+For `web/` and `admin/`:
 1. Import repo in Vercel
-2. Set **root directory** to `web/`
+2. Set **root directory** to `web/` (or `admin/`)
 3. Set `NEXT_PUBLIC_API_URL` to your deployed server URL
-
-For `admin/`:
-1. Same as above but root directory is `admin/`
+4. Deploy
 
 ### Database (Supabase / Neon / Railway PostgreSQL)
 
 ```bash
-# After deploying, run migrations
+# After deploying API, run migrations against production DB
 DATABASE_URL=your_production_url npx prisma db push
 
 # Seed sample data
-DATABASE_URL=your_production_url npx ts-node src/scripts/seed.ts
+DATABASE_URL=your_production_url npm run db:seed
 ```
 
 ## Design System — Apple Liquid Glass
@@ -365,9 +367,7 @@ DATABASE_URL=your_production_url npx ts-node src/scripts/seed.ts
 | Playfair Display | serif | Headings, product names |
 | Inter | sans-serif | Body text, UI |
 
-All cards use `backdrop-blur-xl` with `bg-white/60` and `border border-white/30` — the Liquid Glass style.
-
-Mobile-first — 80%+ of Indian shoppers browse on phones.
+All cards use `backdrop-blur-xl` with `bg-white/60` and `border border-white/30` — the Liquid Glass style. Mobile-first — 80%+ of Indian shoppers browse on phones.
 
 ## Screenshots
 
@@ -378,6 +378,22 @@ Mobile-first — 80%+ of Indian shoppers browse on phones.
 | Cart | Glass cards, free shipping progress, save-for-later |
 | Checkout | Glass progress bar, glass payment cards, UPI QR glass modal |
 | Admin dashboard | Bento grid, glass stat cards, weekly chart, low stock alerts |
+
+> Screenshots coming soon — run locally at http://localhost:3000
+
+## Contributing
+
+1. Fork the repo
+2. Create a feature branch: `git checkout -b feat/your-feature`
+3. Make your changes and add tests
+4. Run `npm test` and ensure all tests pass
+5. Submit a pull request
+
+For bug reports or feature requests, open an issue.
+
+## License
+
+MIT — see [LICENSE](./LICENSE) for details.
 
 ---
 
@@ -401,6 +417,7 @@ Mobile-first — 80%+ of Indian shoppers browse on phones.
 | Build 14 | 2026-03-25 | Admin power tools, order workflow, product analytics | 1050+ |
 | Build 15 | 2026-03-25 | Admin power tools, order workflow, product analytics | 1126 |
 | Build 16 | 2026-03-25 | Apple Liquid Glass UI overhaul — glassmorphism, pill shapes | 1126 |
-| Build 17 | 2026-03-25 | Admin bento dashboard, product image hover, trust badge pills, glass checkout, skeleton loaders, 404/500 pages, accessibility | 1126 |
+| Build 17 | 2026-03-25 | Admin bento dashboard, product image hover, trust badge pills, glass checkout, skeleton loaders, 404/500 pages, accessibility | 1324 |
+| Build 18 | 2026-03-25 | README rewrite, Vercel redeploy, setup script, seed polish, package.json cleanup | 1324 |
 
 Built with care for Srinidhi Boutique, Hyderabad.

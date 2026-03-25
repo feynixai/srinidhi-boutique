@@ -1,49 +1,57 @@
 'use client';
 import Link from 'next/link';
-import { FiHeart, FiSun, FiBriefcase, FiFeather } from 'react-icons/fi';
+import Image from 'next/image';
+import { FiPlay } from 'react-icons/fi';
 
 const OCCASIONS = [
   {
     slug: 'wedding',
     label: 'Wedding',
-    icon: <FiHeart size={32} />,
-    desc: 'Bridal & festive looks',
-    gradient: 'from-rose-100 to-pink-50',
-    border: 'border-rose-200',
-    textColor: 'text-rose-700',
+    desc: 'Bridal & Festive Looks',
+    image: 'https://picsum.photos/seed/wedding-saree/400/711',
+    looks: 24,
   },
   {
     slug: 'festival',
     label: 'Festival',
-    icon: <FiSun size={32} />,
-    desc: 'Navratri, Diwali & more',
-    gradient: 'from-amber-100 to-yellow-50',
-    border: 'border-amber-200',
-    textColor: 'text-amber-700',
+    desc: 'Navratri, Diwali & More',
+    image: 'https://picsum.photos/seed/festival-saree/400/711',
+    looks: 18,
   },
   {
     slug: 'office',
     label: 'Office',
-    icon: <FiBriefcase size={32} />,
-    desc: 'Elegant daily wear',
-    gradient: 'from-blue-100 to-indigo-50',
-    border: 'border-blue-200',
-    textColor: 'text-blue-700',
+    desc: 'Elegant Daily Wear',
+    image: 'https://picsum.photos/seed/office-wear/400/711',
+    looks: 15,
   },
   {
     slug: 'casual',
     label: 'Casual',
-    icon: <FiFeather size={32} />,
-    desc: 'Everyday comfort',
-    gradient: 'from-green-100 to-emerald-50',
-    border: 'border-green-200',
-    textColor: 'text-green-700',
+    desc: 'Everyday Comfort',
+    image: 'https://picsum.photos/seed/casual-saree/400/711',
+    looks: 12,
+  },
+  {
+    slug: 'party',
+    label: 'Party',
+    desc: 'Glamour & Sparkle',
+    image: 'https://picsum.photos/seed/party-saree/400/711',
+    looks: 14,
+  },
+  {
+    slug: 'pooja',
+    label: 'Pooja',
+    desc: 'Traditional & Auspicious',
+    image: 'https://picsum.photos/seed/pooja-saree/400/711',
+    looks: 10,
   },
 ];
 
 export function ShopByOccasion() {
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16" data-testid="shop-by-occasion">
+      {/* Section heading */}
       <div className="text-center mb-10">
         <h2 className="section-heading">Shop by Occasion</h2>
         <div className="divider-gold mx-auto" />
@@ -51,21 +59,49 @@ export function ShopByOccasion() {
           Find the perfect outfit for every moment
         </p>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+      {/* Cards: horizontal snap-scroll on mobile, 6-col grid on desktop */}
+      <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-3 lg:grid-cols-6 md:overflow-x-visible">
         {OCCASIONS.map((occ) => (
           <Link
             key={occ.slug}
             href={`/shop?occasion=${occ.slug}`}
-            className={`group relative overflow-hidden rounded-3xl bg-gradient-to-br ${occ.gradient} border ${occ.border} p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-300`}
+            className="group relative flex-shrink-0 w-[55vw] sm:w-[40vw] md:w-auto snap-center rounded-3xl overflow-hidden aspect-[9/16]"
             data-testid={`occasion-${occ.slug}`}
           >
-            <div className={`mb-3 group-hover:scale-110 transition-transform duration-300 flex justify-center ${occ.textColor}`}>
-              {occ.icon}
+            {/* Background image */}
+            <Image
+              src={occ.image}
+              alt={occ.label}
+              fill
+              sizes="(max-width: 768px) 55vw, (max-width: 1024px) 33vw, 16vw"
+              className="object-cover transition-transform duration-500 group-hover:scale-110"
+              unoptimized
+            />
+
+            {/* Dark gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+            {/* Reel count badge */}
+            <div className="absolute top-3 right-3 bg-black/40 backdrop-blur-md text-white text-[10px] font-semibold px-2.5 py-1 rounded-full tracking-wide">
+              {occ.looks} Looks
             </div>
-            <h3 className={`font-serif text-xl font-bold ${occ.textColor} mb-1`}>{occ.label}</h3>
-            <p className="text-xs text-[#1a1a2e]/60 tracking-wide">{occ.desc}</p>
-            <div className={`mt-3 text-xs font-semibold ${occ.textColor} opacity-0 group-hover:opacity-100 transition-opacity`}>
-              Shop Now →
+
+            {/* Play button — glass morphism */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:animate-pulse">
+                <FiPlay className="text-white ml-0.5" size={22} />
+              </div>
+            </div>
+
+            {/* Bottom text */}
+            <div className="absolute bottom-0 left-0 right-0 p-4">
+              <h3 className="font-serif text-xl font-bold text-white leading-tight">
+                {occ.label}
+              </h3>
+              <p className="text-white/70 text-xs mt-1 tracking-wide">
+                {occ.desc}
+              </p>
             </div>
           </Link>
         ))}

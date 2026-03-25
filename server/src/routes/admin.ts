@@ -80,6 +80,105 @@ adminRoutes.get('/dashboard', async (_req: Request, res: Response) => {
   });
 });
 
+// ── Build 15: Dashboard Widgets ───────────────────────────────────────────────
+
+adminRoutes.get('/dashboard/widgets', async (_req: Request, res: Response) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const week7Start = new Date(today);
+  week7Start.setDate(today.getDate() - 6);
+  const week30Start = new Date(today);
+  week30Start.setDate(today.getDate() - 29);
+
+  const [
+    todayOrders,
+    todayRevenueAgg,
+    totalProducts,
+    lowStockCount,
+    pendingReturnsCount,
+    unreadChatsCount,
+    topSellingProductsRaw,
+    recentOrders,
+    weekRevenue7Agg,
+    weekRevenue30Agg,
+  ] = await Promise.all([
+    prisma.order.count({ where: { createdAt: { gte: today } } }),
+    prisma.order.aggregate({ where: { createdAt: { gte: today } }, _sum: { total: true } }),
+    prisma.product.count({ where: { active: true } }),
+    prisma.product.count({ where: { stock: { lte: 5 }, active: true } }),
+    prisma.returnRequest.count({ where: { status: 'pending' } }),
+    prisma.chatMessage.count({ where: { status: 'open' } }),
+    prisma.orderItem.groupBy({
+      by: ['productId', 'name'],
+      _sum: { quantity: true },
+      orderBy: { _sum: { quantity: 'desc' } },
+      take: 5,
+    }),
+    prisma.order.findMany({ orderBy: { createdAt: 'desc' }, take: 5 }),
+    prisma.order.aggregate({ where: { createdAt: { gte: week7Start } }, _sum: { total: true } }),
+    prisma.order.aggregate({ where: { createdAt: { gte: week30Start } }, _sum: { total: true } }),
+  ]);
+
+  const topSellingProducts = topSellingProductsRaw.map((p) => ({
+    productId: p.productId,
+    name: p.name,
+    totalSold: p._sum.quantity ?? 0,
+  }));
+
+  res.json({
+    todayOrders,
+    todayRevenue: Number(todayRevenueAgg._sum.total ?? 0),
+    totalProducts,
+    lowStockCount,
+    pendingReturnsCount,
+    unreadChatsCount,
+    topSellingProducts,
+    recentOrders,
+    weekRevenue7: Number(weekRevenue7Agg._sum.total ?? 0),
+    weekRevenue30: Number(weekRevenue30Agg._sum.total ?? 0),
+  });
+});
+
+// ── Build 15: Revenue Chart ───────────────────────────────────────────────────
+
+adminRoutes.get('/revenue-chart', async (req: Request, res: Response) => {
+  const rawDays = parseInt((req.query.days as string) || '7', 10);
+  const days = Math.min(isNaN(rawDays) ? 7 : rawDays, 90);
+  const since = new Date();
+  since.setDate(since.getDate() - (days - 1));
+  since.setHours(0, 0, 0, 0);
+
+  const orders = await prisma.order.findMany({
+    where: { createdAt: { gte: since } },
+    select: { total: true, createdAt: true },
+    orderBy: { createdAt: 'asc' },
+  });
+
+  const dailyMap = new Map<string, { revenue: number; orders: number }>();
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    dailyMap.set(d.toISOString().slice(0, 10), { revenue: 0, orders: 0 });
+  }
+  for (const o of orders) {
+    const key = new Date(o.createdAt).toISOString().slice(0, 10);
+    const entry = dailyMap.get(key);
+    if (entry) {
+      entry.revenue += Number(o.total);
+      entry.orders += 1;
+    }
+  }
+
+  const chart = Array.from(dailyMap.entries()).map(([date, v]) => ({
+    date,
+    revenue: v.revenue,
+    orders: v.orders,
+  }));
+
+  const totalRevenue = orders.reduce((sum, o) => sum + Number(o.total), 0);
+  res.json({ days, chart, totalRevenue });
+});
+
 // Products
 adminRoutes.get('/products', async (req: Request, res: Response) => {
   const { page = '1', limit = '20', search } = req.query;
@@ -122,6 +221,46 @@ const productSchema = z.object({
   onOffer: z.boolean().default(false),
   offerPercent: z.number().int().min(0).max(100).optional(),
   active: z.boolean().default(true),
+});
+
+// ── Build 15: Product Analytics ───────────────────────────────────────────────
+
+adminRoutes.get('/products/analytics', async (req: Request, res: Response) => {
+  const { sort = 'revenue', limit } = req.query;
+  const validSorts = ['revenue', 'orders', 'rating'];
+  if (!validSorts.includes(sort as string)) throw new AppError(400, 'Invalid sort. Use: revenue, orders, rating');
+
+  const limitNum = limit ? parseInt(limit as string, 10) : undefined;
+
+  const products = await prisma.product.findMany({
+    where: { active: true },
+    select: {
+      id: true,
+      name: true,
+      orderItems: { select: { price: true, quantity: true } },
+      reviews: { where: { approved: true }, select: { rating: true } },
+    },
+  });
+
+  let analytics = products.map((p) => {
+    const orders = p.orderItems.length;
+    const revenue = p.orderItems.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
+    const avgRating =
+      p.reviews.length > 0
+        ? Math.round((p.reviews.reduce((sum, r) => sum + r.rating, 0) / p.reviews.length) * 10) / 10
+        : 0;
+    const underperforming = orders < 5 && revenue < 5000;
+    return { productId: p.id, name: p.name, orders, revenue, avgRating, underperforming };
+  });
+
+  if (sort === 'revenue') analytics.sort((a, b) => b.revenue - a.revenue);
+  else if (sort === 'orders') analytics.sort((a, b) => b.orders - a.orders);
+  else if (sort === 'rating') analytics.sort((a, b) => b.avgRating - a.avgRating);
+
+  if (limitNum) analytics = analytics.slice(0, limitNum);
+
+  const underperformingCount = analytics.filter((a) => a.underperforming).length;
+  res.json({ analytics, total: analytics.length, sort, underperformingCount });
 });
 
 adminRoutes.get('/products/:id', async (req: Request, res: Response) => {
@@ -173,6 +312,59 @@ adminRoutes.delete('/products/:id', async (req: Request, res: Response) => {
   });
 
   res.json({ success: true });
+});
+
+// ── Build 15: Product Cross-sell / Complete-look / Details ───────────────────
+
+adminRoutes.patch('/products/:id/cross-sell', async (req: Request, res: Response) => {
+  const { productIds } = z.object({ productIds: z.array(z.string()) }).parse(req.body);
+  const product = await prisma.product.findUnique({ where: { id: req.params.id } });
+  if (!product) throw new AppError(404, 'Product not found');
+
+  if (productIds.length > 0) {
+    const found = await prisma.product.count({ where: { id: { in: productIds } } });
+    if (found !== productIds.length) throw new AppError(404, 'One or more cross-sell products not found');
+  }
+
+  const updated = await prisma.product.update({
+    where: { id: req.params.id },
+    data: { crossSellIds: productIds },
+  });
+  res.json({ success: true, crossSellIds: updated.crossSellIds });
+});
+
+adminRoutes.patch('/products/:id/complete-look', async (req: Request, res: Response) => {
+  const { productIds } = z.object({ productIds: z.array(z.string()) }).parse(req.body);
+  const product = await prisma.product.findUnique({ where: { id: req.params.id } });
+  if (!product) throw new AppError(404, 'Product not found');
+
+  if (productIds.length > 0) {
+    const found = await prisma.product.count({ where: { id: { in: productIds } } });
+    if (found !== productIds.length) throw new AppError(404, 'One or more complete-look products not found');
+  }
+
+  const updated = await prisma.product.update({
+    where: { id: req.params.id },
+    data: { completeLookIds: productIds },
+  });
+  res.json({ success: true, completeLookIds: updated.completeLookIds });
+});
+
+adminRoutes.patch('/products/:id/details', async (req: Request, res: Response) => {
+  const { fabricCare, videoUrl } = z
+    .object({ fabricCare: z.string().optional(), videoUrl: z.string().optional() })
+    .parse(req.body);
+  const product = await prisma.product.findUnique({ where: { id: req.params.id } });
+  if (!product) throw new AppError(404, 'Product not found');
+
+  const updated = await prisma.product.update({
+    where: { id: req.params.id },
+    data: {
+      ...(fabricCare !== undefined ? { fabricCare } : {}),
+      ...(videoUrl !== undefined ? { videoUrl } : {}),
+    },
+  });
+  res.json(updated);
 });
 
 // Orders
@@ -252,6 +444,24 @@ adminRoutes.patch('/products/:id/stock', async (req: Request, res: Response) => 
     data: { stock },
   });
   res.json(updated);
+});
+
+// ── Build 15: Bulk Ship ───────────────────────────────────────────────────────
+
+adminRoutes.post('/orders/bulk-ship', async (req: Request, res: Response) => {
+  const { ids, trackingId } = z
+    .object({
+      ids: z.array(z.string()).min(1, 'At least one order ID required'),
+      trackingId: z.string().min(1, 'trackingId is required'),
+    })
+    .parse(req.body);
+
+  const result = await prisma.order.updateMany({
+    where: { id: { in: ids } },
+    data: { status: 'shipped', trackingId },
+  });
+
+  res.json({ updated: result.count, trackingId });
 });
 
 // Bulk status update — must be before /:id routes
@@ -407,6 +617,95 @@ adminRoutes.get('/orders/:id', async (req: Request, res: Response) => {
   });
   if (!order) throw new AppError(404, 'Order not found');
   res.json(order);
+});
+
+// ── Build 15: Order Timeline / Advance Status / Shipping Label ────────────────
+
+const STATUS_FLOW = ['placed', 'confirmed', 'packed', 'shipped', 'delivered'] as const;
+type OrderStatus = typeof STATUS_FLOW[number];
+
+adminRoutes.get('/orders/:id/timeline', async (req: Request, res: Response) => {
+  const order = await prisma.order.findUnique({ where: { id: req.params.id } });
+  if (!order) throw new AppError(404, 'Order not found');
+
+  const currentIdx = STATUS_FLOW.indexOf(order.status as OrderStatus);
+  const safeIdx = currentIdx === -1 ? 0 : currentIdx;
+  const nextStatus = safeIdx < STATUS_FLOW.length - 1 ? STATUS_FLOW[safeIdx + 1] : null;
+  const canAdvance = nextStatus !== null;
+
+  const timeline = STATUS_FLOW.map((status, idx) => ({
+    status,
+    completed: idx <= safeIdx,
+    current: idx === safeIdx,
+  }));
+
+  res.json({ timeline, nextStatus, canAdvance });
+});
+
+adminRoutes.post('/orders/:id/advance-status', async (req: Request, res: Response) => {
+  const order = await prisma.order.findUnique({ where: { id: req.params.id } });
+  if (!order) throw new AppError(404, 'Order not found');
+
+  const currentIdx = STATUS_FLOW.indexOf(order.status as OrderStatus);
+  if (currentIdx === -1 || currentIdx >= STATUS_FLOW.length - 1) {
+    throw new AppError(400, 'Order is already at final status or has an unknown status');
+  }
+
+  const nextStatus = STATUS_FLOW[currentIdx + 1];
+  const { trackingId } = z.object({ trackingId: z.string().optional() }).parse(req.body);
+
+  const updated = await prisma.order.update({
+    where: { id: req.params.id },
+    data: { status: nextStatus, ...(trackingId ? { trackingId } : {}) },
+  });
+  res.json({ advancedTo: nextStatus, order: updated });
+});
+
+adminRoutes.get('/orders/:id/shipping-label', async (req: Request, res: Response) => {
+  const order = await prisma.order.findUnique({
+    where: { id: req.params.id },
+    include: { items: true },
+  });
+  if (!order) throw new AppError(404, 'Order not found');
+
+  const address = order.address as { line1: string; line2?: string; city: string; state?: string; pincode: string };
+  const isCOD = order.paymentMethod === 'cod';
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Shipping Label — ${order.orderNumber}</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; font-size: 14px; background: #fff; }
+  .label { width: 100mm; border: 2px solid #000; padding: 16px; margin: 20px auto; }
+  .brand { font-size: 15px; font-weight: bold; border-bottom: 1px solid #000; padding-bottom: 8px; margin-bottom: 8px; }
+  .section { margin-bottom: 10px; }
+  .section h3 { font-size: 11px; text-transform: uppercase; color: #555; margin-bottom: 4px; }
+  .order-num { font-size: 18px; font-weight: bold; text-align: center; border: 2px solid #000; padding: 6px; margin: 10px 0; }
+  .cod-badge { background: #000; color: #fff; text-align: center; padding: 6px; font-weight: bold; font-size: 13px; margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="label">
+  <div class="brand">Srinidhi Boutique — Hyderabad, Telangana</div>
+  <div class="order-num">${order.orderNumber}</div>
+  <div class="section">
+    <h3>Ship To</h3>
+    <p><strong>${order.customerName}</strong></p>
+    <p>${order.customerPhone}</p>
+    <p>${address.line1}${address.line2 ? ', ' + address.line2 : ''}</p>
+    <p>${address.city}${address.state ? ', ' + address.state : ''} — ${address.pincode}</p>
+  </div>
+  ${order.trackingId ? `<div class="section"><h3>Tracking</h3><p>${order.trackingId}</p></div>` : ''}
+  ${isCOD ? `<div class="cod-badge">COD — ₹${Number(order.total).toLocaleString('en-IN')}</div>` : ''}
+</div>
+</body>
+</html>`;
+
+  res.setHeader('Content-Type', 'text/html');
+  res.send(html);
 });
 
 // Customers
@@ -660,9 +959,10 @@ adminRoutes.get('/orders/:id/invoice', async (req: Request, res: Response) => {
     const itemTotal = Number(item.price) * item.quantity;
     const rate = itemGstRates[idx];
     const itemGst = itemTotal * rate;
+    const hsnCode = (item.product?.category as { hsnCode?: string } | null)?.hsnCode || '';
     return `
       <tr>
-        <td style="padding:10px 12px;border-bottom:1px solid #f0e8e8;">${item.name}${item.size ? ` <span style="color:#999;font-size:12px;">(${item.size})</span>` : ''}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #f0e8e8;">${item.name}${item.size ? ` <span style="color:#999;font-size:12px;">(${item.size})</span>` : ''}${hsnCode ? `<br/><span style="color:#999;font-size:11px;">HSN: ${hsnCode}</span>` : ''}</td>
         <td style="padding:10px 12px;border-bottom:1px solid #f0e8e8;text-align:center;">${item.quantity}</td>
         <td style="padding:10px 12px;border-bottom:1px solid #f0e8e8;text-align:right;">₹${Number(item.price).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
         <td style="padding:10px 12px;border-bottom:1px solid #f0e8e8;text-align:right;">${(rate * 100).toFixed(0)}% — ₹${itemGst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
@@ -766,10 +1066,19 @@ adminRoutes.get('/orders/:id/invoice', async (req: Request, res: Response) => {
     </table>
   </div>
 
-  <div class="footer">
-    <p>Thank you for shopping with Srinidhi Boutique!</p>
-    <p style="margin-top:4px;">For queries: +91-XXXXXXXXXX | srinidhiboutique@gmail.com</p>
-    <p style="margin-top:8px;font-style:italic;">This is a computer-generated invoice and does not require a signature.</p>
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:40px;border-top:1px solid #f0e8e8;padding-top:20px;">
+    <div class="footer" style="border:none;padding:0;text-align:left;">
+      <p>Thank you for shopping with Srinidhi Boutique!</p>
+      <p style="margin-top:4px;">For queries: +91-XXXXXXXXXX | srinidhiboutique@gmail.com</p>
+      <p style="margin-top:8px;font-style:italic;color:#999;font-size:12px;">This is a computer-generated invoice.</p>
+    </div>
+    <div style="text-align:right;">
+      <p style="font-size:11px;color:#999;font-style:italic;">For and on behalf of</p>
+      <p style="font-weight:600;margin-top:2px;">Srinidhi Boutique</p>
+      <div style="margin-top:30px;border-top:1px solid #ccc;padding-top:6px;">
+        <p style="font-size:12px;color:#666;">Authorised Signatory</p>
+      </div>
+    </div>
   </div>
 </div>
 <script class="no-print">
@@ -1030,6 +1339,16 @@ adminRoutes.post('/products/bulk', async (req: Request, res: Response) => {
   }
 
   res.json({ success: true, updatedCount, action });
+});
+
+// ── Build 15: Category HSN Code ───────────────────────────────────────────────
+
+adminRoutes.patch('/categories/:id/hsn', async (req: Request, res: Response) => {
+  const { hsnCode } = z.object({ hsnCode: z.string().min(1, 'hsnCode is required') }).parse(req.body);
+  const category = await prisma.category.findUnique({ where: { id: req.params.id } });
+  if (!category) throw new AppError(404, 'Category not found');
+  const updated = await prisma.category.update({ where: { id: req.params.id }, data: { hsnCode } });
+  res.json(updated);
 });
 
 // ── Build 12: GST Category Rates ────────────────────────────────────────────

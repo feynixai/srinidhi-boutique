@@ -13,6 +13,7 @@ import { SizeGuideModal } from '@/components/SizeGuideModal';
 import { ProductReviews } from '@/components/ProductReviews';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductQA } from '@/components/ProductQA';
+import BackInStockButton from '@/components/BackInStockButton';
 
 const API_URL_INTERNAL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -438,6 +439,9 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
             {/* CTA Buttons */}
             <div className="space-y-3 pt-2" ref={addToCartButtonRef}>
+              {product.stock === 0 && (
+                <BackInStockButton productId={product.id} productName={product.name} />
+              )}
               <div className="flex gap-3">
                 <button
                   onClick={handleAddToCart}
@@ -489,10 +493,23 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 <p>{product.description || 'Beautiful handpicked piece from our curated collection.'}</p>
               </Accordion>
               <Accordion title="Fabric & Care">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {product.fabric && <p><strong>Fabric:</strong> {product.fabric}</p>}
                   {product.occasion.length > 0 && <p><strong>Occasion:</strong> {product.occasion.map((o) => o.charAt(0).toUpperCase() + o.slice(1)).join(', ')}</p>}
-                  <p>Dry clean recommended. Store in a cool, dry place.</p>
+                  <div className="flex flex-wrap gap-3 pt-1">
+                    {[
+                      { icon: '🧺', label: 'Dry Clean' },
+                      { icon: '🌡️', label: 'Cool Iron' },
+                      { icon: '🚫', label: 'No Bleach' },
+                      { icon: '💧', label: 'Hand Wash' },
+                    ].map((care) => (
+                      <div key={care.label} className="flex items-center gap-1.5 bg-white/60 rounded-full px-3 py-1.5 border border-white/40 text-xs text-[#1a1a2e]/70">
+                        <span>{care.icon}</span>
+                        <span>{care.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-[#1a1a2e]/50">Store in a cool, dry place away from direct sunlight.</p>
                 </div>
               </Accordion>
               <Accordion title="Shipping & Returns">

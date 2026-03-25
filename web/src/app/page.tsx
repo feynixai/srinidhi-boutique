@@ -4,6 +4,9 @@ import { getFeaturedProducts, getBestSellers, getOffers, getCategories } from '@
 import { ProductCard } from '@/components/ProductCard';
 import { HeroCarousel } from '@/components/HeroCarousel';
 import { NewsletterSignup } from '@/components/NewsletterSignup';
+import { FadeInSection } from '@/components/FadeInSection';
+import { CountdownTimer } from '@/components/CountdownTimer';
+import { ShopByOccasion } from '@/components/ShopByOccasion';
 
 async function getData() {
   const [featured, bestSellers, offers, categories] = await Promise.all([
@@ -15,8 +18,16 @@ async function getData() {
   return { featured, bestSellers, offers, categories };
 }
 
+// Flash sale ends at midnight today
+function getFlashSaleEnd(): Date {
+  const end = new Date();
+  end.setHours(23, 59, 59, 0);
+  return end;
+}
+
 export default async function HomePage() {
   const { featured, bestSellers, offers, categories } = await getData();
+  const flashSaleEnd = getFlashSaleEnd();
 
   return (
     <div className="bg-[#f5f5f0]">
@@ -82,46 +93,54 @@ export default async function HomePage() {
 
       {/* Category Grid */}
       {categories.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
-          <div className="text-center mb-10">
-            <h2 className="section-heading">Shop by Category</h2>
-            <div className="divider-gold mx-auto" />
-            <p className="text-[#1a1a2e]/50 text-sm mt-2 tracking-wide">
-              Curated for every occasion
-            </p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-            {categories.slice(0, 6).map((cat, i) => (
-              <Link
-                key={cat.id}
-                href={`/category/${cat.slug}`}
-                className={`group relative overflow-hidden rounded-3xl bg-gray-100 shadow-card hover:-translate-y-1 hover:shadow-card-hover transition-all duration-300 ${
-                  i === 0 ? 'row-span-2 aspect-[4/5]' : 'aspect-square'
-                }`}
-              >
-                {cat.image && (
-                  <Image
-                    src={cat.image}
-                    alt={cat.name}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-700"
-                    sizes="(max-width: 640px) 50vw, 33vw"
-                  />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e]/70 via-[#1a1a2e]/10 to-transparent group-hover:from-[#1a1a2e]/80 transition-all duration-300" />
-                <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <h3 className="text-white font-serif text-xl group-hover:text-[#c5a55a] transition-colors">
-                    {cat.name}
-                  </h3>
-                  <p className="text-white/70 text-xs mt-0.5 tracking-wide">Explore →</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
+        <FadeInSection>
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
+            <div className="text-center mb-10">
+              <h2 className="section-heading">Shop by Category</h2>
+              <div className="divider-gold mx-auto" />
+              <p className="text-[#1a1a2e]/50 text-sm mt-2 tracking-wide">
+                Curated for every occasion
+              </p>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+              {categories.slice(0, 6).map((cat, i) => (
+                <Link
+                  key={cat.id}
+                  href={`/category/${cat.slug}`}
+                  className={`group relative overflow-hidden rounded-3xl bg-gray-100 shadow-card hover:-translate-y-1 hover:shadow-card-hover transition-all duration-300 ${
+                    i === 0 ? 'row-span-2 aspect-[4/5]' : 'aspect-square'
+                  }`}
+                >
+                  {cat.image && (
+                    <Image
+                      src={cat.image}
+                      alt={cat.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-700"
+                      sizes="(max-width: 640px) 50vw, 33vw"
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e]/70 via-[#1a1a2e]/10 to-transparent group-hover:from-[#1a1a2e]/80 transition-all duration-300" />
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <h3 className="text-white font-serif text-xl group-hover:text-[#c5a55a] transition-colors">
+                      {cat.name}
+                    </h3>
+                    <p className="text-white/70 text-xs mt-0.5 tracking-wide">Explore →</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        </FadeInSection>
       )}
 
+      {/* Shop by Occasion */}
+      <FadeInSection delay={100}>
+        <ShopByOccasion />
+      </FadeInSection>
+
       {/* Festival Collection Banner */}
+      <FadeInSection>
       <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
         <div className="relative overflow-hidden rounded-3xl bg-[#1a1a2e] py-16 px-6 text-center shadow-card">
           <div className="absolute inset-0 opacity-10">
@@ -152,9 +171,11 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+      </FadeInSection>
 
       {/* Featured Products */}
       {featured.length > 0 && (
+        <FadeInSection>
         <section className="pb-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="flex items-end justify-between mb-10">
@@ -176,10 +197,12 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+        </FadeInSection>
       )}
 
       {/* Offers Banner */}
       {offers.length > 0 && (
+        <FadeInSection>
         <section className="bg-[#e8f0e8]/60 py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="grid md:grid-cols-2 gap-6 items-center mb-10">
@@ -192,6 +215,9 @@ export default async function HomePage() {
                 <p className="text-[#1a1a2e]/60 mt-3 text-sm leading-relaxed">
                   Up to 25% off on selected sarees, kurtis &amp; lehengas.
                 </p>
+                <div className="mt-4">
+                  <CountdownTimer endsAt={flashSaleEnd} label="Ends in" />
+                </div>
               </div>
               <div className="text-center md:text-right">
                 <div className="inline-block bg-blue-600 text-white px-8 py-4 rounded-3xl font-serif text-3xl italic mb-2 shadow-card">
@@ -215,10 +241,12 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+        </FadeInSection>
       )}
 
       {/* Best Sellers */}
       {bestSellers.length > 0 && (
+        <FadeInSection>
         <section className="py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="flex items-end justify-between mb-10">
@@ -241,6 +269,7 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+        </FadeInSection>
       )}
 
       {/* Testimonials */}

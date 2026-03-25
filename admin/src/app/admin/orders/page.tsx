@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
-import { getAdminOrders, bulkUpdateOrderStatus } from '@/lib/api';
+import { getAdminOrders, bulkUpdateOrderStatus, updateOrderStatus } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
 
 const TABS = [
@@ -47,6 +47,16 @@ export default function OrdersPage() {
   });
 
   const orders = data?.orders || [];
+
+  const quickShipMutation = useMutation({
+    mutationFn: (id: string) => updateOrderStatus(id, 'shipped'),
+    onSuccess: () => {
+      toast.success('Marked as shipped');
+      queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    },
+    onError: () => toast.error('Failed to update status'),
+  });
 
   function toggleSelect(id: string) {
     setSelected((prev) => prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]);
@@ -173,6 +183,16 @@ export default function OrdersPage() {
                   <p className="text-xs text-gray-400 mt-1 capitalize">{order.paymentMethod}</p>
                 </div>
               </Link>
+              {['placed', 'confirmed', 'packed'].includes(order.status) && (
+                <button
+                  onClick={(e) => { e.preventDefault(); quickShipMutation.mutate(order.id); }}
+                  disabled={quickShipMutation.isPending}
+                  className="flex-shrink-0 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg px-3 py-2 text-xs font-semibold hover:bg-blue-100 transition-colors disabled:opacity-50 whitespace-nowrap"
+                  title="Mark as Shipped"
+                >
+                  🚚 Ship
+                </button>
+              )}
             </div>
           ))}
         </div>

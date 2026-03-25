@@ -70,13 +70,13 @@ export default function DashboardPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['dashboard'],
     queryFn: getDashboard,
-    refetchInterval: 60000,
+    refetchInterval: 30000,
   });
 
   const { data: widgets } = useQuery({
     queryKey: ['dashboard-widgets'],
     queryFn: getDashboardWidgets,
-    refetchInterval: 60000,
+    refetchInterval: 30000,
   });
 
   const { data: lowStockData } = useQuery({
@@ -120,10 +120,13 @@ export default function DashboardPage() {
         <div className="glass-card p-5 flex flex-col gap-2 border-t-4 border-[#c5a55a]">
           <div className="flex items-center justify-between">
             <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold">Orders</p>
-            <span className="text-xl">📦</span>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" title="Live" />
+              <span className="text-xl">📦</span>
+            </div>
           </div>
           <p className="text-4xl font-bold text-[#c5a55a]">{stats.todayOrders}</p>
-          <p className="text-xs text-gray-400">Today</p>
+          <p className="text-xs text-gray-400">Today · updates every 30s</p>
         </div>
 
         <div className="glass-card p-5 flex flex-col gap-2 border-t-4 border-emerald-500">
@@ -191,6 +194,23 @@ export default function DashboardPage() {
               {action.label}
             </Link>
           ))}
+          <div className="border-t border-black/5 pt-2 space-y-2">
+            <p className="text-xs text-gray-400 font-semibold uppercase tracking-widest">Export Data</p>
+            {[
+              { label: '⬇ Orders CSV', type: 'orders' },
+              { label: '⬇ Products CSV', type: 'products' },
+              { label: '⬇ Customers CSV', type: 'customers' },
+            ].map((exp) => (
+              <a
+                key={exp.type}
+                href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/admin/export/${exp.type}`}
+                download
+                className="block bg-gray-50 text-gray-700 border border-gray-200 rounded-2xl px-4 py-2.5 text-xs font-semibold hover:bg-gray-100 transition-all text-center"
+              >
+                {exp.label}
+              </a>
+            ))}
+          </div>
         </div>
       </div>
 

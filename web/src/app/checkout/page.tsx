@@ -85,6 +85,8 @@ export default function CheckoutPage() {
   const [availableCoupons, setAvailableCoupons] = useState<CouponSuggestion[]>([]);
   const [upiOrderId] = useState(`SB${Date.now()}`);
   const [selectedCountry, setSelectedCountry] = useState('IN');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [pincodeLoading, setPincodeLoading] = useState(false);
 
   const country = COUNTRIES.find((c) => c.code === selectedCountry) || COUNTRIES[0];
   const isIndia = selectedCountry === 'IN';
@@ -174,13 +176,53 @@ export default function CheckoutPage() {
     setCouponInput('');
   }
 
+  function formatIndianPhone(raw: string): string {
+    const digits = raw.replace(/\D/g, '').slice(0, 10);
+    if (digits.length <= 5) return digits;
+    return `${digits.slice(0, 5)} ${digits.slice(5)}`;
+  }
+
+  async function handlePincodeBlur(pincode: string) {
+    if (!isIndia || pincode.length !== 6) return;
+    setPincodeLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/api/pincode/${pincode}`);
+      const data = await res.json();
+      if (data.available && data.city) {
+        setAddress((prev) => ({
+          ...prev,
+          city: data.city || prev.city,
+          state: data.state || prev.state,
+        }));
+        setFieldErrors((prev) => ({ ...prev, city: '', pincode: '' }));
+      }
+    } catch {
+      // silently ignore pincode lookup failures
+    } finally {
+      setPincodeLoading(false);
+    }
+  }
+
   function validateAddress() {
-    if (!address.customerName.trim()) { toast.error('Enter your name'); return false; }
-    if (!address.customerPhone.trim()) { toast.error('Enter your phone number'); return false; }
-    if (!address.line1.trim()) { toast.error('Enter address line 1'); return false; }
-    if (!address.city.trim()) { toast.error('Enter city'); return false; }
-    if (isIndia && !address.pincode.match(/^\d{6}$/)) { toast.error('Enter valid 6-digit pincode'); return false; }
-    if (!isIndia && !address.pincode.trim()) { toast.error(`Enter ${country.postalLabel}`); return false; }
+    const errors: Record<string, string> = {};
+    if (!address.customerName.trim()) errors.customerName = 'Enter your full name';
+    if (!address.customerPhone.trim()) {
+      errors.customerPhone = 'Enter your phone number';
+    } else if (isIndia && address.customerPhone.replace(/\D/g, '').length < 10) {
+      errors.customerPhone = 'Enter a valid 10-digit mobile number';
+    }
+    if (!address.line1.trim()) errors.line1 = 'Enter your address';
+    if (!address.city.trim()) errors.city = 'Enter your city';
+    if (isIndia && !address.pincode.match(/^\d{6}$/)) {
+      errors.pincode = 'Enter valid 6-digit pincode';
+    } else if (!isIndia && !address.pincode.trim()) {
+      errors.pincode = `Enter ${country.postalLabel}`;
+    }
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      toast.error('Please fix the highlighted fields');
+      return false;
+    }
     return true;
   }
 
@@ -360,10 +402,11 @@ export default function CheckoutPage() {
                   <label className="block text-sm font-medium mb-1">Full Name *</label>
                   <input
                     value={address.customerName}
-                    onChange={(e) => setAddress({ ...address, customerName: e.target.value })}
-                    className="w-full border border-gray-200 rounded-sm px-3 py-2.5 focus:outline-none focus:border-rose-gold text-sm"
+                    onChange={(e) => { setAddress({ ...address, customerName: e.target.value }); setFieldErrors((p) => ({ ...p, customerName: '' })); }}
+                    className={`w-full border rounded-sm px-3 py-2.5 focus:outline-none text-sm ${fieldErrors.customerName ? 'border-red-400 bg-red-50/30 focus:border-red-400' : 'border-gray-200 focus:border-rose-gold'}`}
                     placeholder="Your full name"
                   />
+                  {fieldErrors.customerName && <p className="text-red-500 text-xs mt-1">{fieldErrors.customerName}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Phone Number *</label>
@@ -373,11 +416,17 @@ export default function CheckoutPage() {
                     </span>
                     <input
                       value={address.customerPhone}
-                      onChange={(e) => setAddress({ ...address, customerPhone: e.target.value })}
-                      className="flex-1 border border-gray-200 rounded-sm px-3 py-2.5 focus:outline-none focus:border-rose-gold text-sm"
-                      placeholder="Phone number"
+                      onChange={(e) => {
+                        const formatted = isIndia ? formatIndianPhone(e.target.value) : e.target.value;
+                        setAddress({ ...address, customerPhone: formatted });
+                        setFieldErrors((p) => ({ ...p, customerPhone: '' }));
+                      }}
+                      className={`flex-1 border rounded-sm px-3 py-2.5 focus:outline-none text-sm ${fieldErrors.customerPhone ? 'border-red-400 bg-red-50/30 focus:border-red-400' : 'border-gray-200 focus:border-rose-gold'}`}
+                      placeholder={isIndia ? '98765 43210' : 'Phone number'}
+                      inputMode="numeric"
                     />
                   </div>
+                  {fieldErrors.customerPhone && <p className="text-red-500 text-xs mt-1">{fieldErrors.customerPhone}</p>}
                 </div>
               </div>
 
@@ -396,10 +445,11 @@ export default function CheckoutPage() {
                 <label className="block text-sm font-medium mb-1">Address Line 1 *</label>
                 <input
                   value={address.line1}
-                  onChange={(e) => setAddress({ ...address, line1: e.target.value })}
-                  className="w-full border border-gray-200 rounded-sm px-3 py-2.5 focus:outline-none focus:border-rose-gold text-sm"
+                  onChange={(e) => { setAddress({ ...address, line1: e.target.value }); setFieldErrors((p) => ({ ...p, line1: '' })); }}
+                  className={`w-full border rounded-sm px-3 py-2.5 focus:outline-none text-sm ${fieldErrors.line1 ? 'border-red-400 bg-red-50/30 focus:border-red-400' : 'border-gray-200 focus:border-rose-gold'}`}
                   placeholder="House/flat no., street, area"
                 />
+                {fieldErrors.line1 && <p className="text-red-500 text-xs mt-1">{fieldErrors.line1}</p>}
               </div>
 
               <div>
@@ -417,10 +467,11 @@ export default function CheckoutPage() {
                   <label className="block text-sm font-medium mb-1">City *</label>
                   <input
                     value={address.city}
-                    onChange={(e) => setAddress({ ...address, city: e.target.value })}
-                    className="w-full border border-gray-200 rounded-sm px-3 py-2.5 focus:outline-none focus:border-rose-gold text-sm"
+                    onChange={(e) => { setAddress({ ...address, city: e.target.value }); setFieldErrors((p) => ({ ...p, city: '' })); }}
+                    className={`w-full border rounded-sm px-3 py-2.5 focus:outline-none text-sm ${fieldErrors.city ? 'border-red-400 bg-red-50/30 focus:border-red-400' : 'border-gray-200 focus:border-rose-gold'}`}
                     placeholder="City"
                   />
+                  {fieldErrors.city && <p className="text-red-500 text-xs mt-1">{fieldErrors.city}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">State / Province</label>
@@ -452,14 +503,23 @@ export default function CheckoutPage() {
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">{country.postalLabel} *</label>
+                  <label className="block text-sm font-medium mb-1">
+                    {country.postalLabel} *{pincodeLoading && <span className="text-xs text-[#c5a55a] ml-2">Looking up...</span>}
+                  </label>
                   <input
                     value={address.pincode}
-                    onChange={(e) => setAddress({ ...address, pincode: e.target.value })}
-                    className="w-full border border-gray-200 rounded-sm px-3 py-2.5 focus:outline-none focus:border-rose-gold text-sm"
+                    onChange={(e) => {
+                      const val = isIndia ? e.target.value.replace(/\D/g, '').slice(0, 6) : e.target.value;
+                      setAddress({ ...address, pincode: val });
+                      setFieldErrors((p) => ({ ...p, pincode: '' }));
+                    }}
+                    onBlur={(e) => handlePincodeBlur(e.target.value)}
+                    className={`w-full border rounded-sm px-3 py-2.5 focus:outline-none text-sm ${fieldErrors.pincode ? 'border-red-400 bg-red-50/30 focus:border-red-400' : 'border-gray-200 focus:border-rose-gold'}`}
                     placeholder={country.postalPlaceholder}
                     maxLength={isIndia ? 6 : 10}
+                    inputMode={isIndia ? 'numeric' : 'text'}
                   />
+                  {fieldErrors.pincode && <p className="text-red-500 text-xs mt-1">{fieldErrors.pincode}</p>}
                 </div>
               </div>
 

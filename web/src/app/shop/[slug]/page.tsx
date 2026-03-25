@@ -14,6 +14,7 @@ import { ProductReviews } from '@/components/ProductReviews';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductQA } from '@/components/ProductQA';
 import BackInStockButton from '@/components/BackInStockButton';
+import RecentlyViewed from '@/components/RecentlyViewed';
 
 const API_URL_INTERNAL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -112,6 +113,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const [selectedColor, setSelectedColor] = useState<string>('');
   const [selectedImage, setSelectedImage] = useState(0);
   const [adding, setAdding] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [zoomed, setZoomed] = useState(false);
   const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
   const [showStickyBar, setShowStickyBar] = useState(false);
@@ -140,6 +142,17 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
     },
     enabled: !!product,
   });
+
+  // ESC to close lightbox
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setLightboxOpen(false);
+      if (e.key === 'ArrowRight' && lightboxOpen && product) setSelectedImage((i) => Math.min(i + 1, product.images.length - 1));
+      if (e.key === 'ArrowLeft' && lightboxOpen && product) setSelectedImage((i) => Math.max(i - 1, 0));
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [lightboxOpen, product]);
 
   // Sticky add-to-cart bar: show when main button scrolls off screen
   useEffect(() => {
@@ -260,16 +273,19 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      {/* Breadcrumb */}
+      {/* Breadcrumb — glass pill */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-        <p className="text-xs text-[#1a1a2e]/40 tracking-wide">
-          <Link href="/" className="hover:text-[#c5a55a]">Home</Link>
-          &nbsp;/&nbsp;
+        <nav className="inline-flex items-center gap-1.5 bg-white/60 backdrop-blur-xl border border-white/40 px-4 py-2 rounded-full text-xs shadow-sm">
+          <Link href="/" className="text-[#1a1a2e]/50 hover:text-[#c5a55a] transition-colors">Home</Link>
+          <span className="text-[#1a1a2e]/20">/</span>
           {product.category && (
-            <><Link href={`/category/${product.category.slug}`} className="hover:text-[#c5a55a]">{product.category.name}</Link>&nbsp;/&nbsp;</>
+            <>
+              <Link href={`/category/${product.category.slug}`} className="text-[#1a1a2e]/50 hover:text-[#c5a55a] transition-colors">{product.category.name}</Link>
+              <span className="text-[#1a1a2e]/20">/</span>
+            </>
           )}
-          <span className="text-[#1a1a2e]/70">{product.name}</span>
-        </p>
+          <span className="text-[#1a1a2e]/80 font-medium truncate max-w-[180px]">{product.name}</span>
+        </nav>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
@@ -295,6 +311,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             <div className="flex-1 relative">
               <div
                 className="relative aspect-[3/4] overflow-hidden bg-gray-100 rounded-2xl cursor-zoom-in"
+                onClick={() => setLightboxOpen(true)}
                 onMouseEnter={() => setZoomed(true)}
                 onMouseLeave={() => setZoomed(false)}
                 onMouseMove={(e) => {
@@ -473,6 +490,20 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               </a>
             </div>
 
+            {/* Delivery & Return Mini-cards */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-white/50 backdrop-blur-sm border border-white/40 rounded-2xl p-3 text-center">
+                <p className="text-xl mb-1">🚚</p>
+                <p className="text-xs font-semibold text-[#1a1a2e]">Fast Delivery</p>
+                <p className="text-[11px] text-[#1a1a2e]/50 mt-0.5">Usually 3–5 business days</p>
+              </div>
+              <div className="bg-white/50 backdrop-blur-sm border border-white/40 rounded-2xl p-3 text-center">
+                <p className="text-xl mb-1">↩️</p>
+                <p className="text-xs font-semibold text-[#1a1a2e]">Easy Returns</p>
+                <p className="text-[11px] text-[#1a1a2e]/50 mt-0.5">7-day return policy</p>
+              </div>
+            </div>
+
             {/* Pincode Checker */}
             <PincodeChecker />
 
@@ -576,6 +607,67 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {relatedProducts.map((p) => <ProductCard key={p.id} product={p} />)}
           </div>
+        </div>
+      )}
+
+      {/* Recently Viewed */}
+      <RecentlyViewed excludeId={product.id} />
+
+      {/* Lightbox Overlay */}
+      {lightboxOpen && (
+        <div
+          className="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center"
+          onClick={() => setLightboxOpen(false)}
+        >
+          <button
+            onClick={() => setLightboxOpen(false)}
+            className="absolute top-4 right-4 text-white/80 hover:text-white text-3xl font-light leading-none z-10 w-10 h-10 flex items-center justify-center bg-white/10 rounded-full"
+            aria-label="Close lightbox"
+          >
+            ×
+          </button>
+          {product.images.length > 1 && (
+            <>
+              <button
+                onClick={(e) => { e.stopPropagation(); setSelectedImage((i) => Math.max(i - 1, 0)); }}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 w-10 h-10 flex items-center justify-center rounded-full text-xl transition-all"
+                aria-label="Previous image"
+              >
+                ‹
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); setSelectedImage((i) => Math.min(i + 1, product.images.length - 1)); }}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 w-10 h-10 flex items-center justify-center rounded-full text-xl transition-all"
+                aria-label="Next image"
+              >
+                ›
+              </button>
+            </>
+          )}
+          <div
+            className="relative max-h-[90vh] max-w-[90vw] w-full h-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {product.images[selectedImage] && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={product.images[selectedImage]}
+                alt={product.name}
+                className="object-contain w-full h-full max-h-[90vh]"
+              />
+            )}
+          </div>
+          {product.images.length > 1 && (
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+              {product.images.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={(e) => { e.stopPropagation(); setSelectedImage(i); }}
+                  className={`w-2 h-2 rounded-full transition-all ${i === selectedImage ? 'bg-white w-5' : 'bg-white/40'}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
 

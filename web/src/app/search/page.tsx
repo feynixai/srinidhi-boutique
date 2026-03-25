@@ -13,9 +13,23 @@ async function SearchResults({ query }: { query: string }) {
         {data.total} results for &ldquo;{query}&rdquo;
       </p>
       {data.products.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
-          <p className="mb-2">No products found for &ldquo;{query}&rdquo;</p>
-          <p className="text-sm">Try a different search term</p>
+        <div className="text-center py-20">
+          <div className="text-5xl mb-4">🔍</div>
+          <h2 className="font-serif text-xl text-[#1a1a2e] mb-2">No products found</h2>
+          <p className="text-gray-500 text-sm mb-6">
+            We couldn&apos;t find anything for &ldquo;{query}&rdquo;. Try different keywords.
+          </p>
+          <div className="flex flex-wrap gap-2 justify-center text-sm">
+            {['Sarees', 'Kurtis', 'Lehengas', 'Kurta Sets', 'Salwar'].map((term) => (
+              <a
+                key={term}
+                href={`/search?q=${term}`}
+                className="px-4 py-2 bg-white/60 border border-white/40 rounded-full text-[#1a1a2e]/70 hover:text-[#c5a55a] hover:border-[#c5a55a]/50 transition-colors"
+              >
+                {term}
+              </a>
+            ))}
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
@@ -38,16 +52,16 @@ export default function SearchPage({ searchParams }: { searchParams: { q?: strin
             name="q"
             defaultValue={query}
             placeholder="Search sarees, kurtis, lehengas..."
-            className="flex-1 border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-rose-gold rounded-sm"
+            className="flex-1 bg-white/60 backdrop-blur-lg border border-white/30 rounded-full px-5 py-3 text-sm focus:outline-none focus:border-[#c5a55a] transition-colors shadow-card"
           />
-          <button type="submit" className="btn-primary px-6 py-2.5 text-sm">
+          <button type="submit" className="btn-primary px-6 py-3 text-sm rounded-full">
             Search
           </button>
         </div>
       </form>
 
       <Suspense fallback={<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[...Array(8)].map((_, i) => <div key={i} className="aspect-[3/4] bg-gray-100 animate-pulse" />)}
+        {[...Array(8)].map((_, i) => <div key={i} className="aspect-[3/4] bg-white/60 backdrop-blur-lg rounded-3xl animate-pulse" />)}
       </div>}>
         <SearchResults query={query} />
       </Suspense>

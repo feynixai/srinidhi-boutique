@@ -2,13 +2,14 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
-import { FiHeart, FiShoppingBag, FiBarChart2 } from 'react-icons/fi';
+import { FiHeart, FiShoppingBag, FiBarChart2, FiEye } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 import { Product, addToCart } from '@/lib/api';
 import { useCartStore } from '@/lib/cart-store';
 import { useWishlistStore } from '@/lib/wishlist-store';
 import { useCompareStore } from '@/lib/compare-store';
 import { useLanguage } from '@/lib/language-context';
+import { QuickViewModal } from './QuickViewModal';
 
 interface ProductCardProps {
   product: Product;
@@ -16,6 +17,8 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const [adding, setAdding] = useState(false);
+  const [quickViewOpen, setQuickViewOpen] = useState(false);
+  const [added, setAdded] = useState(false);
   const { toggle: toggleWishlist, has: inWishlist } = useWishlistStore();
   const { sessionId, itemCount, setItemCount, openCart } = useCartStore();
   const { add: addCompare, remove: removeCompare, has: inCompare } = useCompareStore();
@@ -45,7 +48,8 @@ export function ProductCard({ product }: ProductCardProps) {
         color: product.colors[0],
       });
       setItemCount(itemCount + 1);
-      openCart();
+      setAdded(true);
+      setTimeout(() => { setAdded(false); openCart(); }, 700);
       toast.success('Added to cart');
     } catch {
       toast.error('Could not add to cart');
@@ -126,16 +130,42 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
 
-        {/* Hover quick-add */}
+        {/* Hover quick-add + quick-view */}
         <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-          <button
-            onClick={handleQuickAdd}
-            disabled={adding || product.stock === 0}
-            className="w-full bg-[#1a1a2e] text-white py-3 text-xs font-semibold tracking-wider hover:bg-[#2d2d4e] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-          >
-            <FiShoppingBag size={14} />
-            {adding ? '...' : t.quickAdd}
-          </button>
+          <div className="flex">
+            <button
+              onClick={handleQuickAdd}
+              disabled={adding || product.stock === 0}
+              className={`flex-1 py-3 text-xs font-semibold tracking-wider transition-all flex items-center justify-center gap-2 disabled:opacity-50 ${
+                added
+                  ? 'bg-green-500 text-white'
+                  : 'bg-[#1a1a2e] text-white hover:bg-[#2d2d4e]'
+              }`}
+            >
+              {added ? (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  ADDED!
+                </>
+              ) : adding ? (
+                <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              ) : (
+                <>
+                  <FiShoppingBag size={14} />
+                  {t.quickAdd}
+                </>
+              )}
+            </button>
+            <button
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setQuickViewOpen(true); }}
+              className="bg-[#2d2d4e] text-white/70 hover:text-white px-3 py-3 transition-colors border-l border-white/10 flex items-center"
+              aria-label="Quick view"
+            >
+              <FiEye size={15} />
+            </button>
+          </div>
         </div>
 
         {/* Wishlist + Compare buttons */}

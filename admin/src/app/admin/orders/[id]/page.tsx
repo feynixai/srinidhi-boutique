@@ -73,6 +73,14 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
     onError: () => toast.error('Failed to update status'),
   });
 
+  const TIMELINE_STEPS = [
+    { value: 'placed', label: 'Placed', icon: '🛍️' },
+    { value: 'confirmed', label: 'Confirmed', icon: '✅' },
+    { value: 'packed', label: 'Packed', icon: '📦' },
+    { value: 'shipped', label: 'Shipped', icon: '🚚' },
+    { value: 'delivered', label: 'Delivered', icon: '🎉' },
+  ];
+
   if (isLoading) return (
     <div className="space-y-4">
       <div className="h-10 bg-gray-100 animate-pulse rounded-lg w-48" />
@@ -94,6 +102,9 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
     return STATUS_FLOW.indexOf(s) > currentIndex || s.value === 'cancelled';
   }).slice(0, 3);
 
+  const isCancelled = order.status === 'cancelled';
+  const currentStepIndex = isCancelled ? -1 : TIMELINE_STEPS.findIndex((s) => s.value === order.status);
+
   return (
     <div className="space-y-6 pb-10 max-w-3xl">
       <div className="flex items-center gap-3 flex-wrap">
@@ -105,6 +116,59 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
         >
           🖨️ Print Invoice
         </button>
+      </div>
+
+      {/* Order Timeline Stepper */}
+      <div className="card">
+        <h2 className="text-sm font-bold text-[#1a1a2e] mb-4 uppercase tracking-widest">Order Timeline</h2>
+        {isCancelled ? (
+          <div className="flex items-center gap-3 py-2">
+            <span className="w-10 h-10 flex items-center justify-center rounded-full bg-red-100 text-lg flex-shrink-0">❌</span>
+            <div>
+              <p className="font-semibold text-red-600">Order Cancelled</p>
+              <p className="text-xs text-gray-400">This order has been cancelled</p>
+            </div>
+          </div>
+        ) : (
+          <div className="relative flex items-start sm:items-center gap-0">
+            {TIMELINE_STEPS.map((step, i) => {
+              const isDone = i < currentStepIndex;
+              const isCurrent = i === currentStepIndex;
+              const isPending = i > currentStepIndex;
+              return (
+                <div key={step.value} className="flex-1 flex flex-col sm:flex-row items-center">
+                  <div className="flex flex-col items-center flex-shrink-0">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-base transition-all ${
+                      isDone
+                        ? 'bg-green-500 text-white shadow-md'
+                        : isCurrent
+                        ? 'bg-[#c5a55a] text-white shadow-lg ring-4 ring-[#c5a55a]/20'
+                        : 'bg-gray-100 text-gray-400'
+                    }`}>
+                      {isDone ? '✓' : step.icon}
+                    </div>
+                    <p className={`text-[10px] mt-1.5 font-semibold text-center leading-tight w-14 ${
+                      isDone ? 'text-green-600' : isCurrent ? 'text-[#c5a55a]' : 'text-gray-400'
+                    }`}>
+                      {step.label}
+                    </p>
+                  </div>
+                  {i < TIMELINE_STEPS.length - 1 && (
+                    <div className={`hidden sm:block flex-1 h-0.5 mx-1 rounded-full mt-[-20px] transition-all ${
+                      i < currentStepIndex ? 'bg-green-400' : 'bg-gray-200'
+                    }`} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+        {order.trackingId && (
+          <div className="mt-4 pt-4 border-t border-black/5 flex items-center gap-2">
+            <span className="text-gray-400 text-xs uppercase tracking-wider font-semibold">Tracking ID</span>
+            <span className="font-bold text-[#1a1a2e] text-sm">{order.trackingId}</span>
+          </div>
+        )}
       </div>
 
       {/* Status Update - Big Buttons */}

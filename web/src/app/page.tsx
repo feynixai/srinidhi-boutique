@@ -7,6 +7,7 @@ import { NewsletterSignup } from '@/components/NewsletterSignup';
 import { FadeInSection } from '@/components/FadeInSection';
 import { CountdownTimer } from '@/components/CountdownTimer';
 import { ShopByOccasion } from '@/components/ShopByOccasion';
+import RecentlyViewed from '@/components/RecentlyViewed';
 
 async function getData() {
   const [featured, bestSellers, offers, categories] = await Promise.all([
@@ -477,6 +478,8 @@ export default async function HomePage() {
       </section>
 
       {/* Newsletter */}
+      <RecentlyViewed />
+
       <NewsletterSignup />
 
       {/* Instagram Social Proof */}

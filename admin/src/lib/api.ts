@@ -136,6 +136,9 @@ export const deleteProduct = (id: string) =>
 export const updateProductStock = (id: string, stock: number) =>
   api.patch(`/api/admin/products/${id}/stock`, { stock }).then((r) => r.data as Product);
 
+export const updateProductActive = (id: string, active: boolean) =>
+  api.put(`/api/admin/products/${id}`, { active }).then((r) => r.data as Product);
+
 export const getAdminOrders = (params?: Record<string, string>) =>
   api.get('/api/admin/orders', { params }).then((r) => r.data as { orders: Order[]; total: number; page: number; totalPages: number });
 

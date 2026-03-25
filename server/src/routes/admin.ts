@@ -97,6 +97,7 @@ adminRoutes.get('/dashboard/widgets', async (_req: Request, res: Response) => {
     lowStockCount,
     pendingReturnsCount,
     unreadChatsCount,
+    pendingReviewsCount,
     topSellingProductsRaw,
     recentOrders,
     weekRevenue7Agg,
@@ -108,6 +109,7 @@ adminRoutes.get('/dashboard/widgets', async (_req: Request, res: Response) => {
     prisma.product.count({ where: { stock: { lte: 5 }, active: true } }),
     prisma.returnRequest.count({ where: { status: 'pending' } }),
     prisma.chatMessage.count({ where: { status: 'open' } }),
+    prisma.review.count({ where: { approved: false } }),
     prisma.orderItem.groupBy({
       by: ['productId', 'name'],
       _sum: { quantity: true },
@@ -132,6 +134,7 @@ adminRoutes.get('/dashboard/widgets', async (_req: Request, res: Response) => {
     lowStockCount,
     pendingReturnsCount,
     unreadChatsCount,
+    pendingReviewsCount,
     topSellingProducts,
     recentOrders,
     weekRevenue7: Number(weekRevenue7Agg._sum.total ?? 0),

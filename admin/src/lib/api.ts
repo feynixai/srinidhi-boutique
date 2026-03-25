@@ -106,6 +106,9 @@ export interface DashboardWidgets {
   todayRevenue: number;
   totalProducts: number;
   lowStockCount: number;
+  pendingReturnsCount: number;
+  unreadChatsCount: number;
+  pendingReviewsCount: number;
   topSellingProducts: TopSellingProduct[];
   recentOrders: Order[];
   weekRevenue7: number;

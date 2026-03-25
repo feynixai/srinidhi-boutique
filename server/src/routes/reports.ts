@@ -169,6 +169,115 @@ reportRoutes.get('/returns', async (req: Request, res: Response) => {
   });
 });
 
+// GET /api/reports/advanced?period=7|30|90 — comprehensive analytics
+reportRoutes.get('/advanced', async (req: Request, res: Response) => {
+  const days = Math.min(Math.max(parseInt(String(req.query.period || '30')), 1), 365);
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
+  startDate.setHours(0, 0, 0, 0);
+
+  const paidOrders = await prisma.order.findMany({
+    where: { paymentStatus: 'paid', createdAt: { gte: startDate } },
+    include: { items: { include: { product: { include: { category: true } } } } },
+  });
+
+  const totalRevenue = paidOrders.reduce((s, o) => s + Number(o.total), 0);
+  const totalOrders = paidOrders.length;
+  const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+  // Revenue by category
+  const categoryMap: Record<string, { name: string; revenue: number; orders: number }> = {};
+  for (const order of paidOrders) {
+    for (const item of order.items) {
+      const catName = item.product.category?.name || 'Uncategorized';
+      if (!categoryMap[catName]) categoryMap[catName] = { name: catName, revenue: 0, orders: 0 };
+      categoryMap[catName].revenue += Number(item.price) * item.quantity;
+      categoryMap[catName].orders += 1;
+    }
+  }
+  const revenueByCategory = Object.values(categoryMap).sort((a, b) => b.revenue - a.revenue);
+
+  // Revenue by payment method
+  const paymentMap: Record<string, { method: string; revenue: number; orders: number }> = {};
+  for (const order of paidOrders) {
+    const method = order.paymentMethod || 'unknown';
+    if (!paymentMap[method]) paymentMap[method] = { method, revenue: 0, orders: 0 };
+    paymentMap[method].revenue += Number(order.total);
+    paymentMap[method].orders += 1;
+  }
+  const revenueByPayment = Object.values(paymentMap).sort((a, b) => b.revenue - a.revenue);
+
+  // Top 10 products by revenue
+  const productMap: Record<string, { productId: string; name: string; revenue: number; unitsSold: number }> = {};
+  for (const order of paidOrders) {
+    for (const item of order.items) {
+      if (!productMap[item.productId]) productMap[item.productId] = { productId: item.productId, name: item.name, revenue: 0, unitsSold: 0 };
+      productMap[item.productId].revenue += Number(item.price) * item.quantity;
+      productMap[item.productId].unitsSold += item.quantity;
+    }
+  }
+  const topProducts = Object.values(productMap).sort((a, b) => b.revenue - a.revenue).slice(0, 10);
+
+  // New vs returning customers
+  const phones = [...new Set(paidOrders.map((o) => o.customerPhone))];
+  let newCustomers = 0;
+  let returningCustomers = 0;
+  await Promise.all(phones.map(async (phone) => {
+    const firstOrder = await prisma.order.findFirst({
+      where: { customerPhone: phone, paymentStatus: 'paid' },
+      orderBy: { createdAt: 'asc' },
+      select: { createdAt: true },
+    });
+    if (firstOrder && firstOrder.createdAt >= startDate) newCustomers++;
+    else returningCustomers++;
+  }));
+
+  res.json({
+    period: days,
+    startDate,
+    summary: { totalRevenue, totalOrders, avgOrderValue },
+    revenueByCategory,
+    revenueByPayment,
+    topProducts,
+    customerSegments: { newCustomers, returningCustomers },
+  });
+});
+
+// GET /api/reports/coupon-analytics — revenue generated per coupon
+reportRoutes.get('/coupon-analytics', async (_req: Request, res: Response) => {
+  const coupons = await prisma.coupon.findMany({ orderBy: { usedCount: 'desc' } });
+
+  const analytics = await Promise.all(coupons.map(async (coupon) => {
+    const orders = await prisma.order.findMany({
+      where: { couponCode: coupon.code, paymentStatus: 'paid' },
+      select: { total: true, discount: true },
+    });
+    return {
+      id: coupon.id,
+      code: coupon.code,
+      discount: coupon.discount,
+      usedCount: coupon.usedCount,
+      active: coupon.active,
+      expiresAt: coupon.expiresAt,
+      maxUses: coupon.maxUses,
+      minOrder: coupon.minOrder ? Number(coupon.minOrder) : null,
+      revenueGenerated: orders.reduce((s, o) => s + Number(o.total), 0),
+      totalDiscount: orders.reduce((s, o) => s + Number(o.discount), 0),
+      orderCount: orders.length,
+    };
+  }));
+
+  res.json(analytics);
+});
+
+// DELETE /api/reports/coupons/expired — cleanup expired inactive coupons
+reportRoutes.delete('/coupons/expired', async (_req: Request, res: Response) => {
+  const result = await prisma.coupon.deleteMany({
+    where: { expiresAt: { lt: new Date() }, active: false },
+  });
+  res.json({ deleted: result.count });
+});
+
 // GET /api/reports/revenue-by-region — revenue by country/state
 reportRoutes.get('/revenue-by-region', async (req: Request, res: Response) => {
   const { format = 'json' } = req.query;

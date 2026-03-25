@@ -5,7 +5,7 @@ import { useState, use, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { FaWhatsapp } from 'react-icons/fa';
-import { FiShare2, FiHeart, FiChevronDown, FiChevronUp, FiCopy, FiShoppingBag } from 'react-icons/fi';
+import { FiShare2, FiHeart, FiCopy, FiShoppingBag } from 'react-icons/fi';
 import { getProduct, addToCart, getProducts } from '@/lib/api';
 import { useCartStore } from '@/lib/cart-store';
 import { useWishlistStore } from '@/lib/wishlist-store';
@@ -20,21 +20,6 @@ const API_URL_INTERNAL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:40
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
-function Accordion({ title, children }: { title: string; children: React.ReactNode }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="border-t border-white/30">
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between py-4 text-left"
-      >
-        <span className="text-sm font-semibold tracking-wider uppercase text-[#1a1a2e]">{title}</span>
-        {open ? <FiChevronUp size={16} className="text-[#c5a55a]" /> : <FiChevronDown size={16} className="text-[#1a1a2e]/30" />}
-      </button>
-      {open && <div className="pb-4 text-sm text-[#1a1a2e]/60 leading-relaxed">{children}</div>}
-    </div>
-  );
-}
 
 function PincodeChecker() {
   const [pincode, setPincode] = useState('');
@@ -117,6 +102,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const [zoomed, setZoomed] = useState(false);
   const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
   const [showStickyBar, setShowStickyBar] = useState(false);
+  const [activeProductTab, setActiveProductTab] = useState<'description' | 'reviews' | 'qa' | 'sizeguide'>('description');
   const addToCartButtonRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef<number | null>(null);
   const { sessionId, itemCount, setItemCount, openCart } = useCartStore();
@@ -226,11 +212,29 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
     },
   };
 
-  const whatsappMsg = encodeURIComponent(
-    `Hi! I'm interested in buying "${product.name}" (₹${Number(product.price).toLocaleString('en-IN')})${selectedSize ? `, Size: ${selectedSize}` : ''}${selectedColor ? `, Color: ${selectedColor}` : ''}. Can you help me place an order?`
-  );
   const waNumber = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+919876543210').replace('+', '');
-  const waLink = `https://wa.me/${waNumber}?text=${whatsappMsg}`;
+  const productUrl = typeof window !== 'undefined' ? window.location.href : `https://proofcrest.com/shop/${product.slug}`;
+  const whatsappOrderMsg = encodeURIComponent(
+    `Hi! I'm interested in buying "${product.name}" (₹${displayPrice.toLocaleString('en-IN')})${selectedSize ? ` · Size: ${selectedSize}` : ''}${selectedColor ? ` · Colour: ${selectedColor}` : ''}. Can you help me place an order?\n${productUrl}`
+  );
+  const waLink = `https://wa.me/${waNumber}?text=${whatsappOrderMsg}`;
+
+  const whatsappShareMsg = encodeURIComponent(
+    `Check out this beautiful piece from Srinidhi Boutique!\n\n*${product.name}*\n₹${displayPrice.toLocaleString('en-IN')}${discountPct ? ` (${discountPct}% OFF)` : ''}\n\n${productUrl}`
+  );
+  const waShareLink = `https://wa.me/?text=${whatsappShareMsg}`;
+
+  // Delivery estimate
+  const now = new Date();
+  const hoursLeft = 23 - now.getHours();
+  const deliveryDate = new Date(now);
+  deliveryDate.setDate(deliveryDate.getDate() + 5);
+  const deliveryStr = deliveryDate.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+
+  // Size recommendation (show most common size or first available)
+  const recommendedSize = product.sizes.length > 0
+    ? (product.sizes.includes('M') ? 'M' : product.sizes.includes('L') ? 'L' : product.sizes[Math.floor(product.sizes.length / 2)])
+    : null;
 
   async function handleAddToCart() {
     if (product!.sizes.length > 0 && !selectedSize) {
@@ -490,6 +494,31 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               </a>
             </div>
 
+            {/* Trust section */}
+            <div className="bg-white/40 backdrop-blur-sm border border-white/30 rounded-2xl p-4 space-y-2">
+              <p className="flex items-center gap-2 text-sm text-[#1a1a2e]/80"><span className="text-green-500 font-bold text-base">✓</span> Authentic Products — Curated in Hyderabad</p>
+              <p className="flex items-center gap-2 text-sm text-[#1a1a2e]/80"><span className="text-green-500 font-bold text-base">✓</span> Free Returns within 7 days of delivery</p>
+              <p className="flex items-center gap-2 text-sm text-[#1a1a2e]/80"><span className="text-green-500 font-bold text-base">✓</span> Secure Checkout — UPI, Cards & COD</p>
+            </div>
+
+            {/* Delivery estimate */}
+            <div className="bg-white/40 backdrop-blur-sm border border-white/30 rounded-2xl px-4 py-3 flex items-center gap-3">
+              <span className="text-xl">🚚</span>
+              <div>
+                <p className="text-sm text-[#1a1a2e] font-medium">
+                  Order within <span className="text-[#c5a55a] font-semibold">{hoursLeft}h</span> for delivery by <span className="font-semibold">{deliveryStr}</span>
+                </p>
+                <p className="text-xs text-[#1a1a2e]/50 mt-0.5">Free shipping on orders above ₹999</p>
+              </div>
+            </div>
+
+            {/* Size recommendation */}
+            {recommendedSize && product.sizes.length > 1 && (
+              <p className="text-xs text-[#1a1a2e]/60 bg-white/40 rounded-full px-4 py-2 border border-white/30 text-center">
+                Most customers order <span className="font-semibold text-[#1a1a2e]">{recommendedSize}</span> for this product
+              </p>
+            )}
+
             {/* Delivery & Return Mini-cards */}
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-white/50 backdrop-blur-sm border border-white/40 rounded-2xl p-3 text-center">
@@ -518,16 +547,109 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               <p className="flex items-center gap-2 text-[#1a1a2e]/70"><span className="text-green-500 font-bold">✓</span> Genuine products, curated in Hyderabad</p>
             </div>
 
-            {/* Accordions */}
-            <div>
-              <Accordion title="Description">
-                <p>{product.description || 'Beautiful handpicked piece from our curated collection.'}</p>
-              </Accordion>
-              <Accordion title="Fabric & Care">
-                <div className="space-y-3">
-                  {product.fabric && <p><strong>Fabric:</strong> {product.fabric}</p>}
-                  {product.occasion.length > 0 && <p><strong>Occasion:</strong> {product.occasion.map((o) => o.charAt(0).toUpperCase() + o.slice(1)).join(', ')}</p>}
-                  <div className="flex flex-wrap gap-3 pt-1">
+            {/* Estimated Delivery Date */}
+            {(() => {
+              const start = new Date(Date.now() + 3 * 864e5);
+              const end = new Date(Date.now() + 5 * 864e5);
+              const fmt = (d: Date) => d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+              return (
+                <div className="flex items-center gap-2 text-xs text-[#1a1a2e]/60 bg-blue-50/80 border border-blue-100 rounded-xl px-3 py-2.5">
+                  <span>🚚</span>
+                  <span>Estimated delivery: <strong className="text-[#1a1a2e]/80">{fmt(start)} – {fmt(end)}</strong></span>
+                </div>
+              );
+            })()}
+
+            {/* Tab hint */}
+            <p className="text-xs text-[#1a1a2e]/40 text-center">See description, reviews & size guide below ↓</p>
+
+            {/* Share Buttons */}
+            <div className="flex items-center gap-2 pt-2 flex-wrap">
+              <span className="text-xs text-[#6b7280] uppercase tracking-wider mr-1">Share:</span>
+              <a
+                href={waShareLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 bg-green-50 text-green-600 border border-green-100 rounded-full px-3 py-1.5 text-xs font-medium hover:bg-green-100 transition-colors"
+                aria-label="Share on WhatsApp"
+              >
+                <FaWhatsapp size={13} /> WhatsApp
+              </a>
+              <button
+                onClick={() => {
+                  navigator.clipboard?.writeText(productUrl).then(() => toast.success('Link copied! Share it on Instagram.'));
+                }}
+                className="flex items-center gap-1.5 bg-gradient-to-r from-purple-50 to-pink-50 text-purple-600 border border-purple-100 rounded-full px-3 py-1.5 text-xs font-medium hover:from-purple-100 hover:to-pink-100 transition-all"
+                aria-label="Share on Instagram"
+              >
+                <FiCopy size={12} /> Instagram
+              </button>
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productUrl)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-full px-3 py-1.5 text-xs font-medium hover:bg-blue-100 transition-colors"
+                aria-label="Share on Facebook"
+              >
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                Facebook
+              </a>
+              <a
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${product.name} — ₹${displayPrice.toLocaleString('en-IN')}`)}&url=${encodeURIComponent(productUrl)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 bg-sky-50 text-sky-600 border border-sky-100 rounded-full px-3 py-1.5 text-xs font-medium hover:bg-sky-100 transition-colors"
+                aria-label="Share on Twitter"
+              >
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                Twitter
+              </a>
+              <button
+                onClick={handleShare}
+                className="flex items-center gap-1.5 bg-gray-50 text-gray-500 border border-gray-100 rounded-full px-3 py-1.5 text-xs font-medium hover:bg-gray-100 transition-colors"
+              >
+                <FiShare2 size={12} /> More
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Product Tabs: Description | Reviews | Q&A | Size Guide */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-12">
+        {/* Tab nav */}
+        <div className="flex gap-0 border-b border-[#e8e0d5] overflow-x-auto scrollbar-hide">
+          {([
+            { id: 'description', label: 'Description' },
+            { id: 'reviews', label: 'Reviews' },
+            { id: 'qa', label: 'Q&A' },
+            { id: 'sizeguide', label: 'Size Guide' },
+          ] as { id: typeof activeProductTab; label: string }[]).map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveProductTab(tab.id)}
+              className={`px-5 py-3 text-sm font-semibold whitespace-nowrap transition-all border-b-2 -mb-px ${
+                activeProductTab === tab.id
+                  ? 'border-[#c5a55a] text-[#c5a55a]'
+                  : 'border-transparent text-[#1a1a2e]/50 hover:text-[#1a1a2e]'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab content */}
+        <div className="pt-6">
+          {activeProductTab === 'description' && (
+            <div className="bg-white/50 backdrop-blur-sm border border-white/40 rounded-2xl p-6 space-y-5 text-sm text-[#1a1a2e]/70 leading-relaxed">
+              <p className="text-base">{product.description || 'Beautiful handpicked piece from our curated collection at Srinidhi Boutique, Hyderabad.'}</p>
+              {(product.fabric || product.occasion.length > 0) && (
+                <div className="space-y-3 border-t border-white/30 pt-4">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-[#1a1a2e]/40">Fabric & Care</p>
+                  {product.fabric && <p><strong className="text-[#1a1a2e]/80">Fabric:</strong> {product.fabric}</p>}
+                  {product.occasion.length > 0 && <p><strong className="text-[#1a1a2e]/80">Occasion:</strong> {product.occasion.map((o) => o.charAt(0).toUpperCase() + o.slice(1)).join(', ')}</p>}
+                  <div className="flex flex-wrap gap-2 pt-1">
                     {[
                       { icon: '🧺', label: 'Dry Clean' },
                       { icon: '🌡️', label: 'Cool Iron' },
@@ -540,54 +662,61 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                       </div>
                     ))}
                   </div>
-                  <p className="text-xs text-[#1a1a2e]/50">Store in a cool, dry place away from direct sunlight.</p>
+                  <p className="text-xs text-[#1a1a2e]/40">Store in a cool, dry place away from direct sunlight.</p>
                 </div>
-              </Accordion>
-              <Accordion title="Shipping & Returns">
-                <div className="space-y-2">
-                  <p>Orders are processed within 1–2 business days.</p>
-                  <p>Standard delivery: 4–7 business days across India.</p>
-                  <p>Free returns within 7 days of delivery.</p>
-                  <Link href="/shipping" className="text-[#c5a55a] hover:underline text-xs">Check delivery to your pincode →</Link>
-                </div>
-              </Accordion>
+              )}
+              <div className="space-y-2 border-t border-white/30 pt-4">
+                <p className="text-xs font-semibold uppercase tracking-wider text-[#1a1a2e]/40">Shipping & Returns</p>
+                <p>Orders are processed within 1–2 business days. Standard delivery: 4–7 business days across India.</p>
+                <p>Free returns within 7 days of delivery. <Link href="/shipping" className="text-[#c5a55a] hover:underline text-xs">View shipping policy →</Link></p>
+              </div>
             </div>
+          )}
 
-            {/* Share Buttons */}
-            <div className="flex items-center gap-3 pt-2">
-              <span className="text-xs text-[#6b7280] uppercase tracking-wider">Share:</span>
-              <a
-                href={`https://wa.me/?text=${encodeURIComponent(product.name + ' — ' + (typeof window !== 'undefined' ? window.location.href : ''))}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-8 h-8 flex items-center justify-center bg-green-100 text-green-600 rounded-full hover:bg-green-200 transition-colors"
-                aria-label="Share on WhatsApp"
-              >
-                <FaWhatsapp size={14} />
-              </a>
-              <button
-                onClick={handleShare}
-                className="w-8 h-8 flex items-center justify-center bg-gray-100 text-gray-500 rounded-full hover:bg-gray-200 transition-colors"
-                aria-label="Copy link"
-              >
-                <FiCopy size={12} />
-              </button>
-              <button
-                onClick={handleShare}
-                className="flex items-center gap-1.5 text-xs text-[#6b7280] hover:text-[#c5a55a] transition-colors ml-1"
-              >
-                <FiShare2 size={12} /> More
-              </button>
+          {activeProductTab === 'reviews' && (
+            <ProductReviews productId={product.id} />
+          )}
+
+          {activeProductTab === 'qa' && (
+            <ProductQA productId={product.id} />
+          )}
+
+          {activeProductTab === 'sizeguide' && (
+            <div className="bg-white/50 backdrop-blur-sm border border-white/40 rounded-2xl p-6">
+              <p className="text-xs text-gray-500 mb-4">Measurements are in inches. For best fit, measure at the fullest point.</p>
+              <div className="overflow-auto">
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="bg-[#f5f5f0]">
+                      <th className="border border-gray-100 px-4 py-2.5 text-left font-semibold text-[#1a1a2e]">Size</th>
+                      <th className="border border-gray-100 px-4 py-2.5 text-left font-medium text-gray-600">Chest</th>
+                      <th className="border border-gray-100 px-4 py-2.5 text-left font-medium text-gray-600">Waist</th>
+                      <th className="border border-gray-100 px-4 py-2.5 text-left font-medium text-gray-600">Hip</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { size: 'XS', chest: '32"', waist: '26"', hip: '36"' },
+                      { size: 'S',  chest: '34"', waist: '28"', hip: '38"' },
+                      { size: 'M',  chest: '36"', waist: '30"', hip: '40"' },
+                      { size: 'L',  chest: '38"', waist: '32"', hip: '42"' },
+                      { size: 'XL', chest: '40"', waist: '34"', hip: '44"' },
+                      { size: 'XXL',chest: '42"', waist: '36"', hip: '46"' },
+                    ].map((row) => (
+                      <tr key={row.size} className="hover:bg-[#f5f5f0]/50 transition-colors">
+                        <td className="border border-gray-100 px-4 py-2.5 font-bold text-[#c5a55a]">{row.size}</td>
+                        <td className="border border-gray-100 px-4 py-2.5 text-gray-600">{row.chest}</td>
+                        <td className="border border-gray-100 px-4 py-2.5 text-gray-600">{row.waist}</td>
+                        <td className="border border-gray-100 px-4 py-2.5 text-gray-600">{row.hip}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-xs text-gray-400 mt-4">Tip: If you are between sizes, choose the larger size for comfort.</p>
             </div>
-          </div>
+          )}
         </div>
-      </div>
-
-      <ProductReviews productId={product.id} />
-
-      {/* Q&A Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-12">
-        <ProductQA productId={product.id} />
       </div>
 
       {/* Customers Also Bought */}

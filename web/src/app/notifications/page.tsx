@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { BellIcon, CheckIcon } from '@heroicons/react/24/outline';
+import { FiPackage, FiTag, FiZap, FiGift } from 'react-icons/fi';
 
 interface Notification {
   id: string;
@@ -15,10 +16,10 @@ interface Notification {
 }
 
 const TYPE_CONFIG = {
-  order_update: { icon: '📦', color: 'bg-blue-50 border-blue-200' },
-  price_drop: { icon: '🏷️', color: 'bg-green-50 border-green-200' },
-  flash_sale: { icon: '⚡', color: 'bg-orange-50 border-orange-200' },
-  loyalty_reward: { icon: '🌟', color: 'bg-purple-50 border-purple-200' },
+  order_update: { icon: <FiPackage size={22} />, color: 'bg-blue-50 border-blue-200' },
+  price_drop: { icon: <FiTag size={22} />, color: 'bg-green-50 border-green-200' },
+  flash_sale: { icon: <FiZap size={22} />, color: 'bg-orange-50 border-orange-200' },
+  loyalty_reward: { icon: <FiGift size={22} />, color: 'bg-purple-50 border-purple-200' },
 };
 
 function timeAgo(dateStr: string): string {
@@ -118,7 +119,7 @@ export default function NotificationsPage() {
                 className={`border rounded p-4 flex gap-3 items-start transition-opacity ${cfg.color} ${n.read ? 'opacity-70' : ''}`}
                 onClick={() => !n.read && markRead(n.id)}
               >
-                <span className="text-2xl flex-shrink-0">{cfg.icon}</span>
+                <span className="text-[#c5a55a] flex-shrink-0 mt-0.5">{cfg.icon}</span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className={`text-sm font-semibold text-charcoal ${!n.read ? 'text-charcoal' : 'text-charcoal/70'}`}>

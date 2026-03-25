@@ -191,7 +191,7 @@ export default function CouponsPage() {
             disabled={createMutation.isPending}
             className="btn-action bg-rose-gold text-white w-full text-lg disabled:opacity-50"
           >
-            {createMutation.isPending ? 'Creating...' : '✅ Create Coupon'}
+            {createMutation.isPending ? 'Creating...' : 'Create Coupon'}
           </button>
         </div>
       )}
@@ -223,7 +223,7 @@ export default function CouponsPage() {
                       </span>
                     </div>
                     <div className="flex flex-wrap gap-3 text-sm text-gray-600">
-                      <span>💰 {coupon.discount}% off</span>
+                      <span>{coupon.discount}% off</span>
                       {coupon.minOrder && <span>Min ₹{Number(coupon.minOrder).toLocaleString('en-IN')}</span>}
                       {coupon.maxUses && <span>Used: {coupon.usedCount}/{coupon.maxUses}</span>}
                       {!coupon.maxUses && coupon.usedCount > 0 && <span>Used: {coupon.usedCount}×</span>}

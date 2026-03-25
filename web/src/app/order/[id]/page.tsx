@@ -27,7 +27,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
 
   if (isLoading) return (
     <div className="max-w-2xl mx-auto px-4 py-20 text-center">
-      <div className="animate-spin text-4xl mb-4">⏳</div>
+      <div className="flex justify-center mb-4"><svg className="w-10 h-10 animate-spin text-[#c5a55a]" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg></div>
       <p className="text-gray-500">Loading your order...</p>
     </div>
   );
@@ -54,7 +54,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
       {/* Success Header */}
       <div className="text-center mb-8">
         {order.status === 'cancelled' ? (
-          <div className="text-5xl mb-4">❌</div>
+          <div className="text-red-500 flex justify-center mb-4"><svg viewBox="0 0 24 24" className="w-12 h-12" fill="none" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
         ) : (
           <div className="flex justify-center mb-4">
             <div className="relative w-20 h-20">
@@ -136,7 +136,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
             const firstItem = order.items[0];
             const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://proofcrest.com';
             const shareMsg = encodeURIComponent(
-              `Just ordered "${firstItem?.name || 'something beautiful'}" from Srinidhi Boutique! Check out their amazing collection at ${siteUrl} 🛍️`
+              `Just ordered "${firstItem?.name || 'something beautiful'}" from Srinidhi Boutique! Check out their amazing collection at ${siteUrl}`
             );
             return (
               <a

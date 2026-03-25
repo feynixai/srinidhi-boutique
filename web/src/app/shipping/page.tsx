@@ -70,12 +70,12 @@ export default function ShippingPage() {
       <div className="space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
-            { icon: '🚚', title: 'Free Shipping', desc: 'On all orders above ₹999' },
-            { icon: '📦', title: 'Careful Packaging', desc: 'Every item packed with love' },
-            { icon: '↩', title: 'Easy Returns', desc: '7-day hassle-free return policy' },
+            { icon: <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>, title: 'Free Shipping', desc: 'On all orders above ₹999' },
+            { icon: <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>, title: 'Careful Packaging', desc: 'Every item packed with love' },
+            { icon: <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>, title: 'Easy Returns', desc: '7-day hassle-free return policy' },
           ].map((item) => (
             <div key={item.title} className="text-center p-5 bg-white border border-gray-100 rounded-sm">
-              <div className="text-3xl mb-2">{item.icon}</div>
+              <div className="text-[#c5a55a] flex justify-center mb-2">{item.icon}</div>
               <h3 className="font-medium mb-1">{item.title}</h3>
               <p className="text-sm text-gray-500">{item.desc}</p>
             </div>

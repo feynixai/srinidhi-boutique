@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
+import { FiSmartphone, FiCreditCard, FiDollarSign, FiDatabase } from 'react-icons/fi';
 import { useCartStore } from '@/lib/cart-store';
 import { getCart, placeOrder, validateCoupon, getBestCoupons, CouponSuggestion } from '@/lib/api';
 
@@ -696,9 +697,9 @@ export default function CheckoutPage() {
                 // Indian payment options — glass cards
                 <div className="space-y-3">
                   {[
-                    { id: 'upi' as const, label: 'UPI / PhonePe / GPay / Paytm', desc: 'Instant payment via UPI apps — most popular', icon: '📱', badge: 'Recommended' },
-                    { id: 'razorpay' as const, label: 'Pay Online (Razorpay)', desc: 'Debit/Credit cards, Net banking, UPI via Razorpay', icon: '💳' },
-                    { id: 'cod' as const, label: 'Cash on Delivery', desc: `Pay when your order arrives (+₹${COD_CHARGE} handling charge)`, icon: '💵' },
+                    { id: 'upi' as const, label: 'UPI / PhonePe / GPay / Paytm', desc: 'Instant payment via UPI apps — most popular', icon: <FiSmartphone size={22} />, badge: 'Recommended' },
+                    { id: 'razorpay' as const, label: 'Pay Online (Razorpay)', desc: 'Debit/Credit cards, Net banking, UPI via Razorpay', icon: <FiCreditCard size={22} /> },
+                    { id: 'cod' as const, label: 'Cash on Delivery', desc: `Pay when your order arrives (+₹${COD_CHARGE} handling charge)`, icon: <FiDollarSign size={22} /> },
                   ].map((method) => (
                     <button
                       key={method.id}
@@ -710,7 +711,7 @@ export default function CheckoutPage() {
                           : 'border-white/40 bg-white/50 backdrop-blur-xl hover:border-[#1a1a2e]/30 hover:bg-white/70'
                       }`}
                     >
-                      <span className="text-2xl">{method.icon}</span>
+                      <span className="text-[#c5a55a]">{method.icon}</span>
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <p className="font-semibold text-sm text-[#1a1a2e]">{method.label}</p>
@@ -730,8 +731,8 @@ export default function CheckoutPage() {
                 // International: Razorpay (cards) + Bank Transfer
                 <div className="space-y-3">
                   {[
-                    { id: 'razorpay' as const, label: 'Credit / Debit Card (Razorpay)', desc: 'Visa, Mastercard — secure international checkout', icon: '💳', badge: 'Recommended' },
-                    { id: 'bank_transfer' as const, label: 'Bank Transfer (Wire / SWIFT)', desc: 'Transfer to our HDFC account — confirm by email', icon: '🏦' },
+                    { id: 'razorpay' as const, label: 'Credit / Debit Card (Razorpay)', desc: 'Visa, Mastercard — secure international checkout', icon: <FiCreditCard size={22} />, badge: 'Recommended' },
+                    { id: 'bank_transfer' as const, label: 'Bank Transfer (Wire / SWIFT)', desc: 'Transfer to our HDFC account — confirm by email', icon: <FiDatabase size={22} /> },
                   ].map((method) => (
                     <button
                       key={method.id}
@@ -743,7 +744,7 @@ export default function CheckoutPage() {
                           : 'border-white/40 bg-white/50 backdrop-blur-xl hover:border-[#1a1a2e]/30 hover:bg-white/70'
                       }`}
                     >
-                      <span className="text-2xl">{method.icon}</span>
+                      <span className="text-[#c5a55a]">{method.icon}</span>
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <p className="font-semibold text-sm text-[#1a1a2e]">{method.label}</p>
@@ -804,7 +805,7 @@ export default function CheckoutPage() {
               <div className="bg-white/50 backdrop-blur-sm border border-white/40 rounded-2xl p-4 space-y-2.5">
                 <p className="text-xs font-semibold uppercase tracking-wider text-[#1a1a2e]/50 mb-1">Safe & Secure Checkout</p>
                 <p className="flex items-center gap-2 text-xs text-[#1a1a2e]/70">
-                  <span className="text-green-500 font-bold">🔒</span> Your information is encrypted and secure
+                  <svg viewBox="0 0 24 24" className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2}><rect x="3" y="11" width="18" height="11" rx="2"/><path strokeLinecap="round" d="M7 11V7a5 5 0 0110 0v4"/></svg> Your information is encrypted and secure
                 </p>
                 <p className="flex items-center gap-2 text-xs text-[#1a1a2e]/70">
                   <span className="font-bold">✓</span> 100% Money Back Guarantee on all orders

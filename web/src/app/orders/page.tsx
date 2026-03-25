@@ -135,7 +135,7 @@ export default function OrdersPage() {
       {searched && orders.length === 0 && (
         <div className="text-center py-12">
           <div className="glass-card inline-block p-10">
-            <p className="text-4xl mb-3">📦</p>
+            <div className="text-[#c5a55a] flex justify-center mb-3"><svg viewBox="0 0 24 24" className="w-10 h-10" fill="none" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></div>
             <p className="text-lg font-bold text-[#1a1a2e]">No orders found</p>
             <p className="text-sm text-[#6b7280] mt-1">You haven&apos;t placed any orders yet.</p>
             <Link href="/shop" className="btn-primary mt-6 inline-block px-8 py-3 text-sm">START SHOPPING</Link>

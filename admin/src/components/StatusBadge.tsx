@@ -12,16 +12,16 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 const STATUS_LABELS: Record<string, string> = {
-  placed: '📦 Placed',
-  confirmed: '✅ Confirmed',
-  packed: '📦 Packed',
-  shipped: '🚚 Shipped',
-  delivered: '🎉 Delivered',
-  cancelled: '❌ Cancelled',
-  returned: '↩️ Returned',
-  pending: '⏳ Pending',
-  paid: '✅ Paid',
-  failed: '❌ Failed',
+  placed: 'Placed',
+  confirmed: 'Confirmed',
+  packed: 'Packed',
+  shipped: 'Shipped',
+  delivered: 'Delivered',
+  cancelled: 'Cancelled',
+  returned: 'Returned',
+  pending: 'Pending',
+  paid: 'Paid',
+  failed: 'Failed',
 };
 
 export function StatusBadge({ status }: { status: string }) {

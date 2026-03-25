@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaWhatsapp } from 'react-icons/fa';
+import { FiHeart, FiUsers, FiAward, FiFlag } from 'react-icons/fi';
 
 export const metadata: Metadata = {
   title: 'About Us | Srinidhi Boutique',
@@ -9,10 +10,10 @@ export const metadata: Metadata = {
 };
 
 const VALUES = [
-  { icon: '🌸', title: 'Handpicked Selection', desc: 'Every piece is personally chosen for quality, design, and wearability. Nothing goes on the shelf unless Srinidhi herself loves it.' },
-  { icon: '🤝', title: 'Family Values', desc: 'We treat every customer like family — with warmth, honesty, and care. Our team is always just a WhatsApp away.' },
-  { icon: '✨', title: 'Premium Quality', desc: 'From fabric to finish, we never compromise on the quality you deserve. Every stitch, every thread, every colour is thoughtfully chosen.' },
-  { icon: '🇮🇳', title: 'Made in India', desc: 'Supporting Indian weavers, artisans, and designers at every step — from Kanchipuram to Kutch, from Lucknow to Jaipur.' },
+  { icon: <FiHeart size={28} />, title: 'Handpicked Selection', desc: 'Every piece is personally chosen for quality, design, and wearability. Nothing goes on the shelf unless Srinidhi herself loves it.' },
+  { icon: <FiUsers size={28} />, title: 'Family Values', desc: 'We treat every customer like family — with warmth, honesty, and care. Our team is always just a WhatsApp away.' },
+  { icon: <FiAward size={28} />, title: 'Premium Quality', desc: 'From fabric to finish, we never compromise on the quality you deserve. Every stitch, every thread, every colour is thoughtfully chosen.' },
+  { icon: <FiFlag size={28} />, title: 'Made in India', desc: 'Supporting Indian weavers, artisans, and designers at every step — from Kanchipuram to Kutch, from Lucknow to Jaipur.' },
 ];
 
 const MISSION_POINTS = [
@@ -96,7 +97,7 @@ export default function AboutPage() {
                 key={v.title}
                 className="bg-white/60 backdrop-blur-xl border border-white/40 rounded-3xl p-6 text-center shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300"
               >
-                <div className="text-4xl mb-3">{v.icon}</div>
+                <div className="text-[#c5a55a] flex justify-center mb-3">{v.icon}</div>
                 <h3 className="font-serif text-lg text-charcoal mb-2">{v.title}</h3>
                 <p className="text-charcoal/60 text-sm leading-relaxed">{v.desc}</p>
               </div>

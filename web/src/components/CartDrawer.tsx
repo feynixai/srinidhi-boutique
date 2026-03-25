@@ -82,7 +82,7 @@ export function CartDrawer() {
           <div className="px-5 pt-3 pb-1">
             {shipping === 0 ? (
               <p className="text-xs text-center text-green-600 font-semibold bg-green-50 rounded-full py-1.5 px-3">
-                🎉 You've unlocked FREE shipping!
+                You've unlocked FREE shipping!
               </p>
             ) : (
               <div>

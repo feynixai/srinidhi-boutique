@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { FiTruck, FiRefreshCw, FiLock, FiDollarSign, FiMessageCircle, FiPackage, FiCreditCard, FiPhone, FiFeather, FiFlag, FiHeart } from 'react-icons/fi';
 import { getFeaturedProducts, getBestSellers, getOffers, getCategories } from '@/lib/api';
 import { ProductCard } from '@/components/ProductCard';
 import { HeroCarousel } from '@/components/HeroCarousel';
@@ -80,17 +81,17 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-wrap justify-center gap-3">
             {[
-              { icon: '🚚', text: 'Free Shipping', sub: 'Above ₹999' },
-              { icon: '↩️', text: 'Easy Returns', sub: '7-Day Policy' },
-              { icon: '🔒', text: 'Secure Payments', sub: 'UPI · Cards · COD' },
-              { icon: '💰', text: 'Cash on Delivery', sub: 'Pan India' },
-              { icon: '💬', text: 'WhatsApp Support', sub: 'Always Available' },
+              { icon: <FiTruck size={16} />, text: 'Free Shipping', sub: 'Above ₹999' },
+              { icon: <FiRefreshCw size={16} />, text: 'Easy Returns', sub: '7-Day Policy' },
+              { icon: <FiLock size={16} />, text: 'Secure Payments', sub: 'UPI · Cards · COD' },
+              { icon: <FiDollarSign size={16} />, text: 'Cash on Delivery', sub: 'Pan India' },
+              { icon: <FiMessageCircle size={16} />, text: 'WhatsApp Support', sub: 'Always Available' },
             ].map((b) => (
               <div
                 key={b.text}
                 className="flex items-center gap-2.5 bg-white/60 backdrop-blur-xl border border-white/40 px-4 py-2.5 rounded-full shadow-sm hover:bg-white/80 transition-all"
               >
-                <span className="text-lg leading-none">{b.icon}</span>
+                <span className="text-[#c5a55a] leading-none">{b.icon}</span>
                 <div>
                   <p className="text-xs font-semibold text-[#1a1a2e] leading-tight">{b.text}</p>
                   <p className="text-[10px] text-[#1a1a2e]/50 leading-tight">{b.sub}</p>
@@ -147,6 +148,50 @@ export default async function HomePage() {
       {/* Shop by Occasion */}
       <FadeInSection delay={100}>
         <ShopByOccasion />
+      </FadeInSection>
+
+      {/* Hot Collections */}
+      <FadeInSection delay={150}>
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
+          <div className="text-center mb-10">
+            <h2 className="section-heading">Hot Collections</h2>
+            <div className="divider-gold mx-auto" />
+            <p className="text-[#1a1a2e]/50 text-sm mt-2 tracking-wide">
+              Shop by mood, season &amp; occasion
+            </p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {[
+              { name: 'Wedding Season', href: '/shop?occasion=wedding', image: 'https://picsum.photos/seed/hot-wedding/600/400', sub: 'Sarees · Lehengas · Kurtis' },
+              { name: 'Festive Favorites', href: '/shop?occasion=festival', image: 'https://picsum.photos/seed/hot-festival/600/400', sub: 'Diwali · Navratri · Onam' },
+              { name: 'Under ₹2,000', href: '/shop?maxPrice=2000', image: 'https://picsum.photos/seed/hot-budget/600/400', sub: 'Great Picks, Great Prices' },
+              { name: 'New Arrivals', href: '/shop?sort=newest', image: 'https://picsum.photos/seed/hot-new/600/400', sub: 'Just In This Season' },
+              { name: 'Office Ready', href: '/shop?occasion=office', image: 'https://picsum.photos/seed/hot-office/600/400', sub: 'Elegant · Professional · Comfortable' },
+              { name: 'Party Glam', href: '/shop?occasion=party', image: 'https://picsum.photos/seed/hot-party/600/400', sub: 'Shine at Every Celebration' },
+            ].map((col) => (
+              <Link
+                key={col.name}
+                href={col.href}
+                className="group relative overflow-hidden rounded-3xl aspect-[4/3] bg-gray-200 shadow-card hover:-translate-y-1 hover:shadow-card-hover transition-all duration-300"
+              >
+                <Image
+                  src={col.image}
+                  alt={col.name}
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-700"
+                  sizes="(max-width: 640px) 50vw, 33vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e]/80 via-[#1a1a2e]/20 to-transparent group-hover:from-[#1a1a2e]/90 transition-all duration-300" />
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-3">
+                    <h3 className="text-white font-bold text-base leading-tight group-hover:text-[#c5a55a] transition-colors">{col.name}</h3>
+                    <p className="text-white/60 text-xs mt-0.5 tracking-wide">{col.sub}</p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
       </FadeInSection>
 
       {/* Festival Collection Banner */}
@@ -296,25 +341,25 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {[
               {
-                icon: '🚚',
+                icon: <FiTruck size={28} />,
                 title: 'Free Shipping',
                 subtitle: 'Above ₹999',
                 desc: 'Free delivery anywhere in India on all orders above ₹999. Express delivery available in Hyderabad and major cities.',
               },
               {
-                icon: '🔄',
+                icon: <FiRefreshCw size={28} />,
                 title: 'Easy 7-Day Returns',
                 subtitle: 'Hassle-Free',
                 desc: 'Changed your mind? No problem. Return any unworn item within 7 days for a full refund or exchange — no questions asked.',
               },
               {
-                icon: '💳',
+                icon: <FiCreditCard size={28} />,
                 title: 'Secure Payments',
                 subtitle: 'UPI · Cards · COD',
                 desc: 'Pay via UPI, credit/debit cards, net banking, or Cash on Delivery. All transactions secured by Razorpay — PCI-DSS certified.',
               },
               {
-                icon: '📞',
+                icon: <FiPhone size={28} />,
                 title: '24/7 WhatsApp Support',
                 subtitle: 'Always Available',
                 desc: 'Our team is always a WhatsApp message away — whether you need sizing help, want a live product video, or have a question about your order.',
@@ -325,7 +370,7 @@ export default async function HomePage() {
                 className="bg-white/60 backdrop-blur-xl border border-white/40 rounded-3xl p-6 text-center shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300"
                 style={{ boxShadow: '0 4px 24px rgba(197,165,90,0.08), 0 1px 4px rgba(0,0,0,0.04)' }}
               >
-                <div className="text-4xl mb-3">{b.icon}</div>
+                <div className="text-[#c5a55a] flex justify-center mb-3">{b.icon}</div>
                 <h3 className="font-semibold text-[#1a1a2e] text-base mb-0.5">{b.title}</h3>
                 <p className="text-[#c5a55a] text-xs font-medium uppercase tracking-wider mb-3">{b.subtitle}</p>
                 <p className="text-[#1a1a2e]/60 text-sm leading-relaxed">{b.desc}</p>
@@ -366,13 +411,13 @@ export default async function HomePage() {
             </div>
             <div className="space-y-4">
               {[
-                { icon: '🌸', title: 'Handpicked by Srinidhi', desc: 'Every product is personally chosen by our founder — nothing reaches the shelf unless she truly loves it.' },
-                { icon: '🇮🇳', title: 'Sourced from the Best Artisans', desc: 'Direct relationships with weavers and craftspeople across India means better quality and fair prices for you.' },
-                { icon: '📦', title: 'Packaged with Care', desc: 'Your order is wrapped in tissue, sealed, and packed to arrive in perfect condition — every single time.' },
-                { icon: '💬', title: 'Backed by Real Support', desc: 'A real person answers your WhatsApp — not a chatbot. We\'re here for personalised advice, live product videos, and more.' },
+                { icon: <FiHeart size={20} />, title: 'Handpicked by Srinidhi', desc: 'Every product is personally chosen by our founder — nothing reaches the shelf unless she truly loves it.' },
+                { icon: <FiFlag size={20} />, title: 'Sourced from the Best Artisans', desc: 'Direct relationships with weavers and craftspeople across India means better quality and fair prices for you.' },
+                { icon: <FiPackage size={20} />, title: 'Packaged with Care', desc: 'Your order is wrapped in tissue, sealed, and packed to arrive in perfect condition — every single time.' },
+                { icon: <FiMessageCircle size={20} />, title: 'Backed by Real Support', desc: 'A real person answers your WhatsApp — not a chatbot. We\'re here for personalised advice, live product videos, and more.' },
               ].map((p) => (
                 <div key={p.title} className="flex gap-4 items-start bg-white/5 rounded-2xl p-4">
-                  <span className="text-2xl flex-shrink-0">{p.icon}</span>
+                  <span className="text-[#c5a55a] flex-shrink-0 mt-0.5">{p.icon}</span>
                   <div>
                     <h3 className="text-white font-semibold text-sm mb-1">{p.title}</h3>
                     <p className="text-white/50 text-xs leading-relaxed">{p.desc}</p>

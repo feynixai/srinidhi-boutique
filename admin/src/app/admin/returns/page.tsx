@@ -87,7 +87,7 @@ export default function ReturnsAdminPage() {
         </div>
       ) : filtered.length === 0 ? (
         <div className="card text-center py-16 text-gray-400">
-          <p className="text-4xl mb-3">🔄</p>
+          <div className="text-[#c5a55a] flex justify-center mb-3"><svg viewBox="0 0 24 24" className="w-10 h-10" fill="none" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></div>
           <p className="text-xl">No return requests{filter !== 'all' ? ` with status "${filter}"` : ''}</p>
         </div>
       ) : (

@@ -79,14 +79,14 @@ export function ExitIntentPopup() {
 
         {submitted ? (
           <div className="text-center py-4">
-            <div className="text-5xl mb-3">🎉</div>
+            <div className="text-green-500 flex justify-center mb-3"><svg viewBox="0 0 24 24" className="w-12 h-12" fill="none" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
             <h3 className="font-serif text-xl text-[#1a1a2e] mb-1">You're all set!</h3>
             <p className="text-sm text-gray-500">Your 10% off coupon is on its way.</p>
           </div>
         ) : (
           <>
             <div className="text-center mb-6">
-              <div className="text-4xl mb-3">🛍️</div>
+              <div className="text-[#c5a55a] flex justify-center mb-3"><svg viewBox="0 0 24 24" className="w-10 h-10" fill="none" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"/></svg></div>
               <h3 className="font-serif text-2xl text-[#1a1a2e] mb-2">Wait! Get 10% off</h3>
               <p className="text-sm text-[#1a1a2e]/60 leading-relaxed">
                 Your first order is on us. Enter your email and we'll send your exclusive discount code.

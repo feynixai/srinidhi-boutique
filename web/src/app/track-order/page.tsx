@@ -1,14 +1,15 @@
 'use client';
 import { useState } from 'react';
 import { FaWhatsapp } from 'react-icons/fa';
+import { FiShoppingBag, FiCheckCircle, FiPackage, FiTruck, FiGift } from 'react-icons/fi';
 import { api } from '@/lib/api';
 
 const STATUS_STEPS = [
-  { key: 'placed', label: 'Order Placed', icon: '🛍️', desc: 'Your order has been placed successfully.' },
-  { key: 'confirmed', label: 'Confirmed', icon: '✅', desc: 'Your order has been confirmed by our team.' },
-  { key: 'packed', label: 'Packed', icon: '📦', desc: 'Your items have been packed and are ready to ship.' },
-  { key: 'shipped', label: 'Shipped', icon: '🚚', desc: 'Your order is on its way!' },
-  { key: 'delivered', label: 'Delivered', icon: '🎉', desc: 'Your order has been delivered. Enjoy!' },
+  { key: 'placed', label: 'Order Placed', icon: <FiShoppingBag size={16} />, desc: 'Your order has been placed successfully.' },
+  { key: 'confirmed', label: 'Confirmed', icon: <FiCheckCircle size={16} />, desc: 'Your order has been confirmed by our team.' },
+  { key: 'packed', label: 'Packed', icon: <FiPackage size={16} />, desc: 'Your items have been packed and are ready to ship.' },
+  { key: 'shipped', label: 'Shipped', icon: <FiTruck size={16} />, desc: 'Your order is on its way!' },
+  { key: 'delivered', label: 'Delivered', icon: <FiGift size={16} />, desc: 'Your order has been delivered. Enjoy!' },
 ];
 
 type Order = {
@@ -147,7 +148,7 @@ export default function TrackOrderPage() {
             {/* Status Timeline */}
             {order.status === 'cancelled' ? (
               <div className="bg-red-50 border border-red-200 p-5 rounded-sm text-center">
-                <p className="text-2xl mb-2">❌</p>
+                <p className="text-red-500 flex justify-center mb-2"><svg viewBox="0 0 24 24" className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={2}><circle cx="12" cy="12" r="10"/><path strokeLinecap="round" d="M15 9l-6 6M9 9l6 6"/></svg></p>
                 <p className="font-medium text-red-700">Order Cancelled</p>
                 <p className="text-red-500 text-sm mt-1">This order has been cancelled. Contact us for more details.</p>
               </div>

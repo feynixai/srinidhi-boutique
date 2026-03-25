@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { FiPackage, FiDollarSign, FiAlertTriangle, FiClock, FiTrendingUp, FiStar, FiCheckCircle } from 'react-icons/fi';
 import { getDashboard, getDashboardWidgets, getLowStockProducts } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
 
@@ -163,7 +164,7 @@ export default function DashboardPage() {
                 <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold">Orders</p>
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" title="Live" />
-                  <span className="text-xl">📦</span>
+                  <FiPackage size={18} className="text-[#c5a55a]" />
                 </div>
               </div>
               <AnimatedNumber value={stats.todayOrders} className="text-4xl font-bold text-[#c5a55a]" />
@@ -176,7 +177,7 @@ export default function DashboardPage() {
             <div className="glass-card p-5 flex flex-col gap-2 border-t-4 border-emerald-500">
               <div className="flex items-center justify-between">
                 <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold">Revenue</p>
-                <span className="text-xl">💰</span>
+                <FiDollarSign size={18} className="text-emerald-500" />
               </div>
               <AnimatedNumber value={Number(stats.todayRevenue)} prefix="&#x20B9;" className="text-2xl font-bold text-emerald-600" />
               <div className="flex items-center justify-between">
@@ -188,7 +189,7 @@ export default function DashboardPage() {
             <div className={`glass-card p-5 flex flex-col gap-2 border-t-4 ${stats.lowStockProducts > 0 ? 'border-red-400' : 'border-gray-200'}`}>
               <div className="flex items-center justify-between">
                 <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold">Low Stock</p>
-                <span className="text-xl">⚠️</span>
+                <FiAlertTriangle size={18} className={stats.lowStockProducts > 0 ? 'text-red-500' : 'text-gray-300'} />
               </div>
               <AnimatedNumber value={stats.lowStockProducts} className={`text-4xl font-bold ${stats.lowStockProducts > 0 ? 'text-red-500' : 'text-gray-400'}`} />
               <p className="text-xs text-gray-400">{stats.lowStockProducts > 0 ? 'Items need restocking' : 'All stocked up'}</p>
@@ -197,7 +198,7 @@ export default function DashboardPage() {
             <div className={`glass-card p-5 flex flex-col gap-2 border-t-4 ${stats.pendingOrders > 0 ? 'border-orange-400' : 'border-gray-200'}`}>
               <div className="flex items-center justify-between">
                 <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold">Pending</p>
-                <span className="text-xl">⏳</span>
+                <FiClock size={18} className={stats.pendingOrders > 0 ? 'text-orange-500' : 'text-gray-300'} />
               </div>
               <AnimatedNumber value={stats.pendingOrders} className={`text-4xl font-bold ${stats.pendingOrders > 0 ? 'text-orange-500' : 'text-gray-400'}`} />
               <p className="text-xs text-gray-400">Orders need action</p>
@@ -224,10 +225,10 @@ export default function DashboardPage() {
         <div className="glass-card p-6 flex flex-col gap-3">
           <h2 className="text-sm font-bold text-[#1a1a2e] mb-1">Quick Actions</h2>
           {[
-            { href: '/admin/orders?status=placed', label: '⏳ View Pending Orders', color: 'bg-orange-500 text-white', badge: stats.pendingOrders > 0 ? stats.pendingOrders : null },
-            { href: '/admin/products?stock=low', label: '⚠️ Low Stock Items', color: stats.lowStockProducts > 0 ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-600', badge: stats.lowStockProducts > 0 ? stats.lowStockProducts : null },
-            { href: '/admin/reports', label: `💰 Today's Revenue`, color: 'bg-emerald-500 text-white', badge: null },
-            { href: '/admin/qa', label: '⭐ New Reviews to Approve', color: 'bg-amber-400 text-[#1a1a2e]', badge: (widgets?.pendingReviewsCount ?? 0) > 0 ? widgets!.pendingReviewsCount : null },
+            { href: '/admin/orders?status=placed', label: 'View Pending Orders', color: 'bg-orange-500 text-white', badge: stats.pendingOrders > 0 ? stats.pendingOrders : null },
+            { href: '/admin/products?stock=low', label: 'Low Stock Items', color: stats.lowStockProducts > 0 ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-600', badge: stats.lowStockProducts > 0 ? stats.lowStockProducts : null },
+            { href: '/admin/reports', label: `Today's Revenue`, color: 'bg-emerald-500 text-white', badge: null },
+            { href: '/admin/qa', label: 'New Reviews to Approve', color: 'bg-amber-400 text-[#1a1a2e]', badge: (widgets?.pendingReviewsCount ?? 0) > 0 ? widgets!.pendingReviewsCount : null },
           ].map((action) => (
             <Link
               key={action.href}
@@ -252,16 +253,16 @@ export default function DashboardPage() {
               href="/admin/returns"
               className="flex items-center justify-between bg-red-50 border border-red-200 text-red-700 rounded-2xl px-4 py-2.5 text-xs font-semibold hover:bg-red-100 transition-all"
             >
-              <span>↩️ Returns pending</span>
+              <span>Returns pending</span>
               <span className="bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px]">{widgets.pendingReturnsCount}</span>
             </Link>
           )}
           <div className="border-t border-black/5 pt-2 space-y-2">
             <p className="text-xs text-gray-400 font-semibold uppercase tracking-widest">Export Data</p>
             {[
-              { label: '⬇ Orders CSV', type: 'orders' },
-              { label: '⬇ Products CSV', type: 'products' },
-              { label: '⬇ Customers CSV', type: 'customers' },
+              { label: 'Orders CSV', type: 'orders' },
+              { label: 'Products CSV', type: 'products' },
+              { label: 'Customers CSV', type: 'customers' },
             ].map((exp) => (
               <a
                 key={exp.type}
@@ -301,7 +302,7 @@ export default function DashboardPage() {
         <div className="glass-card p-0 overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-white/20">
             <div className="flex items-center gap-2">
-              <span className="text-lg">⚠️</span>
+              <FiAlertTriangle size={16} className="text-red-500" />
               <h2 className="text-sm font-bold text-[#1a1a2e]">Low Stock Alerts</h2>
             </div>
             <Link href="/admin/products?stock=low" className="text-[#c5a55a] font-semibold text-xs hover:underline">
@@ -326,7 +327,7 @@ export default function DashboardPage() {
             </ul>
           ) : (
             <div className="px-6 py-8 text-center text-gray-400 text-sm">
-              {lowStockData ? '✅ All products well stocked' : 'Loading...'}
+              {lowStockData ? 'All products well stocked' : 'Loading...'}
             </div>
           )}
         </div>
@@ -335,7 +336,7 @@ export default function DashboardPage() {
         <div className="glass-card p-0 overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-white/20">
             <div className="flex items-center gap-2">
-              <span className="text-lg">🏆</span>
+              <FiTrendingUp size={16} className="text-[#c5a55a]" />
               <h2 className="text-sm font-bold text-[#1a1a2e]">Top Selling Products</h2>
             </div>
             <Link href="/admin/products" className="text-[#c5a55a] font-semibold text-xs hover:underline">

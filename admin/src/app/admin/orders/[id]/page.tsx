@@ -3,25 +3,26 @@ import { use, useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { FaWhatsapp } from 'react-icons/fa';
+import { FiShoppingCart, FiCheckCircle, FiPackage, FiTruck, FiGift, FiXCircle } from 'react-icons/fi';
 import { api, updateOrderStatus } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
 
 const STATUS_TIMELINE_STEPS = ['placed', 'confirmed', 'packed', 'shipped', 'delivered'];
-const STATUS_TIMELINE_META: Record<string, { label: string; icon: string }> = {
-  placed:    { label: 'Order Placed',  icon: '🛒' },
-  confirmed: { label: 'Confirmed',     icon: '✅' },
-  packed:    { label: 'Packed',        icon: '📦' },
-  shipped:   { label: 'Shipped',       icon: '🚚' },
-  delivered: { label: 'Delivered',     icon: '🎉' },
-  cancelled: { label: 'Cancelled',     icon: '❌' },
+const STATUS_TIMELINE_META: Record<string, { label: string; icon: React.ReactNode }> = {
+  placed:    { label: 'Order Placed',  icon: <FiShoppingCart size={14} /> },
+  confirmed: { label: 'Confirmed',     icon: <FiCheckCircle size={14} /> },
+  packed:    { label: 'Packed',        icon: <FiPackage size={14} /> },
+  shipped:   { label: 'Shipped',       icon: <FiTruck size={14} /> },
+  delivered: { label: 'Delivered',     icon: <FiGift size={14} /> },
+  cancelled: { label: 'Cancelled',     icon: <FiXCircle size={14} /> },
 };
 
 const STATUS_FLOW = [
-  { value: 'confirmed', label: '✅ Confirm Order', color: 'bg-purple-500' },
-  { value: 'packed', label: '📦 Mark Packed', color: 'bg-yellow-500' },
-  { value: 'shipped', label: '🚚 Mark Shipped', color: 'bg-orange-500' },
-  { value: 'delivered', label: '🎉 Mark Delivered', color: 'bg-green-500' },
-  { value: 'cancelled', label: '❌ Cancel Order', color: 'bg-red-500' },
+  { value: 'confirmed', label: 'Confirm Order', color: 'bg-purple-500' },
+  { value: 'packed', label: 'Mark Packed', color: 'bg-yellow-500' },
+  { value: 'shipped', label: 'Mark Shipped', color: 'bg-orange-500' },
+  { value: 'delivered', label: 'Mark Delivered', color: 'bg-green-500' },
+  { value: 'cancelled', label: 'Cancel Order', color: 'bg-red-500' },
 ];
 
 export default function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -97,11 +98,11 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   });
 
   const TIMELINE_STEPS = [
-    { value: 'placed', label: 'Placed', icon: '🛍️' },
-    { value: 'confirmed', label: 'Confirmed', icon: '✅' },
-    { value: 'packed', label: 'Packed', icon: '📦' },
-    { value: 'shipped', label: 'Shipped', icon: '🚚' },
-    { value: 'delivered', label: 'Delivered', icon: '🎉' },
+    { value: 'placed', label: 'Placed', icon: <FiShoppingCart size={14} /> },
+    { value: 'confirmed', label: 'Confirmed', icon: <FiCheckCircle size={14} /> },
+    { value: 'packed', label: 'Packed', icon: <FiPackage size={14} /> },
+    { value: 'shipped', label: 'Shipped', icon: <FiTruck size={14} /> },
+    { value: 'delivered', label: 'Delivered', icon: <FiGift size={14} /> },
   ];
 
   if (isLoading) return (
@@ -137,7 +138,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           onClick={printInvoice}
           className="ml-auto flex items-center gap-2 btn-action bg-gray-100 text-gray-700 px-4 py-2 text-sm hover:bg-gray-200"
         >
-          🖨️ Print Invoice
+          Print Invoice
         </button>
       </div>
 
@@ -146,7 +147,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
         <h2 className="text-sm font-bold text-[#1a1a2e] mb-4 uppercase tracking-widest">Order Timeline</h2>
         {isCancelled ? (
           <div className="flex items-center gap-3 py-2">
-            <span className="w-10 h-10 flex items-center justify-center rounded-full bg-red-100 text-lg flex-shrink-0">❌</span>
+            <span className="w-10 h-10 flex items-center justify-center rounded-full bg-red-100 flex-shrink-0"><FiXCircle size={18} className="text-red-500" /></span>
             <div>
               <p className="font-semibold text-red-600">Order Cancelled</p>
               <p className="text-xs text-gray-400">This order has been cancelled</p>
@@ -278,10 +279,10 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           <h2 className="text-lg font-bold mb-3">Customer</h2>
           <p className="text-lg font-semibold">{order.customerName}</p>
           <a href={`tel:${order.customerPhone}`} className="text-rose-gold text-base block mt-1 hover:underline">
-            📞 {order.customerPhone}
+            {order.customerPhone}
           </a>
           {order.customerEmail && (
-            <p className="text-gray-500 text-sm mt-1">✉️ {order.customerEmail}</p>
+            <p className="text-gray-500 text-sm mt-1">{order.customerEmail}</p>
           )}
           <a href={waLink} target="_blank" rel="noopener noreferrer"
             className="mt-3 inline-flex items-center gap-2 text-green-600 font-medium text-sm hover:underline">

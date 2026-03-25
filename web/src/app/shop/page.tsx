@@ -18,7 +18,7 @@ async function ProductGrid({ searchParams }: { searchParams: Record<string, stri
       {data.products.length === 0 ? (
         <div className="col-span-full py-16 flex justify-center">
           <div className="bg-white/60 backdrop-blur-xl border border-white/30 rounded-3xl shadow-card p-12 text-center max-w-sm w-full">
-            <div className="text-5xl mb-4">🔍</div>
+            <div className="text-[#c5a55a] flex justify-center mb-4"><svg viewBox="0 0 24 24" className="w-12 h-12" fill="none" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg></div>
             <h3 className="font-serif text-xl text-[#1a1a2e] mb-2">No products found</h3>
             <p className="text-gray-500 text-sm mb-6">Try adjusting your filters or browse the full collection.</p>
             <a href="/shop" className="btn-primary text-sm px-6 py-2.5 inline-block">Clear Filters</a>

@@ -43,7 +43,7 @@ export default function CustomersPage() {
         </div>
       ) : customers.length === 0 ? (
         <div className="card text-center py-16 text-gray-400">
-          <p className="text-4xl mb-3">👤</p>
+          <div className="text-gray-300 flex justify-center mb-3"><svg viewBox="0 0 24 24" className="w-10 h-10" fill="none" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg></div>
           <p className="text-xl">No customers found</p>
         </div>
       ) : (

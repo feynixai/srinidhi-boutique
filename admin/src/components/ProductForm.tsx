@@ -292,10 +292,10 @@ export function ProductForm({ product }: ProductFormProps) {
         </div>
         <div className="grid grid-cols-2 gap-4">
           {[
-            { key: 'featured', label: '⭐ Featured Product' },
-            { key: 'bestSeller', label: '🏆 Best Seller' },
-            { key: 'onOffer', label: '🏷️ On Offer / Sale' },
-            { key: 'active', label: '✅ Active (visible in store)' },
+            { key: 'featured', label: 'Featured Product' },
+            { key: 'bestSeller', label: 'Best Seller' },
+            { key: 'onOffer', label: 'On Offer / Sale' },
+            { key: 'active', label: 'Active (visible in store)' },
           ].map(({ key, label }) => (
             <label key={key} className="flex items-center gap-3 cursor-pointer">
               <input
@@ -323,7 +323,7 @@ export function ProductForm({ product }: ProductFormProps) {
           disabled={submitting}
           className="flex-1 btn-action bg-rose-gold text-white text-lg disabled:opacity-50"
         >
-          {submitting ? '⏳ Saving...' : isEdit ? '💾 Save Changes' : '➕ Create Product'}
+          {submitting ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Product'}
         </button>
       </div>
     </form>

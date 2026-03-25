@@ -572,7 +572,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
             {/* Delivery estimate */}
             <div className="bg-white/40 backdrop-blur-sm border border-white/30 rounded-2xl px-4 py-3 flex items-center gap-3">
-              <span className="text-xl">🚚</span>
+              <svg viewBox="0 0 24 24" className="w-5 h-5 text-[#c5a55a] flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
               <div>
                 <p className="text-sm text-[#1a1a2e] font-medium">
                   Order within <span className="text-[#c5a55a] font-semibold">{hoursLeft}h</span> for delivery by <span className="font-semibold">{deliveryStr}</span>
@@ -589,12 +589,12 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             {/* Delivery & Return Mini-cards */}
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-white/50 backdrop-blur-sm border border-white/40 rounded-2xl p-3 text-center">
-                <p className="text-xl mb-1">🚚</p>
+                <div className="flex justify-center mb-1"><svg viewBox="0 0 24 24" className="w-5 h-5 text-[#c5a55a]" fill="none" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg></div>
                 <p className="text-xs font-semibold text-[#1a1a2e]">Fast Delivery</p>
                 <p className="text-[11px] text-[#1a1a2e]/50 mt-0.5">Usually 3–5 business days</p>
               </div>
               <div className="bg-white/50 backdrop-blur-sm border border-white/40 rounded-2xl p-3 text-center">
-                <p className="text-xl mb-1">↩️</p>
+                <div className="flex justify-center mb-1"><svg viewBox="0 0 24 24" className="w-5 h-5 text-[#c5a55a]" fill="none" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg></div>
                 <p className="text-xs font-semibold text-[#1a1a2e]">Easy Returns</p>
                 <p className="text-[11px] text-[#1a1a2e]/50 mt-0.5">7-day return policy</p>
               </div>
@@ -621,7 +621,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               const fmt = (d: Date) => d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
               return (
                 <div className="flex items-center gap-2 text-xs text-[#1a1a2e]/60 bg-blue-50/80 border border-blue-100 rounded-xl px-3 py-2.5">
-                  <span>🚚</span>
+                  <svg viewBox="0 0 24 24" className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
                   <span>Estimated delivery: <strong className="text-[#1a1a2e]/80">{fmt(start)} – {fmt(end)}</strong></span>
                 </div>
               );
@@ -717,15 +717,9 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                   {product.fabric && <p><strong className="text-[#1a1a2e]/80">Fabric:</strong> {product.fabric}</p>}
                   {product.occasion.length > 0 && <p><strong className="text-[#1a1a2e]/80">Occasion:</strong> {product.occasion.map((o) => o.charAt(0).toUpperCase() + o.slice(1)).join(', ')}</p>}
                   <div className="flex flex-wrap gap-2 pt-1">
-                    {[
-                      { icon: '🧺', label: 'Dry Clean' },
-                      { icon: '🌡️', label: 'Cool Iron' },
-                      { icon: '🚫', label: 'No Bleach' },
-                      { icon: '💧', label: 'Hand Wash' },
-                    ].map((care) => (
-                      <div key={care.label} className="flex items-center gap-1.5 bg-white/60 rounded-full px-3 py-1.5 border border-white/40 text-xs text-[#1a1a2e]/70">
-                        <span>{care.icon}</span>
-                        <span>{care.label}</span>
+                    {['Dry Clean', 'Cool Iron', 'No Bleach', 'Hand Wash'].map((label) => (
+                      <div key={label} className="flex items-center gap-1.5 bg-white/60 rounded-full px-3 py-1.5 border border-white/40 text-xs text-[#1a1a2e]/70">
+                        <span>{label}</span>
                       </div>
                     ))}
                   </div>

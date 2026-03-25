@@ -73,10 +73,10 @@ export function Footer() {
                 <li><Link href="/contact" className="hover:text-[#c5a55a] transition-colors">Contact</Link></li>
               </ul>
               <div className="mt-4 text-sm text-[#6b7280]">
-                <p>📍 Hyderabad, Telangana</p>
+                <p>Hyderabad, Telangana</p>
                 <a href={waLink} target="_blank" rel="noopener noreferrer"
                   className="text-green-600 hover:text-green-500 transition-colors">
-                  💬 {whatsappNumber}
+                  {whatsappNumber}
                 </a>
               </div>
             </div>

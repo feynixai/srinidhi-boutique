@@ -120,7 +120,7 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
           {(product as Product & { trending?: boolean }).trending && !product.bestSeller && !isSale && !isNew && (
             <span className="bg-orange-500/90 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full font-semibold shadow-sm flex items-center gap-1">
-              🔥 {t.trending}
+              {t.trending}
             </span>
           )}
         </div>
@@ -220,7 +220,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <p className="text-xs text-gray-400 mb-0.5 uppercase tracking-wider">
           {product.category?.name || product.occasion[0]}
         </p>
-        <h3 className="text-sm font-medium text-[#1a1a1a] line-clamp-2 leading-snug mb-2">{product.name}</h3>
+        <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug mb-2">{product.name}</h3>
         <div className="flex items-center gap-2 flex-wrap">
           <span className="bg-blue-600 text-white text-sm font-bold px-3 py-1 rounded-full">
             &#x20B9;{displayPrice.toLocaleString('en-IN')}

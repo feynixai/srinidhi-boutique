@@ -190,7 +190,7 @@ export default function OrdersPage() {
                   className="flex-shrink-0 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg px-3 py-2 text-xs font-semibold hover:bg-blue-100 transition-colors disabled:opacity-50 whitespace-nowrap"
                   title="Mark as Shipped"
                 >
-                  🚚 Ship
+                  Ship
                 </button>
               )}
             </div>

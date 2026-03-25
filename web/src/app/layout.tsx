@@ -78,7 +78,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-title" content="Srinidhi" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
       </head>
-      <body className="min-h-screen flex flex-col bg-[#f5f5f0] pb-16 md:pb-0">
+      <body className="min-h-screen flex flex-col bg-[#f5f5f0] pb-20 md:pb-0">
         <Providers>
           {/* Skip to main content - accessibility */}
           <a

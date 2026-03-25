@@ -381,46 +381,49 @@ export default async function HomePage() {
       </section>
 
       {/* Our Promise / Quality Statement */}
-      <section className="bg-[#1a1a2e] py-16 px-4">
+      <section className="bg-[#1a1a2e] py-10 sm:py-16 px-4">
         <div className="max-w-5xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
+          {/* Mobile: centered text block, Desktop: 2-col grid */}
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+            <div className="text-center md:text-left">
               <p className="text-[#c5a55a] uppercase tracking-[0.2em] text-xs font-semibold mb-3">Authenticity Guaranteed</p>
-              <h2 className="font-serif text-3xl md:text-4xl text-white mb-5 leading-snug">
+              <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl text-white mb-4 leading-snug">
                 Our Promise of Quality &amp; Authenticity
               </h2>
-              <div className="w-12 h-px bg-[#c5a55a] mb-6" />
-              <p className="text-white/80 text-sm leading-relaxed mb-5">
+              <div className="w-12 h-px bg-[#c5a55a] mb-5 mx-auto md:mx-0" />
+              <p className="text-white/80 text-sm leading-relaxed mb-4">
                 Every product at Srinidhi Boutique is personally inspected by our founder before it reaches you. We source directly from weavers in Kanchipuram, artisans in Lucknow, craftsmen in Jaipur, and textile hubs across India.
               </p>
-              <p className="text-white/80 text-sm leading-relaxed mb-6">
-                We never sell mass-produced replicas or compromise on fabric quality. What you see is exactly what you get - and if it's not perfect, our 7-day return policy means you're always protected.
+              <p className="text-white/80 text-sm leading-relaxed mb-6 hidden sm:block">
+                We never sell mass-produced replicas or compromise on fabric quality. What you see is exactly what you get - and if it&apos;s not perfect, our 7-day return policy means you&apos;re always protected.
               </p>
-              <div className="grid grid-cols-3 gap-4 text-center">
+              {/* Stats row */}
+              <div className="grid grid-cols-3 gap-3 text-center">
                 {[
                   { num: '500+', label: 'Happy Customers' },
                   { num: '100+', label: 'Products' },
                   { num: '5+', label: 'Years' },
                 ].map((s) => (
-                  <div key={s.label} className="bg-white/10 rounded-2xl p-4">
-                    <p className="font-serif text-2xl text-[#c5a55a] mb-1">{s.num}</p>
-                    <p className="text-white/50 text-xs">{s.label}</p>
+                  <div key={s.label} className="bg-white/10 rounded-2xl py-3 px-2 sm:p-4">
+                    <p className="font-serif text-xl sm:text-2xl text-[#c5a55a] mb-0.5">{s.num}</p>
+                    <p className="text-white/50 text-[10px] sm:text-xs leading-tight">{s.label}</p>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="space-y-4">
+            {/* Feature cards — 2-col grid on mobile, single col on desktop */}
+            <div className="grid grid-cols-2 md:grid-cols-1 gap-3 sm:gap-4">
               {[
-                { icon: <FiHeart size={20} />, title: 'Handpicked by Srinidhi', desc: 'Every product is personally chosen by our founder - nothing reaches the shelf unless she truly loves it.' },
-                { icon: <FiFlag size={20} />, title: 'Sourced from the Best Artisans', desc: 'Direct relationships with weavers and craftspeople across India means better quality and fair prices for you.' },
-                { icon: <FiPackage size={20} />, title: 'Packaged with Care', desc: 'Your order is wrapped in tissue, sealed, and packed to arrive in perfect condition - every single time.' },
-                { icon: <FiMessageCircle size={20} />, title: 'Backed by Real Support', desc: 'A real person answers your WhatsApp - not a chatbot. We\'re here for personalised advice, live product videos, and more.' },
+                { icon: <FiHeart size={18} />, title: 'Handpicked by Srinidhi', desc: 'Personally chosen by our founder — nothing reaches the shelf unless she truly loves it.' },
+                { icon: <FiFlag size={18} />, title: 'Best Artisans', desc: 'Direct relationships with weavers across India — better quality, fair prices.' },
+                { icon: <FiPackage size={18} />, title: 'Packaged with Care', desc: 'Wrapped in tissue, sealed, packed to arrive in perfect condition.' },
+                { icon: <FiMessageCircle size={18} />, title: 'Real Support', desc: 'A real person on WhatsApp — not a chatbot. Always available.' },
               ].map((p) => (
-                <div key={p.title} className="flex gap-4 items-start bg-white/5 rounded-2xl p-4">
-                  <span className="text-[#c5a55a] flex-shrink-0 mt-0.5">{p.icon}</span>
+                <div key={p.title} className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-center sm:items-start bg-white/5 rounded-2xl p-3 sm:p-4 text-center sm:text-left">
+                  <span className="text-[#c5a55a] flex-shrink-0">{p.icon}</span>
                   <div>
-                    <h3 className="text-white font-semibold text-sm mb-1">{p.title}</h3>
-                    <p className="text-white/50 text-xs leading-relaxed">{p.desc}</p>
+                    <h3 className="text-white font-semibold text-xs sm:text-sm mb-0.5">{p.title}</h3>
+                    <p className="text-white/50 text-[10px] sm:text-xs leading-relaxed">{p.desc}</p>
                   </div>
                 </div>
               ))}

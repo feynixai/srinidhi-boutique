@@ -109,9 +109,9 @@ export default function CartPage() {
   const hasLehenga = cartCategories.some((c) => c.includes('lehenga') || c.includes('ghagra'));
   const hasHeavyEthnic = hasSaree || hasLehenga;
   const suggestLabel = hasSaree
-    ? 'Complete Your Look — Blouses'
+    ? 'Complete Your Look - Blouses'
     : hasHeavyEthnic
-    ? 'Complete Your Look — Accessories'
+    ? 'Complete Your Look - Accessories'
     : 'You Might Also Like';
 
   const recommendedProducts = (recommendedData?.products || [])
@@ -402,7 +402,7 @@ export default function CartPage() {
           {hasHeavyEthnic && (
             <p className="text-sm text-[#1a1a2e]/50 mb-2">
               {hasSaree
-                ? 'A perfect blouse makes all the difference — here are some that pair beautifully.'
+                ? 'A perfect blouse makes all the difference - here are some that pair beautifully.'
                 : 'Accessories that pair beautifully with your selection.'}
             </p>
           )}

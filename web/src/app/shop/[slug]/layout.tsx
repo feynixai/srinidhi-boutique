@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const { slug } = await params;
     const res = await fetch(`${API_URL}/api/products/${slug}`, { next: { revalidate: 3600 } });
-    if (!res.ok) return { title: 'Product — Srinidhi Boutique' };
+    if (!res.ok) return { title: 'Product - Srinidhi Boutique' };
 
     const product = await res.json();
     const price = Number(product.price).toLocaleString('en-IN');
@@ -21,10 +21,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       : `Shop ${product.name} at ₹${price}. Premium Indian ethnic wear from Srinidhi Boutique, Hyderabad.`;
 
     return {
-      title: `${product.name} — ₹${price} | Srinidhi Boutique`,
+      title: `${product.name} - ₹${price} | Srinidhi Boutique`,
       description,
       openGraph: {
-        title: `${product.name} — ₹${price}`,
+        title: `${product.name} - ₹${price}`,
         description,
         images: image ? [{ url: image, width: 800, height: 1000, alt: product.name }] : [],
         type: 'website',
@@ -32,13 +32,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
       twitter: {
         card: 'summary_large_image',
-        title: `${product.name} — ₹${price}`,
+        title: `${product.name} - ₹${price}`,
         description,
         images: image ? [image] : [],
       },
     };
   } catch {
-    return { title: 'Product — Srinidhi Boutique' };
+    return { title: 'Product - Srinidhi Boutique' };
   }
 }
 

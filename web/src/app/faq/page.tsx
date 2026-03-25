@@ -11,7 +11,7 @@ const FAQS = [
     items: [
       {
         q: 'How do I place an order?',
-        a: 'Browse our collections, select your size and colour, and add to cart. Proceed to checkout and choose your payment method — we accept UPI, cards, net banking via Razorpay, and Cash on Delivery.',
+        a: 'Browse our collections, select your size and colour, and add to cart. Proceed to checkout and choose your payment method - we accept UPI, cards, net banking via Razorpay, and Cash on Delivery.',
       },
       {
         q: 'Is Cash on Delivery available?',
@@ -74,7 +74,7 @@ const FAQS = [
     items: [
       {
         q: 'How do I find my size?',
-        a: 'Each product page has a detailed size chart. We recommend measuring your bust, waist, and hip in inches and comparing with the chart. When in doubt, size up — or WhatsApp us for personalised sizing help.',
+        a: 'Each product page has a detailed size chart. We recommend measuring your bust, waist, and hip in inches and comparing with the chart. When in doubt, size up - or WhatsApp us for personalised sizing help.',
       },
       {
         q: 'Are the colours accurate in photos?',
@@ -91,7 +91,7 @@ const FAQS = [
     items: [
       {
         q: 'Do I need an account to shop?',
-        a: 'No — guest checkout is available! However, creating an account helps you track orders, save addresses, earn loyalty points, and get personalised recommendations.',
+        a: 'No - guest checkout is available! However, creating an account helps you track orders, save addresses, earn loyalty points, and get personalised recommendations.',
       },
       {
         q: 'How does the loyalty programme work?',
@@ -108,7 +108,7 @@ const FAQS = [
     items: [
       {
         q: 'How should I wash silk sarees?',
-        a: 'Silk sarees should be dry cleaned or hand washed in cold water using a mild silk-friendly detergent. Never wring or machine wash. Dry flat in shade — never in direct sunlight which can fade the colour. Store wrapped in a soft muslin cloth.',
+        a: 'Silk sarees should be dry cleaned or hand washed in cold water using a mild silk-friendly detergent. Never wring or machine wash. Dry flat in shade - never in direct sunlight which can fade the colour. Store wrapped in a soft muslin cloth.',
       },
       {
         q: 'How do I care for embroidered or zari work garments?',
@@ -116,15 +116,15 @@ const FAQS = [
       },
       {
         q: 'Can cotton kurtis and suits be machine washed?',
-        a: 'Yes — most cotton kurtis can be machine washed in gentle/delicate mode with cold water. Wash dark colours separately for the first two washes. Avoid tumble drying; instead, dry flat or hang in shade to prevent shrinkage and colour fading.',
+        a: 'Yes - most cotton kurtis can be machine washed in gentle/delicate mode with cold water. Wash dark colours separately for the first two washes. Avoid tumble drying; instead, dry flat or hang in shade to prevent shrinkage and colour fading.',
       },
       {
         q: 'How do I prevent colours from fading?',
-        a: 'Always wash in cold water — hot water causes colour bleed and fading. Turn garments inside out before washing. Use colour-safe or mild detergents. For printed fabrics, add 1 tablespoon of salt or white vinegar to the first wash to set the colour.',
+        a: 'Always wash in cold water - hot water causes colour bleed and fading. Turn garments inside out before washing. Use colour-safe or mild detergents. For printed fabrics, add 1 tablespoon of salt or white vinegar to the first wash to set the colour.',
       },
       {
         q: 'What is the difference between georgette, chiffon, and organza?',
-        a: 'Georgette is slightly heavier with a grainy texture — drapes beautifully and is easy to wear. Chiffon is lighter and more sheer — flowy and elegant for evenings. Organza is crisp and semi-transparent — holds its shape well, great for structured drapes and lehenga skirts. All three are best dry cleaned or gently hand washed.',
+        a: 'Georgette is slightly heavier with a grainy texture - drapes beautifully and is easy to wear. Chiffon is lighter and more sheer - flowy and elegant for evenings. Organza is crisp and semi-transparent - holds its shape well, great for structured drapes and lehenga skirts. All three are best dry cleaned or gently hand washed.',
       },
     ],
   },

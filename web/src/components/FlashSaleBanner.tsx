@@ -42,7 +42,7 @@ export default function FlashSaleBanner({ sale }: { sale: FlashSale }) {
           <span className="text-xs font-bold uppercase tracking-[0.15em] bg-white/20 px-2.5 py-1 rounded-full">
             FLASH SALE
           </span>
-          <span className="text-sm font-semibold">{sale.title} — {sale.discountPercent}% OFF</span>
+          <span className="text-sm font-semibold">{sale.title} - {sale.discountPercent}% OFF</span>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1 text-sm font-mono">

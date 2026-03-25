@@ -40,7 +40,7 @@ export default async function HomePage() {
       {/* Dynamic Flash Sale Countdown Banner */}
       {activeSale && <FlashSaleBanner sale={activeSale} />}
 
-      {/* Announcement Bar — scrolling marquee */}
+      {/* Announcement Bar - scrolling marquee */}
       <div className="bg-[#1a1a2e] text-[#c5a55a] py-2.5 overflow-hidden whitespace-nowrap">
         <div className="animate-marquee inline-block text-xs tracking-[0.15em] uppercase font-medium">
           Free Shipping Above &#x20B9;999 &nbsp;&middot;&nbsp; New Festival Collection Live &nbsp;&middot;&nbsp; Easy 7-Day Returns &nbsp;&middot;&nbsp; Use Code WELCOME10 for 10% Off &nbsp;&middot;&nbsp; Curated in Hyderabad &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -76,7 +76,7 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* Trust Badges — Glass Pills */}
+      {/* Trust Badges - Glass Pills */}
       <div className="bg-white/30 backdrop-blur-sm border-b border-white/20 py-5">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-wrap justify-center gap-3">
@@ -215,7 +215,7 @@ export default async function HomePage() {
             </h2>
             <div className="divider-gold mx-auto" />
             <p className="text-white/80 mt-4 mb-8 text-base leading-relaxed">
-              Navratri · Diwali · Weddings · Sangeet — dress for every celebration.
+              Navratri · Diwali · Weddings · Sangeet - dress for every celebration.
             </p>
             <Link
               href="/shop"
@@ -350,19 +350,19 @@ export default async function HomePage() {
                 icon: <FiRefreshCw size={28} />,
                 title: 'Easy 7-Day Returns',
                 subtitle: 'Hassle-Free',
-                desc: 'Changed your mind? No problem. Return any unworn item within 7 days for a full refund or exchange — no questions asked.',
+                desc: 'Changed your mind? No problem. Return any unworn item within 7 days for a full refund or exchange - no questions asked.',
               },
               {
                 icon: <FiCreditCard size={28} />,
                 title: 'Secure Payments',
                 subtitle: 'UPI · Cards · COD',
-                desc: 'Pay via UPI, credit/debit cards, net banking, or Cash on Delivery. All transactions secured by Razorpay — PCI-DSS certified.',
+                desc: 'Pay via UPI, credit/debit cards, net banking, or Cash on Delivery. All transactions secured by Razorpay - PCI-DSS certified.',
               },
               {
                 icon: <FiPhone size={28} />,
                 title: '24/7 WhatsApp Support',
                 subtitle: 'Always Available',
-                desc: 'Our team is always a WhatsApp message away — whether you need sizing help, want a live product video, or have a question about your order.',
+                desc: 'Our team is always a WhatsApp message away - whether you need sizing help, want a live product video, or have a question about your order.',
               },
             ].map((b) => (
               <div
@@ -394,7 +394,7 @@ export default async function HomePage() {
                 Every product at Srinidhi Boutique is personally inspected by our founder before it reaches you. We source directly from weavers in Kanchipuram, artisans in Lucknow, craftsmen in Jaipur, and textile hubs across India.
               </p>
               <p className="text-white/80 text-sm leading-relaxed mb-6">
-                We never sell mass-produced replicas or compromise on fabric quality. What you see is exactly what you get — and if it's not perfect, our 7-day return policy means you're always protected.
+                We never sell mass-produced replicas or compromise on fabric quality. What you see is exactly what you get - and if it's not perfect, our 7-day return policy means you're always protected.
               </p>
               <div className="grid grid-cols-3 gap-4 text-center">
                 {[
@@ -411,10 +411,10 @@ export default async function HomePage() {
             </div>
             <div className="space-y-4">
               {[
-                { icon: <FiHeart size={20} />, title: 'Handpicked by Srinidhi', desc: 'Every product is personally chosen by our founder — nothing reaches the shelf unless she truly loves it.' },
+                { icon: <FiHeart size={20} />, title: 'Handpicked by Srinidhi', desc: 'Every product is personally chosen by our founder - nothing reaches the shelf unless she truly loves it.' },
                 { icon: <FiFlag size={20} />, title: 'Sourced from the Best Artisans', desc: 'Direct relationships with weavers and craftspeople across India means better quality and fair prices for you.' },
-                { icon: <FiPackage size={20} />, title: 'Packaged with Care', desc: 'Your order is wrapped in tissue, sealed, and packed to arrive in perfect condition — every single time.' },
-                { icon: <FiMessageCircle size={20} />, title: 'Backed by Real Support', desc: 'A real person answers your WhatsApp — not a chatbot. We\'re here for personalised advice, live product videos, and more.' },
+                { icon: <FiPackage size={20} />, title: 'Packaged with Care', desc: 'Your order is wrapped in tissue, sealed, and packed to arrive in perfect condition - every single time.' },
+                { icon: <FiMessageCircle size={20} />, title: 'Backed by Real Support', desc: 'A real person answers your WhatsApp - not a chatbot. We\'re here for personalised advice, live product videos, and more.' },
               ].map((p) => (
                 <div key={p.title} className="flex gap-4 items-start bg-white/5 rounded-2xl p-4">
                   <span className="text-[#c5a55a] flex-shrink-0 mt-0.5">{p.icon}</span>
@@ -449,14 +449,14 @@ export default async function HomePage() {
               {
                 name: 'Anjali Sharma',
                 location: 'Bangalore',
-                product: 'Bridal Lehenga — Scarlet Red',
-                text: 'Ordered the bridal lehenga for my sister\'s wedding — the quality far exceeded our expectations. The embroidery is gorgeous, the blouse fitting was perfect, and the packaging was beautiful. Highly recommend!',
+                product: 'Bridal Lehenga - Scarlet Red',
+                text: 'Ordered the bridal lehenga for my sister\'s wedding - the quality far exceeded our expectations. The embroidery is gorgeous, the blouse fitting was perfect, and the packaging was beautiful. Highly recommend!',
                 rating: 5,
               },
               {
                 name: 'Meera Nair',
                 location: 'Chennai',
-                product: 'Organza Saree — Dusty Rose',
+                product: 'Organza Saree - Dusty Rose',
                 text: 'Best place to shop for ethnic wear online. The saree colours in person are even better than the photos. The organza quality is premium. Easy returns policy is a big bonus.',
                 rating: 5,
               },
@@ -464,14 +464,14 @@ export default async function HomePage() {
                 name: 'Deepika Venkat',
                 location: 'Hyderabad',
                 product: 'Lucknowi Chikankari Kurti',
-                text: 'The Chikankari kurti is absolutely divine. The embroidery is so delicate and intricate — I kept getting compliments at the office all day. The cotton is super soft and breathable. Love it!',
+                text: 'The Chikankari kurti is absolutely divine. The embroidery is so delicate and intricate - I kept getting compliments at the office all day. The cotton is super soft and breathable. Love it!',
                 rating: 5,
               },
               {
                 name: 'Sunita Agarwal',
                 location: 'Pune',
                 product: 'Kurta Set with Dupatta',
-                text: 'Ordered the mustard yellow kurta set for Diwali and it arrived in 5 days — perfectly in time! The three pieces fit together so beautifully. Got so many compliments. Will be back for sure.',
+                text: 'Ordered the mustard yellow kurta set for Diwali and it arrived in 5 days - perfectly in time! The three pieces fit together so beautifully. Got so many compliments. Will be back for sure.',
                 rating: 5,
               },
               {
@@ -505,7 +505,7 @@ export default async function HomePage() {
               {
                 name: 'Pooja Iyer',
                 location: 'Hyderabad',
-                product: 'Mirror Work Kurti — Teal',
+                product: 'Mirror Work Kurti - Teal',
                 text: 'The mirror work kurti is everything! Wore it to Navratri Garba and it literally sparkled on the dance floor. The cotton fabric kept me cool all evening. Fast delivery and lovely packaging too!',
                 rating: 5,
               },

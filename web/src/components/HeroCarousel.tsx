@@ -20,7 +20,7 @@ const slides = [
     tag: 'Exclusive · New Arrivals',
     title: 'Fresh',
     titleHighlight: 'Arrivals',
-    subtitle: 'Discover the latest additions — pure silk sarees, printed kurtis, and bridal lehengas.',
+    subtitle: 'Discover the latest additions - pure silk sarees, printed kurtis, and bridal lehengas.',
     cta: { label: 'SHOP NEW IN', href: '/shop?sort=newest' },
     ctaSecondary: { label: 'SAREES', href: '/category/sarees' },
     image: 'https://picsum.photos/seed/new-arrivals/1600/1000',

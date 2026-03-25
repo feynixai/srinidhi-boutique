@@ -4,8 +4,8 @@ import Image from 'next/image';
 const POSTS = [
   {
     slug: 'how-to-drape-a-saree',
-    title: 'How to Drape a Saree — 5 Elegant Styles',
-    excerpt: 'From the classic Nivi drape worn across South India to the regal Gujarati style — learn five beautiful ways to drape your saree for any occasion.',
+    title: 'How to Drape a Saree - 5 Elegant Styles',
+    excerpt: 'From the classic Nivi drape worn across South India to the regal Gujarati style - learn five beautiful ways to drape your saree for any occasion.',
     image: 'https://picsum.photos/seed/saree-drape/800/500',
     category: 'Style Guide',
     date: 'March 20, 2026',
@@ -14,7 +14,7 @@ const POSTS = [
   {
     slug: 'top-10-kurti-styles',
     title: 'Top 10 Kurti Styles for Every Occasion',
-    excerpt: 'Straight-fit to A-line, chikankari to mirror work — discover the 10 kurti styles every Indian woman needs in her wardrobe and how to style each one.',
+    excerpt: 'Straight-fit to A-line, chikankari to mirror work - discover the 10 kurti styles every Indian woman needs in her wardrobe and how to style each one.',
     image: 'https://picsum.photos/seed/kurti-style/800/500',
     category: 'Style Guide',
     date: 'March 15, 2026',
@@ -23,7 +23,7 @@ const POSTS = [
   {
     slug: 'wedding-season-outfit-guide',
     title: 'Wedding Season: Complete Outfit Guide',
-    excerpt: 'From the mehendi morning to the reception night — a complete outfit guide so you always look stunning at every wedding function, whatever your role.',
+    excerpt: 'From the mehendi morning to the reception night - a complete outfit guide so you always look stunning at every wedding function, whatever your role.',
     image: 'https://picsum.photos/seed/wedding-outfit/800/500',
     category: 'Lookbook',
     date: 'March 10, 2026',
@@ -50,7 +50,7 @@ const POSTS = [
   {
     slug: 'accessorize-with-indian-wear',
     title: 'Accessorize Right: Jewelry Guide for Indian Wear',
-    excerpt: 'The right jewelry transforms an outfit. From temple gold for silk sarees to oxidised silver for printed kurtis — the complete guide to accessorizing Indian wear.',
+    excerpt: 'The right jewelry transforms an outfit. From temple gold for silk sarees to oxidised silver for printed kurtis - the complete guide to accessorizing Indian wear.',
     image: 'https://picsum.photos/seed/jewel-guide/800/500',
     category: 'Style Guide',
     date: 'February 20, 2026',

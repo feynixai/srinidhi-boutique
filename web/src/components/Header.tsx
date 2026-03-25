@@ -289,7 +289,7 @@ export function Header() {
           </div>
         </div>
 
-        {/* Mobile Nav Drawer — glass panel */}
+        {/* Mobile Nav Drawer - glass panel */}
         {mobileOpen && (
           <div className="md:hidden bg-white/90 backdrop-blur-xl border-t border-white/30">
             <div className="max-w-7xl mx-auto px-4 py-2">

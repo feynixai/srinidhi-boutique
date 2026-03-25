@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy | Srinidhi Boutique',
-  description: 'Privacy policy for Srinidhi Boutique — how we collect, use and protect your personal information.',
+  description: 'Privacy policy for Srinidhi Boutique - how we collect, use and protect your personal information.',
 };
 
 export default function PrivacyPage() {
@@ -22,7 +22,7 @@ export default function PrivacyPage() {
           <ul className="list-disc pl-5 mt-2 space-y-1">
             <li>Name, phone number, and email address</li>
             <li>Delivery address and billing information</li>
-            <li>Payment details (processed securely by Razorpay — we never store card numbers)</li>
+            <li>Payment details (processed securely by Razorpay - we never store card numbers)</li>
             <li>Order history and preferences</li>
             <li>Communications sent via WhatsApp, email, or our chat</li>
           </ul>
@@ -95,7 +95,7 @@ export default function PrivacyPage() {
           <ul className="list-none mt-2 space-y-1">
             <li>Email: privacy@srinidhiboutique.com</li>
             <li>WhatsApp: +91-9876543210</li>
-            <li>Address: Srinidhi Boutique, Banjara Hills, Hyderabad — 500034, Telangana, India</li>
+            <li>Address: Srinidhi Boutique, Banjara Hills, Hyderabad - 500034, Telangana, India</li>
           </ul>
         </section>
       </div>

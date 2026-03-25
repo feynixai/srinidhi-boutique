@@ -85,7 +85,7 @@ export function ProductCard({ product }: ProductCardProps) {
             {product.images[1] && (
               <Image
                 src={product.images[1]}
-                alt={`${product.name} — alternate view`}
+                alt={`${product.name} - alternate view`}
                 fill
                 loading="lazy"
                 placeholder="blur"

@@ -20,7 +20,7 @@ export function Footer() {
               </h3>
               <p className="text-[#6b7280] text-sm leading-relaxed max-w-xs">
                 Premium women&apos;s fashion from the heart of Hyderabad. Discover handpicked
-                sarees, kurtis, lehengas and more — crafted for the modern Indian woman.
+                sarees, kurtis, lehengas and more - crafted for the modern Indian woman.
               </p>
               <div className="flex items-center space-x-3 mt-4">
                 <a href={waLink} target="_blank" rel="noopener noreferrer"

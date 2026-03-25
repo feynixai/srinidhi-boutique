@@ -268,7 +268,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,
-    description: product.description || `${product.name} — Premium Indian ethnic wear from Srinidhi Boutique`,
+    description: product.description || `${product.name} - Premium Indian ethnic wear from Srinidhi Boutique`,
     image: product.images,
     sku: product.id,
     brand: { '@type': 'Brand', name: 'Srinidhi Boutique' },
@@ -346,7 +346,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      {/* Breadcrumb — glass pill */}
+      {/* Breadcrumb - glass pill */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
         <nav className="inline-flex items-center gap-1.5 bg-white/60 backdrop-blur-xl border border-white/40 px-4 py-2 rounded-full text-xs shadow-sm">
           <Link href="/" className="text-[#1a1a2e]/50 hover:text-[#c5a55a] transition-colors">Home</Link>
@@ -444,7 +444,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             </div>
           </div>
 
-          {/* Product Info — glass card */}
+          {/* Product Info - glass card */}
           <div className="space-y-5 bg-white/50 backdrop-blur-sm border border-white/40 rounded-3xl p-6 shadow-soft">
             {product.category && (
               <p className="text-xs text-[#c5a55a] uppercase tracking-[0.2em] font-semibold">{product.category.name}</p>
@@ -472,11 +472,11 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
             {product.stock <= 5 && product.stock > 0 && (
               <p className="text-orange-500 text-sm font-medium bg-orange-50 px-3 py-1.5 rounded-full inline-block">
-                Only {product.stock} left — order soon!
+                Only {product.stock} left - order soon!
               </p>
             )}
 
-            {/* Colors — pill chips */}
+            {/* Colors - pill chips */}
             {product.colors.length > 0 && (
               <div>
                 <p className="text-xs uppercase tracking-[0.15em] font-semibold text-[#1a1a2e]/60 mb-3">
@@ -500,7 +500,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               </div>
             )}
 
-            {/* Sizes — pill chips */}
+            {/* Sizes - pill chips */}
             {product.sizes.length > 0 && (
               <div>
                 <div className="flex items-center justify-between mb-3">
@@ -565,9 +565,9 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
             {/* Trust section */}
             <div className="bg-white/40 backdrop-blur-sm border border-white/30 rounded-2xl p-4 space-y-2">
-              <p className="flex items-center gap-2 text-sm text-[#1a1a2e]/80"><span className="text-green-500 font-bold text-base">✓</span> Authentic Products — Curated in Hyderabad</p>
+              <p className="flex items-center gap-2 text-sm text-[#1a1a2e]/80"><span className="text-green-500 font-bold text-base">✓</span> Authentic Products - Curated in Hyderabad</p>
               <p className="flex items-center gap-2 text-sm text-[#1a1a2e]/80"><span className="text-green-500 font-bold text-base">✓</span> Free Returns within 7 days of delivery</p>
-              <p className="flex items-center gap-2 text-sm text-[#1a1a2e]/80"><span className="text-green-500 font-bold text-base">✓</span> Secure Checkout — UPI, Cards & COD</p>
+              <p className="flex items-center gap-2 text-sm text-[#1a1a2e]/80"><span className="text-green-500 font-bold text-base">✓</span> Secure Checkout - UPI, Cards & COD</p>
             </div>
 
             {/* Delivery estimate */}
@@ -606,11 +606,11 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             {/* EMI Calculator */}
             <EMICalculator price={Number(product.price)} />
 
-            {/* Trust Badges — glass list */}
+            {/* Trust Badges - glass list */}
             <div className="bg-white/40 rounded-2xl p-4 space-y-1.5 text-sm">
               <p className="flex items-center gap-2 text-[#1a1a2e]/70"><span className="text-green-500 font-bold">✓</span> Free shipping on orders above ₹999</p>
               <p className="flex items-center gap-2 text-[#1a1a2e]/70"><span className="text-green-500 font-bold">✓</span> Easy 7-day returns & exchanges</p>
-              <p className="flex items-center gap-2 text-[#1a1a2e]/70"><span className="text-green-500 font-bold">✓</span> Secure payment — UPI, Cards & COD</p>
+              <p className="flex items-center gap-2 text-[#1a1a2e]/70"><span className="text-green-500 font-bold">✓</span> Secure payment - UPI, Cards & COD</p>
               <p className="flex items-center gap-2 text-[#1a1a2e]/70"><span className="text-green-500 font-bold">✓</span> Genuine products, curated in Hyderabad</p>
             </div>
 
@@ -662,7 +662,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                 Facebook
               </a>
               <a
-                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${product.name} — ₹${displayPrice.toLocaleString('en-IN')}`)}&url=${encodeURIComponent(productUrl)}`}
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${product.name} - ₹${displayPrice.toLocaleString('en-IN')}`)}&url=${encodeURIComponent(productUrl)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 bg-sky-50 text-sky-600 border border-sky-100 rounded-full px-3 py-1.5 text-xs font-medium hover:bg-sky-100 transition-colors"
@@ -861,7 +861,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
         </div>
       )}
 
-      {/* Sticky Add-to-Cart Bar — slides down from top on scroll */}
+      {/* Sticky Add-to-Cart Bar - slides down from top on scroll */}
       {showStickyBar && product.stock > 0 && (
         <div className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-white/92 border-b border-white/40 shadow-[0_4px_30px_rgba(0,0,0,0.10)] px-4 py-2.5 flex items-center gap-3 animate-slide-down">
           {product.images[0] && (

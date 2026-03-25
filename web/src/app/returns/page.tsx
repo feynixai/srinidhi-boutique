@@ -85,7 +85,7 @@ export default function ReturnsPage() {
         <h1 className="font-serif text-4xl text-charcoal mb-3">Returns & Exchanges</h1>
         <div className="divider-gold" />
         <p className="text-charcoal/60 text-sm mt-3 max-w-md mx-auto">
-          Your satisfaction is our priority. If something isn't right, we'll make it right — within 7 days.
+          Your satisfaction is our priority. If something isn't right, we'll make it right - within 7 days.
         </p>
       </section>
 

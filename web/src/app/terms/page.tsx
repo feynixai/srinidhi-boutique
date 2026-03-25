@@ -73,7 +73,7 @@ export default function TermsPage() {
 
         <section>
           <h2 className="font-serif text-xl text-charcoal mb-3">7. Intellectual Property</h2>
-          <p>All content on this website — including text, images, logos, and design — is the property of Srinidhi Boutique and protected by copyright. You may not reproduce or use any content without prior written permission.</p>
+          <p>All content on this website - including text, images, logos, and design - is the property of Srinidhi Boutique and protected by copyright. You may not reproduce or use any content without prior written permission.</p>
         </section>
 
         <section>

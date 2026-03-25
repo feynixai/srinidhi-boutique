@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   if (!collection) return { title: 'Collection Not Found' };
   return {
     title: `${collection.name} | Srinidhi Boutique`,
-    description: collection.description || `Shop ${collection.name} — curated collection at Srinidhi Boutique.`,
+    description: collection.description || `Shop ${collection.name} - curated collection at Srinidhi Boutique.`,
   };
 }
 

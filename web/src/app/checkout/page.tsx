@@ -295,7 +295,7 @@ export default function CheckoutPage() {
         amount: data.amount,
         currency: data.currency,
         name: 'Srinidhi Boutique',
-        description: `Order — ${items.length} item${items.length > 1 ? 's' : ''}`,
+        description: `Order - ${items.length} item${items.length > 1 ? 's' : ''}`,
         order_id: data.id,
         prefill: {
           name: address.customerName,
@@ -411,7 +411,7 @@ export default function CheckoutPage() {
                 <p className="text-sm font-semibold text-[#1a1a2e]">Have a coupon?</p>
                 {couponApplied ? (
                   <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-xl px-3 py-2">
-                    <span className="text-sm text-green-700 font-medium">{couponCode} — &#x20B9;{couponDiscount} off</span>
+                    <span className="text-sm text-green-700 font-medium">{couponCode} - &#x20B9;{couponDiscount} off</span>
                     <button onClick={removeCoupon} className="text-xs text-red-500 hover:text-red-700">Remove</button>
                   </div>
                 ) : (
@@ -489,7 +489,7 @@ export default function CheckoutPage() {
                 </select>
                 {!isIndia && (
                   <div className="mt-2 bg-blue-50 border border-blue-200 rounded px-3 py-2 text-xs text-blue-700">
-                    International shipping to {country.name} — ₹{(SHIPPING_RATES[selectedCountry] || SHIPPING_RATES['OTHER']).rate} flat rate · Est. {getDelivery(selectedCountry)}
+                    International shipping to {country.name} - ₹{(SHIPPING_RATES[selectedCountry] || SHIPPING_RATES['OTHER']).rate} flat rate · Est. {getDelivery(selectedCountry)}
                   </div>
                 )}
               </div>
@@ -625,7 +625,7 @@ export default function CheckoutPage() {
                 <p className="text-sm font-medium">Have a coupon?</p>
                 {couponApplied ? (
                   <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded px-3 py-2">
-                    <span className="text-sm text-green-700 font-medium">{couponCode} — ₹{couponDiscount} off</span>
+                    <span className="text-sm text-green-700 font-medium">{couponCode} - ₹{couponDiscount} off</span>
                     <button onClick={removeCoupon} className="text-xs text-red-500 hover:text-red-700">Remove</button>
                   </div>
                 ) : (
@@ -694,10 +694,10 @@ export default function CheckoutPage() {
               <h2 className="font-serif text-xl">Payment Method</h2>
 
               {isIndia ? (
-                // Indian payment options — glass cards
+                // Indian payment options - glass cards
                 <div className="space-y-3">
                   {[
-                    { id: 'upi' as const, label: 'UPI / PhonePe / GPay / Paytm', desc: 'Instant payment via UPI apps — most popular', icon: <FiSmartphone size={22} />, badge: 'Recommended' },
+                    { id: 'upi' as const, label: 'UPI / PhonePe / GPay / Paytm', desc: 'Instant payment via UPI apps - most popular', icon: <FiSmartphone size={22} />, badge: 'Recommended' },
                     { id: 'razorpay' as const, label: 'Pay Online (Razorpay)', desc: 'Debit/Credit cards, Net banking, UPI via Razorpay', icon: <FiCreditCard size={22} /> },
                     { id: 'cod' as const, label: 'Cash on Delivery', desc: `Pay when your order arrives (+₹${COD_CHARGE} handling charge)`, icon: <FiDollarSign size={22} /> },
                   ].map((method) => (
@@ -731,8 +731,8 @@ export default function CheckoutPage() {
                 // International: Razorpay (cards) + Bank Transfer
                 <div className="space-y-3">
                   {[
-                    { id: 'razorpay' as const, label: 'Credit / Debit Card (Razorpay)', desc: 'Visa, Mastercard — secure international checkout', icon: <FiCreditCard size={22} />, badge: 'Recommended' },
-                    { id: 'bank_transfer' as const, label: 'Bank Transfer (Wire / SWIFT)', desc: 'Transfer to our HDFC account — confirm by email', icon: <FiDatabase size={22} /> },
+                    { id: 'razorpay' as const, label: 'Credit / Debit Card (Razorpay)', desc: 'Visa, Mastercard - secure international checkout', icon: <FiCreditCard size={22} />, badge: 'Recommended' },
+                    { id: 'bank_transfer' as const, label: 'Bank Transfer (Wire / SWIFT)', desc: 'Transfer to our HDFC account - confirm by email', icon: <FiDatabase size={22} /> },
                   ].map((method) => (
                     <button
                       key={method.id}
@@ -774,7 +774,7 @@ export default function CheckoutPage() {
                 </div>
               )}
 
-              {/* UPI QR Code — Glass Card */}
+              {/* UPI QR Code - Glass Card */}
               {paymentMethod === 'upi' && (
                 <div className="bg-white/60 backdrop-blur-xl border border-white/40 rounded-3xl p-6 text-center shadow-card">
                   <p className="font-semibold text-sm text-[#1a1a2e] mb-1">Scan QR Code to Pay</p>
@@ -886,7 +886,7 @@ export default function CheckoutPage() {
           )}
         </div>
 
-        {/* Order Summary Sidebar — Glass */}
+        {/* Order Summary Sidebar - Glass */}
         <div className="bg-white/60 backdrop-blur-xl border border-white/30 rounded-3xl p-5 h-fit sticky top-24 shadow-card">
           <h3 className="font-serif text-lg text-[#1a1a2e] mb-4">Order Summary</h3>
           <div className="space-y-2 text-sm mb-4">

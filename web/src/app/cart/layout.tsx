@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Your Cart — Srinidhi Boutique',
+  title: 'Your Cart - Srinidhi Boutique',
   description: 'Review items in your cart and proceed to checkout.',
   robots: { index: false },
 };

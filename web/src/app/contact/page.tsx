@@ -106,7 +106,7 @@ export default function ContactPage() {
         <h1 className="font-serif text-4xl text-charcoal mb-3">Contact Us</h1>
         <div className="divider-gold" />
         <p className="text-charcoal/60 text-sm mt-3 max-w-sm mx-auto">
-          We're always happy to help — whether it's finding the right outfit or tracking your order.
+          We're always happy to help - whether it's finding the right outfit or tracking your order.
         </p>
       </section>
 
@@ -194,7 +194,7 @@ export default function ContactPage() {
                     <p className="text-charcoal/60 text-sm leading-relaxed">
                       Srinidhi Boutique<br />
                       Banjara Hills Road No. 12<br />
-                      Hyderabad, Telangana — 500034
+                      Hyderabad, Telangana - 500034
                     </p>
                   </div>
                 </div>
@@ -272,10 +272,10 @@ export default function ContactPage() {
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="Srinidhi Boutique — Banjara Hills, Hyderabad"
+                title="Srinidhi Boutique - Banjara Hills, Hyderabad"
               />
               <div className="px-4 py-2 bg-gray-50 flex items-center justify-between">
-                <p className="text-xs text-charcoal/60">Banjara Hills, Hyderabad — 500034</p>
+                <p className="text-xs text-charcoal/60">Banjara Hills, Hyderabad - 500034</p>
                 <a
                   href="https://maps.google.com/?q=Banjara+Hills+Road+No+12+Hyderabad"
                   target="_blank"

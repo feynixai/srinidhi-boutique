@@ -67,7 +67,7 @@ export function ProductReviews({ productId }: { productId: string }) {
                 <span className="text-sm text-gray-600">{avgRating.toFixed(1)} out of 5 · {reviews.length} review{reviews.length !== 1 ? 's' : ''}</span>
               </div>
             ) : (
-              <p className="text-sm text-gray-600">No reviews yet — be the first!</p>
+              <p className="text-sm text-gray-600">No reviews yet - be the first!</p>
             )}
           </div>
           <button
@@ -167,7 +167,7 @@ export function ProductReviews({ productId }: { productId: string }) {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1">Photo URL <span className="text-gray-600 font-normal">(optional — share your photo!)</span></label>
+              <label className="block text-xs font-medium mb-1">Photo URL <span className="text-gray-600 font-normal">(optional - share your photo!)</span></label>
               <input
                 value={form.imageUrl}
                 onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}

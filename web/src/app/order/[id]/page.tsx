@@ -108,7 +108,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
         <p className="text-gray-500">Order #{order.orderNumber}</p>
       </div>
 
-      {/* WhatsApp Notify Store — shown on new order */}
+      {/* WhatsApp Notify Store - shown on new order */}
       {order.status === 'placed' && (
         <div className="mb-4 bg-green-50 border border-green-200 rounded-sm p-4">
           <p className="text-sm font-semibold text-green-800 mb-1">Let us know you've ordered!</p>
@@ -232,7 +232,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
             <p className="text-gray-500 mb-1">Delivery Address</p>
             <p className="font-medium">{order.customerName}</p>
             <p className="text-gray-600">{address.line1}{address.line2 ? `, ${address.line2}` : ''}</p>
-            <p className="text-gray-600">{address.city}, {address.state} — {address.pincode}</p>
+            <p className="text-gray-600">{address.city}, {address.state} - {address.pincode}</p>
           </div>
           <div>
             <p className="text-gray-500 mb-1">Payment</p>
@@ -246,7 +246,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
       {order.status === 'placed' && (
         <div className="mt-6 border border-rose-gold/30 rounded-sm p-4 bg-rose-50/50">
           <p className="font-serif text-base text-charcoal mb-1">Share your purchase!</p>
-          <p className="text-xs text-charcoal/60 mb-3">Spread the love — share on WhatsApp or Instagram Stories.</p>
+          <p className="text-xs text-charcoal/60 mb-3">Spread the love - share on WhatsApp or Instagram Stories.</p>
           <div className="flex gap-2 flex-wrap">
             <a
               href={`https://wa.me/?text=${encodeURIComponent(`Just shopped at Srinidhi Boutique! Gorgeous ethnic wear from Hyderabad. Check them out at ${process.env.NEXT_PUBLIC_SITE_URL || 'https://srinidhiboutique.com'}`)}`}

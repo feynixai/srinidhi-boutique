@@ -6,20 +6,20 @@ import { FiHeart, FiUsers, FiAward, FiFlag } from 'react-icons/fi';
 
 export const metadata: Metadata = {
   title: 'About Us | Srinidhi Boutique',
-  description: 'The story behind Srinidhi Boutique — a family-run women\'s ethnic fashion store from Hyderabad.',
+  description: 'The story behind Srinidhi Boutique - a family-run women\'s ethnic fashion store from Hyderabad.',
 };
 
 const VALUES = [
   { icon: <FiHeart size={28} />, title: 'Handpicked Selection', desc: 'Every piece is personally chosen for quality, design, and wearability. Nothing goes on the shelf unless Srinidhi herself loves it.' },
-  { icon: <FiUsers size={28} />, title: 'Family Values', desc: 'We treat every customer like family — with warmth, honesty, and care. Our team is always just a WhatsApp away.' },
+  { icon: <FiUsers size={28} />, title: 'Family Values', desc: 'We treat every customer like family - with warmth, honesty, and care. Our team is always just a WhatsApp away.' },
   { icon: <FiAward size={28} />, title: 'Premium Quality', desc: 'From fabric to finish, we never compromise on the quality you deserve. Every stitch, every thread, every colour is thoughtfully chosen.' },
-  { icon: <FiFlag size={28} />, title: 'Made in India', desc: 'Supporting Indian weavers, artisans, and designers at every step — from Kanchipuram to Kutch, from Lucknow to Jaipur.' },
+  { icon: <FiFlag size={28} />, title: 'Made in India', desc: 'Supporting Indian weavers, artisans, and designers at every step - from Kanchipuram to Kutch, from Lucknow to Jaipur.' },
 ];
 
 const MISSION_POINTS = [
   { title: 'Celebrate Indian Craft', desc: 'We believe every handwoven saree, every block-printed kurti, every hand-embroidered dupatta tells a story of incredible skill. Our mission is to connect you with those stories.' },
   { title: 'Make Fashion Accessible', desc: 'Premium ethnic fashion shouldn\'t cost a fortune. We work directly with weavers and artisans to bring you exceptional quality at honest prices.' },
-  { title: 'Build Lasting Relationships', desc: 'We\'re not just a store — we\'re your personal stylist, your trusted fashion partner, your go-to when you need the perfect outfit for life\'s important moments.' },
+  { title: 'Build Lasting Relationships', desc: 'We\'re not just a store - we\'re your personal stylist, your trusted fashion partner, your go-to when you need the perfect outfit for life\'s important moments.' },
 ];
 
 export default function AboutPage() {
@@ -53,7 +53,7 @@ export default function AboutPage() {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
             <p className="text-gold uppercase tracking-[0.2em] text-xs font-semibold mb-3">Who We Are</p>
-            <h2 className="font-serif text-3xl text-charcoal mb-5">More Than a Boutique — A Family Dream</h2>
+            <h2 className="font-serif text-3xl text-charcoal mb-5">More Than a Boutique - A Family Dream</h2>
             <div className="space-y-4 text-charcoal/70 leading-relaxed text-base">
               <p>
                 Srinidhi Boutique was born in 2015 in the heart of Hyderabad, from a simple idea: every woman deserves to
@@ -66,7 +66,7 @@ export default function AboutPage() {
                 of this boutique.
               </p>
               <p>
-                Today, we carry everything from everyday kurtis to bridal lehengas — each piece chosen with the same
+                Today, we carry everything from everyday kurtis to bridal lehengas - each piece chosen with the same
                 care as if it were for someone in our own family.
               </p>
             </div>
@@ -83,7 +83,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Why Choose Us — Glass Cards */}
+      {/* Why Choose Us - Glass Cards */}
       <section className="bg-gradient-to-br from-[#f5f0eb] to-[#fffff0] py-16 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
@@ -113,7 +113,7 @@ export default function AboutPage() {
           <h2 className="section-heading">Our Mission</h2>
           <div className="divider-gold" />
           <p className="text-charcoal/60 text-sm mt-4 max-w-xl mx-auto leading-relaxed">
-            Every decision we make — every fabric we source, every design we choose — comes back to this.
+            Every decision we make - every fabric we source, every design we choose - comes back to this.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -160,9 +160,9 @@ export default function AboutPage() {
           <div className="space-y-10">
             {[
               { year: '2015', title: 'The Beginning', desc: 'Srinidhi opened our first small boutique in Banjara Hills with a curated selection of 50 sarees, driven by a passion for authentic Indian textiles.' },
-              { year: '2017', title: 'Expanding the Collection', desc: 'We added kurtis, salwar suits, and lehengas — sourcing directly from weavers in Kanchipuram, Varanasi, and Jaipur for the best fabrics at fair prices.' },
+              { year: '2017', title: 'Expanding the Collection', desc: 'We added kurtis, salwar suits, and lehengas - sourcing directly from weavers in Kanchipuram, Varanasi, and Jaipur for the best fabrics at fair prices.' },
               { year: '2019', title: 'Going Online', desc: 'Srinidhi Boutique launched online, reaching customers across India and making premium ethnic fashion accessible beyond Hyderabad.' },
-              { year: '2021', title: 'Festival & Bridal Range', desc: 'We launched our exclusive festival and bridal collections — handpicked pieces for weddings, Diwali, Navratri, and every celebration in between.' },
+              { year: '2021', title: 'Festival & Bridal Range', desc: 'We launched our exclusive festival and bridal collections - handpicked pieces for weddings, Diwali, Navratri, and every celebration in between.' },
               { year: '2024', title: 'New Store & 5,000 Happy Customers', desc: 'We moved to a larger store, launched WhatsApp ordering, and celebrated 5,000 happy customers across India. The dream keeps growing!' },
             ].map((item) => (
               <div key={item.year} className="flex gap-6 items-start">
@@ -192,7 +192,7 @@ export default function AboutPage() {
             {[
               { name: 'Srinidhi', role: 'Founder & Head Buyer', img: 'team-srinidhi', desc: 'The heart of the boutique. Srinidhi hand-picks every piece with an eye for quality and an obsession for design.' },
               { name: 'Kavitha', role: 'Customer Relations', img: 'team-kavitha', desc: 'The first voice you hear on WhatsApp. Kavitha ensures every customer finds exactly what they need.' },
-              { name: 'Ravi', role: 'Operations & Logistics', img: 'team-ravi', desc: 'Ravi keeps everything running smoothly — from packing orders with care to ensuring on-time delivery.' },
+              { name: 'Ravi', role: 'Operations & Logistics', img: 'team-ravi', desc: 'Ravi keeps everything running smoothly - from packing orders with care to ensuring on-time delivery.' },
             ].map((member) => (
               <div key={member.name} className="text-center">
                 <div className="relative w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden bg-gray-200">

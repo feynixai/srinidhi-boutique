@@ -30,7 +30,7 @@ const body = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: 'Srinidhi Boutique — Premium Women\'s Ethnic Fashion, Hyderabad',
+  title: 'Srinidhi Boutique - Premium Women\'s Ethnic Fashion, Hyderabad',
   description: 'Discover premium sarees, kurtis, lehengas and more. Handpicked Indian ethnic wear from Hyderabad. Free shipping on orders above ₹999.',
   keywords: 'sarees, kurtis, lehengas, women ethnic fashion, Hyderabad boutique, Indian ethnic wear, festival collection',
   manifest: '/manifest.json',
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     apple: '/apple-touch-icon.svg',
   },
   openGraph: {
-    title: 'Srinidhi Boutique — Premium Women\'s Ethnic Fashion, Hyderabad',
+    title: 'Srinidhi Boutique - Premium Women\'s Ethnic Fashion, Hyderabad',
     description: 'Discover premium sarees, kurtis, lehengas and more. Handpicked Indian ethnic wear from Hyderabad. Free shipping on orders above ₹999.',
     siteName: 'Srinidhi Boutique',
     type: 'website',
@@ -54,13 +54,13 @@ export const metadata: Metadata = {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Srinidhi Boutique — Premium Women\'s Ethnic Fashion',
+        alt: 'Srinidhi Boutique - Premium Women\'s Ethnic Fashion',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Srinidhi Boutique — Premium Women\'s Ethnic Fashion',
+    title: 'Srinidhi Boutique - Premium Women\'s Ethnic Fashion',
     description: 'Discover premium sarees, kurtis, lehengas and more. Handpicked Indian ethnic wear from Hyderabad.',
     images: ['/og-image.jpg'],
   },
@@ -80,7 +80,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen flex flex-col bg-[#f5f5f0] pb-16 md:pb-0">
         <Providers>
-          {/* Skip to main content — accessibility */}
+          {/* Skip to main content - accessibility */}
           <a
             href="#main-content"
             className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:bg-[#1a1a2e] focus:text-[#c5a55a] focus:px-4 focus:py-2 focus:rounded-full focus:text-sm focus:font-semibold"

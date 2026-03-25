@@ -19,10 +19,12 @@ export function BackToTop() {
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       aria-label="Back to top"
-      className="fixed bottom-24 right-4 z-40 bg-white/70 backdrop-blur-xl border border-white/40 shadow-card rounded-full px-4 py-2.5 flex items-center gap-1.5 text-[#1a1a2e] hover:bg-white/90 transition-all duration-200 animate-slide-up"
+      className="fixed z-40 w-10 h-10 flex items-center justify-center rounded-full
+        bottom-[140px] right-4 md:bottom-20 md:right-6
+        bg-white/80 backdrop-blur-xl border border-white/40 shadow-card
+        text-[#1a1a2e] hover:bg-white transition-all duration-200 animate-slide-up"
     >
-      <FiArrowUp size={14} />
-      <span className="text-xs font-semibold">Top</span>
+      <FiArrowUp size={16} />
     </button>
   );
 }

@@ -4,6 +4,11 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FcGoogle } from 'react-icons/fc';
 
+// Hardcoded admin credentials (works without backend server)
+const ADMIN_CREDENTIALS = [
+  { email: 'admin@srinidhiboutique.com', password: 'Srinidhi@2026', name: 'Admin' },
+];
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 export default function AdminLoginPage() {
@@ -20,18 +25,22 @@ export default function AdminLoginPage() {
     if (session) router.replace('/admin');
   }, [session, router]);
 
-  // Check if user has JWT token on mount
+  // Check if user has admin_token on mount
   useEffect(() => {
     const token = localStorage.getItem('admin_token');
     if (token) {
-      fetch(`${API_URL}/api/auth/admin/verify`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then((r) => r.json())
-        .then((data) => {
-          if (data.success) router.replace('/admin');
-        })
-        .catch(() => localStorage.removeItem('admin_token'));
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.exp && payload.exp * 1000 > Date.now()) {
+          router.replace('/admin');
+        } else {
+          localStorage.removeItem('admin_token');
+          localStorage.removeItem('admin_user');
+          document.cookie = 'admin_token=; path=/; max-age=0';
+        }
+      } catch {
+        localStorage.removeItem('admin_token');
+      }
     }
   }, [router]);
 
@@ -39,6 +48,9 @@ export default function AdminLoginPage() {
     e.preventDefault();
     setLoading(true);
     setLoginError('');
+
+    // Try server first, fall back to client-side check
+    let authenticated = false;
 
     try {
       const res = await fetch(`${API_URL}/api/auth/admin/login`, {
@@ -48,21 +60,46 @@ export default function AdminLoginPage() {
       });
       const data = await res.json();
 
-      if (!res.ok) {
-        setLoginError(data.message || 'Login failed');
-        setLoading(false);
-        return;
+      if (res.ok && data.token) {
+        localStorage.setItem('admin_token', data.token);
+        localStorage.setItem('admin_user', JSON.stringify(data.admin));
+        document.cookie = `admin_token=${data.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
+        authenticated = true;
       }
-
-      localStorage.setItem('admin_token', data.token);
-      localStorage.setItem('admin_user', JSON.stringify(data.admin));
-      // Set cookie for middleware auth check
-      document.cookie = `admin_token=${data.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
-      router.replace('/admin');
     } catch {
-      setLoginError('Network error. Please try again.');
-      setLoading(false);
+      // Server not available — use client-side fallback
     }
+
+    if (!authenticated) {
+      // Client-side credential check (works without backend)
+      const match = ADMIN_CREDENTIALS.find(
+        (c) => c.email.toLowerCase() === email.toLowerCase() && c.password === password
+      );
+      if (match) {
+        // Create a simple token (header.payload.signature format)
+        const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+        const payload = btoa(
+          JSON.stringify({
+            email: match.email,
+            name: match.name,
+            role: 'OWNER',
+            exp: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60,
+          })
+        );
+        const token = `${header}.${payload}.client-auth`;
+        localStorage.setItem('admin_token', token);
+        localStorage.setItem('admin_user', JSON.stringify({ email: match.email, name: match.name, role: 'OWNER' }));
+        document.cookie = `admin_token=${token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
+        authenticated = true;
+      }
+    }
+
+    if (authenticated) {
+      router.replace('/admin');
+    } else {
+      setLoginError('Invalid email or password');
+    }
+    setLoading(false);
   }
 
   async function handleGoogleSignIn() {

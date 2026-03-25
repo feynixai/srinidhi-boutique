@@ -7,7 +7,7 @@ export function BackToTop() {
 
   useEffect(() => {
     function onScroll() {
-      setVisible(window.scrollY > 400);
+      setVisible(window.scrollY > 500);
     }
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -19,9 +19,10 @@ export function BackToTop() {
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       aria-label="Back to top"
-      className="fixed bottom-24 right-4 z-40 w-10 h-10 rounded-full bg-rose-gold text-white shadow-lg flex items-center justify-center hover:bg-rose-gold/90 transition-all"
+      className="fixed bottom-24 right-4 z-40 bg-white/70 backdrop-blur-xl border border-white/40 shadow-card rounded-full px-4 py-2.5 flex items-center gap-1.5 text-[#1a1a2e] hover:bg-white/90 transition-all duration-200 animate-slide-up"
     >
-      <FiArrowUp size={18} />
+      <FiArrowUp size={14} />
+      <span className="text-xs font-semibold">Top</span>
     </button>
   );
 }

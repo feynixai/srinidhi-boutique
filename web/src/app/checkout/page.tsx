@@ -1,4 +1,6 @@
 'use client';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
@@ -8,7 +10,7 @@ import { getCart, placeOrder, validateCoupon, getBestCoupons, CouponSuggestion }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
-type Step = 'address' | 'payment' | 'confirm';
+type Step = 'cart' | 'address' | 'payment' | 'confirm';
 
 const UPI_ID = 'srinidhioboutique@ybl';
 const STORE_NAME = 'Srinidhi+Boutique';
@@ -75,7 +77,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { sessionId, setItemCount } = useCartStore();
-  const [step, setStep] = useState<Step>('address');
+  const [step, setStep] = useState<Step>('cart');
   const [submitting, setSubmitting] = useState(false);
   const [couponCode, setCouponCode] = useState(searchParams.get('coupon') || '');
   const [couponInput, setCouponInput] = useState('');
@@ -333,6 +335,7 @@ export default function CheckoutPage() {
   }
 
   const STEPS: { key: Step; label: string }[] = [
+    { key: 'cart', label: 'Cart' },
     { key: 'address', label: 'Delivery' },
     { key: 'payment', label: 'Payment' },
     { key: 'confirm', label: 'Confirm' },
@@ -341,8 +344,7 @@ export default function CheckoutPage() {
 
   const StepIndicator = () => (
     <div className="mb-10">
-      {/* Glass progress bar */}
-      <div className="bg-white/60 backdrop-blur-xl border border-white/30 rounded-full px-6 py-3 shadow-sm flex items-center justify-between max-w-sm mx-auto">
+      <div className="bg-white/60 backdrop-blur-xl border border-white/30 rounded-full px-5 py-3 shadow-sm flex items-center justify-between max-w-md mx-auto">
         {STEPS.map((s, i) => {
           const done = currentStepIndex > i;
           const active = currentStepIndex === i;
@@ -356,8 +358,8 @@ export default function CheckoutPage() {
               <span className={`ml-1.5 text-xs hidden sm:block font-medium transition-colors ${active ? 'text-[#1a1a2e]' : done ? 'text-green-600' : 'text-gray-400'}`}>
                 {s.label}
               </span>
-              {i < 2 && (
-                <div className={`w-10 h-0.5 mx-3 rounded-full transition-all duration-500 ${done ? 'bg-green-400' : 'bg-gray-200'}`} />
+              {i < 3 && (
+                <div className={`w-6 h-0.5 mx-2 rounded-full transition-all duration-500 ${done ? 'bg-green-400' : 'bg-gray-200'}`} />
               )}
             </div>
           );
@@ -373,7 +375,101 @@ export default function CheckoutPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-2">
-          {/* Step 1: Address */}
+          {/* Step 1: Cart Review */}
+          {step === 'cart' && (
+            <div className="space-y-5">
+              <h2 className="font-serif text-xl text-[#1a1a2e]">Cart Review</h2>
+
+              {/* Items */}
+              <div className="space-y-3">
+                {items.map((item) => (
+                  <div key={item.id} className="flex gap-3 p-3 bg-white/60 backdrop-blur-lg border border-white/30 rounded-2xl">
+                    <div className="relative w-16 h-20 flex-shrink-0 bg-gray-50 rounded-xl overflow-hidden">
+                      {item.product.images[0] && (
+                        <Image src={item.product.images[0]} alt={item.product.name} fill className="object-cover" sizes="64px" loading="lazy" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium line-clamp-2 text-[#1a1a2e]">{item.product.name}</p>
+                      {(item.size || item.color) && (
+                        <p className="text-xs text-gray-400 mt-0.5">{[item.size, item.color].filter(Boolean).join(' · ')}</p>
+                      )}
+                      <div className="flex items-center justify-between mt-2">
+                        <span className="text-xs text-gray-500">Qty: {item.quantity}</span>
+                        <span className="font-bold text-sm text-[#1a1a2e]">
+                          &#x20B9;{(Number(item.product.price) * item.quantity).toLocaleString('en-IN')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Coupon */}
+              <div className="bg-white/60 backdrop-blur-lg border border-white/30 rounded-2xl p-4 space-y-3">
+                <p className="text-sm font-semibold text-[#1a1a2e]">Have a coupon?</p>
+                {couponApplied ? (
+                  <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-xl px-3 py-2">
+                    <span className="text-sm text-green-700 font-medium">{couponCode} — &#x20B9;{couponDiscount} off</span>
+                    <button onClick={removeCoupon} className="text-xs text-red-500 hover:text-red-700">Remove</button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex gap-2">
+                      <input
+                        value={couponInput}
+                        onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                        placeholder="Enter coupon code"
+                        className="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-[#c5a55a] bg-white/80"
+                        onKeyDown={(e) => e.key === 'Enter' && applyCoupon()}
+                      />
+                      <button onClick={() => applyCoupon()} disabled={couponLoading} className="btn-outline px-4 py-2 text-sm disabled:opacity-50">
+                        {couponLoading ? '...' : 'Apply'}
+                      </button>
+                    </div>
+                    {availableCoupons.length > 0 && (
+                      <div>
+                        <p className="text-xs text-gray-500 mb-2">Available for your order:</p>
+                        <div className="space-y-2">
+                          {availableCoupons.map((c, idx) => (
+                            <div key={c.code} className={`flex items-center justify-between rounded-xl px-3 py-2 border ${idx === 0 ? 'border-green-300 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
+                              <div className="flex items-center gap-2">
+                                {idx === 0 && <span className="text-xs bg-green-600 text-white px-1.5 py-0.5 rounded font-medium">Best</span>}
+                                <span className="text-sm font-mono font-semibold text-[#1a1a2e]">{c.code}</span>
+                                <span className="text-xs text-gray-500">
+                                  {c.type === 'flat' ? `₹${c.discount} off` : `${c.discount}% off`} · saves &#x20B9;{Math.round(c.discountAmount)}
+                                </span>
+                              </div>
+                              <button onClick={() => applyCoupon(c.code)} className="text-xs font-medium text-[#c5a55a] hover:text-[#1a1a2e] transition-colors">Apply</button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+
+              {/* Savings banner */}
+              {savings > 0 && (
+                <div className="bg-green-50 border border-green-200 rounded-2xl p-3 text-center">
+                  <p className="text-green-700 font-semibold text-sm">You save &#x20B9;{savings.toLocaleString('en-IN')} on this order!</p>
+                </div>
+              )}
+
+              <button
+                onClick={() => setStep('address')}
+                className="btn-primary w-full py-3 tracking-widest text-sm mt-2"
+              >
+                CONTINUE TO DELIVERY
+              </button>
+              <Link href="/cart" className="block text-center text-sm text-[#c5a55a] hover:underline">
+                Edit Cart
+              </Link>
+            </div>
+          )}
+
+          {/* Step 2: Address */}
           {step === 'address' && (
             <div className="space-y-4">
               <h2 className="font-serif text-xl">Delivery Details</h2>
@@ -579,12 +675,15 @@ export default function CheckoutPage() {
                 )}
               </div>
 
-              <button
-                onClick={() => { if (validateAddress()) setStep('payment'); }}
-                className="btn-primary w-full mt-4 py-3 tracking-widest text-sm"
-              >
-                CONTINUE TO PAYMENT
-              </button>
+              <div className="flex gap-3 mt-4">
+                <button onClick={() => setStep('cart')} className="btn-outline flex-1 py-3 text-sm">Back</button>
+                <button
+                  onClick={() => { if (validateAddress()) setStep('payment'); }}
+                  className="btn-primary flex-1 py-3 tracking-widest text-sm"
+                >
+                  CONTINUE TO PAYMENT
+                </button>
+              </div>
             </div>
           )}
 

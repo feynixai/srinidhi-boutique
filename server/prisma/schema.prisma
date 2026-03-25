@@ -27,6 +27,10 @@ model Product {
   onOffer      Boolean  @default(false)
   offerPercent Int?
   active       Boolean  @default(true)
+  fabricCare   String?
+  videoUrl     String?
+  crossSellIds String[]
+  completeLookIds String[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   orderItems             OrderItem[]
@@ -55,6 +59,7 @@ model Category {
   slug     String    @unique
   image    String?
   gstRate  Float     @default(5)   // GST % applicable to products in this category
+  hsnCode  String?                  // HSN code for GST invoicing
   products Product[]
   coupons  Coupon[]
 }
@@ -77,6 +82,7 @@ model User {
   referralsMade   Referral[]         @relation("ReferralsMade")
   referralReceived Referral[]        @relation("ReferralReceived")
   notifications   UserNotification[]
+  savedAddresses  CustomerAddress[]
 }
 
 model AdminUser {
@@ -611,4 +617,23 @@ model StoreSale {
   endAt       DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+// ── Build 14 models ───────────────────────────────────────────────────────────
+
+model CustomerAddress {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label     String   @default("Home")
+  line1     String
+  line2     String?
+  city      String
+  state     String
+  pincode   String
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }

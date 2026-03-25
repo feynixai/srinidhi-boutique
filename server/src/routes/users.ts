@@ -113,7 +113,7 @@ userRoutes.put('/:id/profile', async (req: Request, res: Response) => {
   res.json(user);
 });
 
-// PUT /api/users/:id/addresses
+// PUT /api/users/:id/addresses (legacy JSON field)
 userRoutes.put('/:id/addresses', async (req: Request, res: Response) => {
   const { addresses } = z
     .object({ addresses: z.array(z.record(z.unknown())) })
@@ -125,4 +125,101 @@ userRoutes.put('/:id/addresses', async (req: Request, res: Response) => {
     select: { id: true, addresses: true },
   });
   res.json({ addresses: user.addresses });
+});
+
+// ── Build 14: Multi-Address Management ───────────────────────────────────────
+
+const addressSchema = z.object({
+  label: z.enum(['Home', 'Office', 'Other']).default('Home'),
+  line1: z.string().min(1),
+  line2: z.string().optional(),
+  city: z.string().min(1),
+  state: z.string().min(1),
+  pincode: z.string().min(6).max(6),
+  isDefault: z.boolean().default(false),
+});
+
+// GET /api/users/:id/saved-addresses
+userRoutes.get('/:id/saved-addresses', async (req: Request, res: Response) => {
+  const user = await prisma.user.findUnique({ where: { id: req.params.id } });
+  if (!user) throw new AppError(404, 'User not found');
+
+  const addresses = await prisma.customerAddress.findMany({
+    where: { userId: req.params.id },
+    orderBy: [{ isDefault: 'desc' }, { createdAt: 'asc' }],
+  });
+  res.json({ addresses, count: addresses.length });
+});
+
+// POST /api/users/:id/saved-addresses
+userRoutes.post('/:id/saved-addresses', async (req: Request, res: Response) => {
+  const user = await prisma.user.findUnique({ where: { id: req.params.id } });
+  if (!user) throw new AppError(404, 'User not found');
+
+  const data = addressSchema.parse(req.body);
+
+  if (data.isDefault) {
+    await prisma.customerAddress.updateMany({ where: { userId: req.params.id }, data: { isDefault: false } });
+  }
+
+  const existingCount = await prisma.customerAddress.count({ where: { userId: req.params.id } });
+  const makeDefault = data.isDefault || existingCount === 0;
+
+  const address = await prisma.customerAddress.create({
+    data: { ...data, userId: req.params.id, isDefault: makeDefault },
+  });
+  res.status(201).json(address);
+});
+
+// PATCH /api/users/:id/saved-addresses/:addressId
+userRoutes.patch('/:id/saved-addresses/:addressId', async (req: Request, res: Response) => {
+  const existing = await prisma.customerAddress.findFirst({
+    where: { id: req.params.addressId, userId: req.params.id },
+  });
+  if (!existing) throw new AppError(404, 'Address not found');
+
+  const data = addressSchema.partial().parse(req.body);
+
+  if (data.isDefault) {
+    await prisma.customerAddress.updateMany({ where: { userId: req.params.id }, data: { isDefault: false } });
+  }
+
+  const updated = await prisma.customerAddress.update({ where: { id: req.params.addressId }, data });
+  res.json(updated);
+});
+
+// DELETE /api/users/:id/saved-addresses/:addressId
+userRoutes.delete('/:id/saved-addresses/:addressId', async (req: Request, res: Response) => {
+  const existing = await prisma.customerAddress.findFirst({
+    where: { id: req.params.addressId, userId: req.params.id },
+  });
+  if (!existing) throw new AppError(404, 'Address not found');
+
+  await prisma.customerAddress.delete({ where: { id: req.params.addressId } });
+
+  if (existing.isDefault) {
+    const next = await prisma.customerAddress.findFirst({
+      where: { userId: req.params.id },
+      orderBy: { createdAt: 'asc' },
+    });
+    if (next) {
+      await prisma.customerAddress.update({ where: { id: next.id }, data: { isDefault: true } });
+    }
+  }
+  res.json({ success: true });
+});
+
+// PATCH /api/users/:id/saved-addresses/:addressId/set-default
+userRoutes.patch('/:id/saved-addresses/:addressId/set-default', async (req: Request, res: Response) => {
+  const existing = await prisma.customerAddress.findFirst({
+    where: { id: req.params.addressId, userId: req.params.id },
+  });
+  if (!existing) throw new AppError(404, 'Address not found');
+
+  await prisma.customerAddress.updateMany({ where: { userId: req.params.id }, data: { isDefault: false } });
+  const updated = await prisma.customerAddress.update({
+    where: { id: req.params.addressId },
+    data: { isDefault: true },
+  });
+  res.json(updated);
 });

@@ -230,6 +230,103 @@ productRoutes.get('/:slug/also-bought', async (req: Request, res: Response) => {
   res.json(sorted);
 });
 
+// GET /api/products/promotions/exit-intent — exit intent popup promo
+productRoutes.get('/promotions/exit-intent', async (_req: Request, res: Response) => {
+  const sale = await prisma.storeSale.findFirst({ where: { active: true }, orderBy: { createdAt: 'desc' } });
+  const stayCoupon = await prisma.coupon.findFirst({
+    where: { active: true, code: { startsWith: 'STAY' } },
+    orderBy: { createdAt: 'desc' },
+  });
+  const code = stayCoupon?.code || 'STAY10';
+  const discount = stayCoupon?.discount || 10;
+  res.json({
+    show: true,
+    headline: "Wait! Don't leave yet",
+    message: `Use code ${code} for ${discount}% off your order`,
+    code,
+    discount,
+    activeSale: sale ? { discountPct: sale.discountPct, label: sale.label } : null,
+  });
+});
+
+// GET /api/products/promotions/welcome-banner — first-visit welcome banner
+productRoutes.get('/promotions/welcome-banner', async (_req: Request, res: Response) => {
+  const welcomeCoupon = await prisma.coupon.findFirst({
+    where: { active: true, code: { startsWith: 'WELCOME' } },
+    orderBy: { createdAt: 'desc' },
+  });
+  const code = welcomeCoupon?.code || 'WELCOME10';
+  const discount = welcomeCoupon?.discount || 10;
+  res.json({
+    show: true,
+    headline: 'Welcome to Srinidhi Boutique!',
+    message: `Use code ${code} for ${discount}% off your first order`,
+    code,
+    discount,
+  });
+});
+
+// GET /api/products/:slug/cross-sell — curated or same-category cross-sells
+productRoutes.get('/:slug/cross-sell', async (req: Request, res: Response) => {
+  const product = await prisma.product.findUnique({ where: { slug: req.params.slug } });
+  if (!product) throw new AppError(404, 'Product not found');
+
+  if (product.crossSellIds && product.crossSellIds.length > 0) {
+    const products = await prisma.product.findMany({
+      where: { id: { in: product.crossSellIds }, active: true },
+      include: { category: true },
+    });
+    return res.json({ products, curated: true });
+  }
+
+  const products = await prisma.product.findMany({
+    where: { active: true, categoryId: product.categoryId || undefined, id: { not: product.id } },
+    include: { category: true },
+    orderBy: { bestSeller: 'desc' },
+    take: 4,
+  });
+  res.json({ products, curated: false });
+});
+
+// GET /api/products/:slug/upsell — premium upgrade suggestion
+productRoutes.get('/:slug/upsell', async (req: Request, res: Response) => {
+  const product = await prisma.product.findUnique({
+    where: { slug: req.params.slug },
+    include: { category: true },
+  });
+  if (!product) throw new AppError(404, 'Product not found');
+
+  const upsell = await prisma.product.findFirst({
+    where: {
+      active: true,
+      categoryId: product.categoryId || undefined,
+      id: { not: product.id },
+      price: { gt: product.price },
+    },
+    include: { category: true },
+    orderBy: { price: 'asc' },
+  });
+
+  if (!upsell) return res.json({ upsell: null });
+  const priceDiff = Math.round(Number(upsell.price) - Number(product.price));
+  res.json({ upsell, message: `Upgrade to ${upsell.name} for just ₹${priceDiff} more`, priceDiff });
+});
+
+// GET /api/products/:slug/complete-look — curated matching products
+productRoutes.get('/:slug/complete-look', async (req: Request, res: Response) => {
+  const product = await prisma.product.findUnique({ where: { slug: req.params.slug } });
+  if (!product) throw new AppError(404, 'Product not found');
+
+  if (product.completeLookIds && product.completeLookIds.length > 0) {
+    const products = await prisma.product.findMany({
+      where: { id: { in: product.completeLookIds }, active: true },
+      include: { category: true },
+    });
+    return res.json({ products, curated: true });
+  }
+  res.json({ products: [], curated: false });
+});
+
 // GET /api/products/:slug/related — same category, exclude self
 productRoutes.get('/:slug/related', async (req: Request, res: Response) => {
   const product = await prisma.product.findUnique({ where: { slug: req.params.slug } });

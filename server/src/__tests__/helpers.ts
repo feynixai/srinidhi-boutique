@@ -129,47 +129,18 @@ export async function createTestAdminUser(overrides: Record<string, unknown> = {
 }
 
 export async function cleanupTest() {
-  // Use TRUNCATE CASCADE to handle all FK constraints atomically
-  await testPrisma.$executeRawUnsafe(`
-    TRUNCATE TABLE
-      "WebhookDelivery", "Webhook",
-      "GiftCardTransaction", "GiftCard",
-      "PreOrderBooking", "PreOrder",
-      "StoreCredit",
-      "Bundle",
-      "AbandonedCart",
-      "ChatMessage",
-      "Lookbook",
-      "FlashSaleProduct", "FlashSale",
-      "LoyaltyHistory", "LoyaltyAccount",
-      "Referral",
-      "BackInStockNotification",
-      "StockMovement",
-      "RecentlyViewed",
-      "WishlistItem",
-      "ReturnRequest",
-      "Review",
-      "OrderItem",
-      "CartItem",
-      "Order",
-      "Coupon",
-      "ProductQA",
-      "ProductTag",
-      "ProductVariant",
-      "Tag",
-      "Collection",
-      "UserNotification",
-      "Product",
-      "Category",
-      "PincodeZone",
-      "Newsletter",
-      "ContactSubmission",
-      "OtpCode",
-      "User",
-      "AdminUser",
-      "StoreSale"
-    CASCADE
-  `);
+  // Dynamic TRUNCATE — queries pg_tables so it never breaks when new models are added
+  const tables = await testPrisma.$queryRaw<Array<{ tablename: string }>>`
+    SELECT tablename FROM pg_tables WHERE schemaname = 'public'
+  `;
+  const tableNames = tables
+    .map(t => t.tablename)
+    .filter(t => t !== '_prisma_migrations');
+  if (tableNames.length > 0) {
+    await testPrisma.$executeRawUnsafe(
+      `TRUNCATE TABLE ${tableNames.map(t => `"${t}"`).join(', ')} CASCADE`
+    );
+  }
 }
 
 export async function createTestNewsletter(email: string, overrides: Record<string, unknown> = {}) {

@@ -30,7 +30,7 @@ async function ProductGrid({ searchParams }: { searchParams: Record<string, stri
 export default function ShopPage({ searchParams }: ShopPageProps) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-      <h1 className="font-serif text-3xl mb-8">All Products</h1>
+      <h1 className="font-bold text-3xl mb-8 text-[#1a1a2e] tracking-tight">All Products</h1>
       <div className="flex gap-10">
         <Suspense fallback={<div className="w-64 flex-shrink-0" />}>
           <FilterSidebar />
@@ -39,7 +39,7 @@ export default function ShopPage({ searchParams }: ShopPageProps) {
           <Suspense fallback={
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="aspect-[3/4] bg-gray-100 animate-pulse rounded" />
+                <div key={i} className="aspect-[3/4] bg-white/60 animate-pulse rounded-2xl" />
               ))}
             </div>
           }>

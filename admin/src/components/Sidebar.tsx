@@ -3,7 +3,19 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { useSession, signOut } from 'next-auth/react';
-import { FiGrid, FiShoppingBag, FiPackage, FiTag, FiMenu, FiX, FiUsers, FiBarChart2, FiSettings, FiRefreshCw, FiLogOut } from 'react-icons/fi';
+import {
+  FiGrid,
+  FiShoppingBag,
+  FiPackage,
+  FiTag,
+  FiMenu,
+  FiX,
+  FiUsers,
+  FiBarChart2,
+  FiSettings,
+  FiRefreshCw,
+  FiLogOut,
+} from 'react-icons/fi';
 
 const NAV = [
   { href: '/admin', label: 'Dashboard', icon: FiGrid },
@@ -22,10 +34,10 @@ export function Sidebar() {
   const [open, setOpen] = useState(false);
 
   const NavContent = () => (
-    <nav className="p-4 space-y-2 flex flex-col h-full">
+    <nav className="p-4 space-y-1 flex flex-col h-full">
       <div className="px-3 py-4 mb-2">
-        <h1 className="text-xl font-bold text-charcoal">Srinidhi Boutique</h1>
-        <p className="text-sm text-gray-500">Admin Panel</p>
+        <h1 className="text-xl font-bold text-[#1a1a2e]">Srinidhi Boutique</h1>
+        <p className="text-sm text-gray-400">Admin Panel</p>
       </div>
       <div className="flex-1">
         {NAV.map(({ href, label, icon: Icon }) => {
@@ -35,13 +47,13 @@ export function Sidebar() {
               key={href}
               href={href}
               onClick={() => setOpen(false)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-lg font-medium transition-all mb-1 ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-base font-medium transition-all mb-1 ${
                 active
-                  ? 'bg-rose-gold text-white shadow-sm'
-                  : 'text-gray-700 hover:bg-gray-100'
+                  ? 'bg-[#1a1a2e] text-white shadow-[0_4px_12px_rgba(26,26,46,0.3)]'
+                  : 'text-gray-600 hover:bg-white/60 hover:text-[#1a1a2e]'
               }`}
             >
-              <Icon size={22} />
+              <Icon size={20} />
               {label}
             </Link>
           );
@@ -49,22 +61,24 @@ export function Sidebar() {
       </div>
       {/* User section */}
       {session?.user && (
-        <div className="border-t border-gray-100 pt-4 mt-2">
-          <div className="flex items-center gap-3 px-3 py-2">
+        <div className="border-t border-black/5 pt-4 mt-2">
+          <div className="flex items-center gap-3 px-3 py-2 bg-white/40 rounded-2xl">
             {session.user.image ? (
               <img src={session.user.image} alt="avatar" className="w-9 h-9 rounded-full" />
             ) : (
-              <div className="w-9 h-9 rounded-full bg-[#8B1A4A] flex items-center justify-center text-white font-bold text-sm">
+              <div className="w-9 h-9 rounded-full bg-[#c5a55a] flex items-center justify-center text-white font-bold text-sm">
                 {(session.user.name || session.user.email || 'A')[0].toUpperCase()}
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-800 truncate">{session.user.name || 'Admin'}</p>
-              <p className="text-xs text-gray-500 truncate">{session.user.email}</p>
+              <p className="text-sm font-semibold text-[#1a1a2e] truncate">
+                {session.user.name || 'Admin'}
+              </p>
+              <p className="text-xs text-gray-400 truncate">{session.user.email}</p>
             </div>
             <button
               onClick={() => signOut({ callbackUrl: '/login' })}
-              className="p-1.5 text-gray-400 hover:text-red-500 transition-colors"
+              className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
               title="Sign out"
             >
               <FiLogOut size={16} />
@@ -78,9 +92,12 @@ export function Sidebar() {
   return (
     <>
       {/* Mobile header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between z-40">
-        <h1 className="text-lg font-bold">Srinidhi Boutique Admin</h1>
-        <button onClick={() => setOpen(!open)} className="p-2">
+      <div className="md:hidden fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-b border-white/30 px-4 py-3 flex items-center justify-between z-40">
+        <h1 className="text-lg font-bold text-[#1a1a2e]">Srinidhi Admin</h1>
+        <button
+          onClick={() => setOpen(!open)}
+          className="p-2 hover:bg-white/60 rounded-full transition-all"
+        >
           {open ? <FiX size={24} /> : <FiMenu size={24} />}
         </button>
       </div>
@@ -88,15 +105,18 @@ export function Sidebar() {
       {/* Mobile Drawer */}
       {open && (
         <div className="md:hidden fixed inset-0 z-50" onClick={() => setOpen(false)}>
-          <div className="absolute inset-0 bg-black/50" />
-          <div className="absolute left-0 top-0 bottom-0 w-72 bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+          <div
+            className="absolute left-0 top-0 bottom-0 w-72 bg-[#f5f5f0]/95 backdrop-blur-xl shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <NavContent />
           </div>
         </div>
       )}
 
       {/* Desktop Sidebar */}
-      <div className="hidden md:flex md:flex-col fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-gray-200 z-30">
+      <div className="hidden md:flex md:flex-col fixed left-0 top-0 bottom-0 w-64 bg-white/60 backdrop-blur-xl border-r border-white/30 z-30">
         <NavContent />
       </div>
 

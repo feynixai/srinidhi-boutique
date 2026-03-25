@@ -59,7 +59,7 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
       {onClose && (
         <div className="flex items-center justify-between pb-2 border-b">
           <h3 className="font-serif text-xl">Filters</h3>
-          <button onClick={onClose} className="p-1 hover:text-rose-gold">
+          <button onClick={onClose} className="p-1 hover:text-[#c5a55a]">
             <FiX size={20} />
           </button>
         </div>
@@ -72,7 +72,7 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
             <h3 className="text-xs font-semibold uppercase tracking-wider text-charcoal/60">Active Filters</h3>
             <button
               onClick={() => router.push('/shop')}
-              className="text-xs text-rose-gold hover:underline"
+              className="text-xs text-[#c5a55a] hover:underline"
             >
               Clear all
             </button>
@@ -82,7 +82,7 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
               <button
                 key={f.key}
                 onClick={() => updateParam(f.key, null)}
-                className="flex items-center gap-1 bg-rose-gold/10 text-rose-gold text-xs px-2.5 py-1 rounded-full hover:bg-rose-gold/20 transition-colors"
+                className="flex items-center gap-1 bg-rose-gold/10 text-[#c5a55a] text-xs px-2.5 py-1 rounded-full hover:bg-rose-gold/20 transition-colors"
               >
                 {f.label} <FiX size={10} />
               </button>
@@ -121,10 +121,10 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
             <button
               key={size}
               onClick={() => updateParam('size', activeSize === size ? null : size)}
-              className={`px-3 py-1.5 text-xs border rounded-sm transition-colors ${
+              className={`px-3 py-1.5 text-xs border rounded-full transition-all ${
                 activeSize === size
-                  ? 'border-rose-gold bg-rose-gold text-white'
-                  : 'border-gray-200 hover:border-rose-gold'
+                  ? 'border-[#c5a55a] bg-[#c5a55a] text-[#1a1a2e] font-semibold'
+                  : 'border-white/50 bg-white/60 hover:border-[#c5a55a] text-[#1a1a2e]'
               }`}
             >
               {size}
@@ -143,7 +143,7 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
               onClick={() => updateParam('color', activeColor === name ? null : name)}
               title={name}
               className={`w-7 h-7 rounded-full border-2 transition-all ${
-                activeColor === name ? 'border-rose-gold scale-110' : 'border-gray-200 hover:border-gray-400'
+                activeColor === name ? 'border-[#c5a55a] scale-110 shadow-sm' : 'border-white/50 hover:border-[#6b7280]'
               }`}
               style={{ backgroundColor: hex }}
             />
@@ -160,7 +160,7 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
         <select
           value={activeFabric || ''}
           onChange={(e) => updateParam('fabric', e.target.value || null)}
-          className="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-rose-gold bg-white"
+          className="w-full bg-white/70 border border-white/50 rounded-full px-4 py-1.5 text-sm focus:outline-none focus:border-[#c5a55a]"
         >
           <option value="">All Fabrics</option>
           {FABRICS.map((f) => (
@@ -179,9 +179,9 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
                 type="checkbox"
                 checked={activeOccasion === occ}
                 onChange={() => updateParam('occasion', activeOccasion === occ ? null : occ)}
-                className="accent-rose-gold"
+                className="accent-[#c5a55a]"
               />
-              <span className="text-sm capitalize group-hover:text-rose-gold transition-colors">
+              <span className="text-sm capitalize group-hover:text-[#c5a55a] transition-colors">
                 {occ}
               </span>
             </label>
@@ -206,7 +206,7 @@ export function FilterSidebar() {
       <div className="md:hidden mb-4">
         <button
           onClick={() => setMobileOpen(true)}
-          className="flex items-center gap-2 border border-gray-200 px-4 py-2.5 text-sm font-medium hover:border-rose-gold transition-colors rounded-sm"
+          className="flex items-center gap-2 glass-card-sm px-4 py-2.5 text-sm font-medium text-[#1a1a2e] transition-all"
         >
           <FiFilter size={16} />
           Filters
@@ -223,7 +223,7 @@ export function FilterSidebar() {
         <div className="fixed inset-0 z-50 md:hidden" onClick={() => setMobileOpen(false)}>
           <div className="absolute inset-0 bg-black/40" />
           <div
-            className="absolute left-0 top-0 bottom-0 w-80 bg-white shadow-xl p-5 overflow-y-auto"
+            className="absolute left-0 top-0 bottom-0 w-80 bg-[#f5f5f0]/95 backdrop-blur-xl border-r border-white/40 shadow-xl p-5 overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <FilterContent onClose={() => setMobileOpen(false)} />

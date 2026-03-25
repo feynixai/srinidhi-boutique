@@ -46,21 +46,28 @@ export function CartDrawer() {
   return (
     <>
       {isCartOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50" onClick={closeCart} />
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50" onClick={closeCart} />
       )}
 
       <div
-        className={`fixed right-0 top-0 h-full w-full max-w-sm bg-white z-50 flex flex-col shadow-2xl transition-transform duration-300 ${
+        className={`fixed right-0 top-0 h-full w-full max-w-sm bg-[#f5f5f0]/95 backdrop-blur-xl z-50 flex flex-col shadow-2xl transition-transform duration-300 ${
           isCartOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="flex items-center justify-between px-5 py-4 border-b">
-          <h2 className="font-serif text-lg">Shopping Bag ({items.reduce((s, i) => s + i.quantity, 0)})</h2>
-          <button onClick={closeCart} className="p-2 hover:text-rose-gold transition-colors">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 bg-white/60 backdrop-blur-lg border-b border-white/30">
+          <h2 className="font-serif text-lg text-[#1a1a2e]">
+            Shopping Bag ({items.reduce((s, i) => s + i.quantity, 0)})
+          </h2>
+          <button
+            onClick={closeCart}
+            className="p-2 hover:bg-white/60 rounded-full transition-all text-[#1a1a2e]/60 hover:text-[#1a1a2e]"
+          >
             <FiX size={20} />
           </button>
         </div>
 
+        {/* Items */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
           {items.length === 0 ? (
             <div className="text-center py-16">
@@ -71,8 +78,11 @@ export function CartDrawer() {
             </div>
           ) : (
             items.map((item) => (
-              <div key={item.id} className="flex gap-3">
-                <div className="relative w-20 h-24 flex-shrink-0 bg-gray-50 rounded overflow-hidden">
+              <div
+                key={item.id}
+                className="flex gap-3 bg-white/60 backdrop-blur-lg border border-white/30 rounded-2xl p-3"
+              >
+                <div className="relative w-20 h-24 flex-shrink-0 bg-gray-50 rounded-xl overflow-hidden">
                   {item.product.images[0] && (
                     <Image
                       src={item.product.images[0]}
@@ -84,34 +94,43 @@ export function CartDrawer() {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium line-clamp-2 leading-tight">{item.product.name}</p>
+                  <p className="text-sm font-medium line-clamp-2 leading-tight text-[#1a1a2e]">
+                    {item.product.name}
+                  </p>
                   {(item.size || item.color) && (
-                    <p className="text-xs text-gray-500 mt-0.5">
+                    <p className="text-xs text-gray-400 mt-0.5">
                       {[item.size, item.color].filter(Boolean).join(' · ')}
                     </p>
                   )}
-                  <p className="text-sm font-semibold mt-1">
-                    ₹{(Number(item.product.price) * item.quantity).toLocaleString('en-IN')}
+                  <p className="text-sm font-bold mt-1 text-[#1a1a2e]">
+                    &#x20B9;{(Number(item.product.price) * item.quantity).toLocaleString('en-IN')}
                   </p>
                   <div className="flex items-center gap-2 mt-2">
-                    <button
-                      onClick={() => item.quantity > 1
-                        ? updateMutation.mutate({ id: item.id, qty: item.quantity - 1 })
-                        : removeMutation.mutate(item.id)}
-                      className="p-1 border border-gray-200 rounded hover:border-rose-gold transition-colors"
-                    >
-                      <FiMinus size={12} />
-                    </button>
-                    <span className="text-sm font-medium w-6 text-center">{item.quantity}</span>
-                    <button
-                      onClick={() => updateMutation.mutate({ id: item.id, qty: item.quantity + 1 })}
-                      className="p-1 border border-gray-200 rounded hover:border-rose-gold transition-colors"
-                    >
-                      <FiPlus size={12} />
-                    </button>
+                    {/* Pill quantity control */}
+                    <div className="flex items-center border border-gray-200 rounded-full overflow-hidden bg-white/80">
+                      <button
+                        onClick={() =>
+                          item.quantity > 1
+                            ? updateMutation.mutate({ id: item.id, qty: item.quantity - 1 })
+                            : removeMutation.mutate(item.id)
+                        }
+                        className="px-2.5 py-1 hover:bg-gray-100 transition-colors"
+                      >
+                        <FiMinus size={11} />
+                      </button>
+                      <span className="text-sm font-semibold w-6 text-center">{item.quantity}</span>
+                      <button
+                        onClick={() =>
+                          updateMutation.mutate({ id: item.id, qty: item.quantity + 1 })
+                        }
+                        className="px-2.5 py-1 hover:bg-gray-100 transition-colors"
+                      >
+                        <FiPlus size={11} />
+                      </button>
+                    </div>
                     <button
                       onClick={() => removeMutation.mutate(item.id)}
-                      className="ml-auto p-1 text-gray-400 hover:text-red-500 transition-colors"
+                      className="ml-auto p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
                     >
                       <FiTrash2 size={14} />
                     </button>
@@ -122,37 +141,42 @@ export function CartDrawer() {
           )}
         </div>
 
+        {/* Footer summary */}
         {items.length > 0 && (
-          <div className="px-5 py-4 border-t bg-warm-white">
+          <div className="px-5 py-4 bg-white/70 backdrop-blur-lg border-t border-white/30">
             <div className="space-y-2 text-sm mb-4">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Subtotal</span>
-                <span>₹{subtotal.toLocaleString('en-IN')}</span>
+              <div className="flex justify-between text-[#1a1a2e]/70">
+                <span>Subtotal</span>
+                <span>&#x20B9;{subtotal.toLocaleString('en-IN')}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Shipping</span>
-                <span className={shipping === 0 ? 'text-green-600 font-medium' : ''}>
+              <div className="flex justify-between text-[#1a1a2e]/70">
+                <span>Shipping</span>
+                <span className={shipping === 0 ? 'text-green-600 font-semibold' : ''}>
                   {shipping === 0 ? 'FREE' : `₹${shipping}`}
                 </span>
               </div>
               {shipping > 0 && (
-                <p className="text-xs text-rose-gold">
-                  Add ₹{(999 - subtotal).toLocaleString('en-IN')} more for free shipping
+                <p className="text-xs text-[#c5a55a]">
+                  Add &#x20B9;{(999 - subtotal).toLocaleString('en-IN')} more for free shipping
                 </p>
               )}
-              <div className="flex justify-between font-semibold text-base border-t pt-2 mt-2">
+              <div className="flex justify-between font-bold text-base border-t border-black/5 pt-2 mt-2 text-[#1a1a2e]">
                 <span>Total</span>
-                <span>₹{(subtotal + shipping).toLocaleString('en-IN')}</span>
+                <span>&#x20B9;{(subtotal + shipping).toLocaleString('en-IN')}</span>
               </div>
             </div>
 
             {/* Coupon */}
             {appliedCoupon ? (
-              <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-sm px-3 py-2 mb-3 text-sm">
+              <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-full px-4 py-2 mb-3 text-sm">
                 <span className="text-green-700 flex items-center gap-1.5">
-                  <FiTag size={13} /> <span className="font-medium">{appliedCoupon}</span> applied
+                  <FiTag size={13} />
+                  <span className="font-semibold">{appliedCoupon}</span> applied
                 </span>
-                <button onClick={() => setAppliedCoupon('')} className="text-green-600 hover:text-green-800 text-xs underline">
+                <button
+                  onClick={() => setAppliedCoupon('')}
+                  className="text-green-600 hover:text-green-800 text-xs underline"
+                >
                   Remove
                 </button>
               </div>
@@ -162,7 +186,7 @@ export function CartDrawer() {
                   value={couponInput}
                   onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
                   placeholder="Coupon code"
-                  className="flex-1 border border-gray-200 rounded-sm px-3 py-2 text-xs focus:outline-none focus:border-rose-gold"
+                  className="flex-1 bg-white/80 border border-gray-200 rounded-full px-4 py-2 text-xs focus:outline-none focus:border-[#c5a55a]"
                 />
                 <button
                   onClick={() => {
@@ -172,7 +196,7 @@ export function CartDrawer() {
                       toast.success('Coupon applied!');
                     }
                   }}
-                  className="bg-rose-gold text-white px-3 py-2 text-xs rounded-sm hover:bg-opacity-90 transition-colors"
+                  className="bg-[#c5a55a] text-[#1a1a2e] px-4 py-2 text-xs rounded-full font-semibold hover:opacity-90 transition-all"
                 >
                   Apply
                 </button>
@@ -188,7 +212,7 @@ export function CartDrawer() {
             </Link>
             <button
               onClick={closeCart}
-              className="w-full text-center text-xs text-gray-500 hover:text-charcoal mt-3 transition-colors"
+              className="w-full text-center text-xs text-gray-400 hover:text-[#1a1a2e] mt-3 transition-colors"
             >
               Continue Shopping
             </button>

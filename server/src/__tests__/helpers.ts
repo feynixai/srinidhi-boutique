@@ -98,6 +98,7 @@ export async function cleanupTest() {
   await testPrisma.category.deleteMany({});
   await testPrisma.pincodeZone.deleteMany({});
   await testPrisma.newsletter.deleteMany({});
+  await testPrisma.contactSubmission.deleteMany({});
 }
 
 export async function createTestNewsletter(email: string, overrides: Record<string, unknown> = {}) {

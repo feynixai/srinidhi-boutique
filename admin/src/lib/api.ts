@@ -112,6 +112,9 @@ export const getAdminOrders = (params?: Record<string, string>) =>
 export const updateOrderStatus = (id: string, status: string, trackingId?: string) =>
   api.put(`/api/admin/orders/${id}/status`, { status, trackingId }).then((r) => r.data as Order);
 
+export const bulkUpdateOrderStatus = (ids: string[], status: string) =>
+  api.post('/api/admin/orders/bulk-status', { ids, status }).then((r) => r.data as { updated: number });
+
 export const getAdminCoupons = () =>
   api.get('/api/admin/coupons').then((r) => r.data as Coupon[]);
 

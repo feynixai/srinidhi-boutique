@@ -147,6 +147,14 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
           className="flex-1 flex items-center justify-center gap-2 border border-green-500 text-green-600 py-3 text-sm hover:bg-green-50 transition-colors rounded-sm">
           <FaWhatsapp size={18} /> Track via WhatsApp
         </a>
+        <a
+          href={`https://wa.me/?text=${encodeURIComponent(`I just ordered from Srinidhi Boutique! Check them out at srinidhiboutique.com`)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-1 flex items-center justify-center gap-2 bg-green-500 text-white py-3 text-sm hover:bg-green-600 transition-colors rounded-sm"
+        >
+          <FaWhatsapp size={18} /> Share on WhatsApp
+        </a>
         <Link href="/shop" className="flex-1 btn-primary text-center py-3 text-sm">
           Continue Shopping
         </Link>

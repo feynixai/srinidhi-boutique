@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState, use, useEffect } from 'react';
+import { useState, use, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { FaWhatsapp } from 'react-icons/fa';
@@ -108,6 +108,9 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   const [selectedColor, setSelectedColor] = useState<string>('');
   const [selectedImage, setSelectedImage] = useState(0);
   const [adding, setAdding] = useState(false);
+  const [zoomed, setZoomed] = useState(false);
+  const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
+  const touchStartX = useRef<number | null>(null);
   const { sessionId, itemCount, setItemCount, openCart } = useCartStore();
   const { toggle: toggleWishlist, has: inWishlist } = useWishlistStore();
 
@@ -259,26 +262,62 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
               </div>
             )}
             <div className="flex-1 relative">
-              <div className="relative aspect-[3/4] overflow-hidden bg-cream">
+              <div
+                className="relative aspect-[3/4] overflow-hidden bg-cream cursor-zoom-in"
+                onMouseEnter={() => setZoomed(true)}
+                onMouseLeave={() => setZoomed(false)}
+                onMouseMove={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const x = ((e.clientX - rect.left) / rect.width) * 100;
+                  const y = ((e.clientY - rect.top) / rect.height) * 100;
+                  setZoomPos({ x, y });
+                }}
+                onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+                onTouchEnd={(e) => {
+                  if (touchStartX.current === null) return;
+                  const diff = touchStartX.current - e.changedTouches[0].clientX;
+                  if (Math.abs(diff) > 40) {
+                    if (diff > 0) setSelectedImage((i) => Math.min(i + 1, product.images.length - 1));
+                    else setSelectedImage((i) => Math.max(i - 1, 0));
+                  }
+                  touchStartX.current = null;
+                }}
+              >
                 {product.images[selectedImage] && (
                   <Image
                     src={product.images[selectedImage]}
                     alt={product.name}
                     fill
-                    className="object-cover"
+                    className="object-cover transition-transform duration-100"
+                    style={zoomed ? {
+                      transform: 'scale(2)',
+                      transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
+                    } : {}}
                     sizes="(max-width: 768px) 100vw, 50vw"
                     priority
                   />
                 )}
                 {discountPct && (
-                  <span className="absolute top-3 left-3 bg-rose-gold text-white text-xs px-3 py-1 font-semibold tracking-wide">
+                  <span className="absolute top-3 left-3 bg-rose-gold text-white text-xs px-3 py-1 font-semibold tracking-wide z-10">
                     {discountPct}% OFF
                   </span>
                 )}
                 {product.featured && (
-                  <span className="absolute top-3 right-3 bg-gold text-charcoal text-xs px-3 py-1 font-semibold tracking-wide">
+                  <span className="absolute top-3 right-3 bg-gold text-charcoal text-xs px-3 py-1 font-semibold tracking-wide z-10">
                     FEATURED
                   </span>
+                )}
+                {/* Mobile swipe indicator */}
+                {product.images.length > 1 && (
+                  <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-10 md:hidden">
+                    {product.images.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setSelectedImage(i)}
+                        className={`w-1.5 h-1.5 rounded-full transition-all ${i === selectedImage ? 'bg-white w-4' : 'bg-white/50'}`}
+                      />
+                    ))}
+                  </div>
                 )}
               </div>
             </div>

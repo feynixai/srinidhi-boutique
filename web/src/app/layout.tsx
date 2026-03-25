@@ -5,6 +5,7 @@ import { Providers } from './providers';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { CartDrawer } from '@/components/CartDrawer';
+import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { Toaster } from 'react-hot-toast';
 
 const playfair = Playfair_Display({
@@ -25,17 +26,25 @@ export const metadata: Metadata = {
   title: 'Srinidhi Boutique — Premium Women\'s Ethnic Fashion, Hyderabad',
   description: 'Discover premium sarees, kurtis, lehengas and more. Handpicked Indian ethnic wear from Hyderabad. Free shipping on orders above ₹999.',
   keywords: 'sarees, kurtis, lehengas, women ethnic fashion, Hyderabad boutique, Indian ethnic wear, festival collection',
+  manifest: '/manifest.json',
+  themeColor: '#B76E79',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      </head>
       <body className="min-h-screen flex flex-col bg-white">
         <Providers>
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
           <CartDrawer />
+          <WhatsAppButton />
           <Toaster
             position="bottom-center"
             toastOptions={{

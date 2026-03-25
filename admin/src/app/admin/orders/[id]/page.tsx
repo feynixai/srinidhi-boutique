@@ -21,10 +21,45 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
 
   const { data: order, isLoading } = useQuery({
     queryKey: ['admin-order', id],
-    queryFn: () => api.get(`/api/admin/orders`).then(() =>
-      api.get(`/api/orders/${id}`).then((r) => r.data)
-    ),
+    queryFn: () => api.get(`/api/admin/orders/${id}`).then((r) => r.data),
   });
+
+  function printInvoice() {
+    if (!order) return;
+    const address = order.address as Record<string, string>;
+    const html = `
+      <html><head><title>Invoice ${order.orderNumber}</title>
+      <style>body{font-family:sans-serif;padding:32px;color:#1a1a1a}h1{font-size:24px;margin-bottom:4px}
+      .meta{color:#666;font-size:13px;margin-bottom:24px}.divider{border:none;border-top:1px solid #eee;margin:16px 0}
+      table{width:100%;border-collapse:collapse;font-size:14px}th{text-align:left;padding:8px 4px;border-bottom:2px solid #eee}
+      td{padding:8px 4px;border-bottom:1px solid #f0f0f0}.total{font-weight:700;font-size:16px}
+      .footer{margin-top:32px;color:#999;font-size:12px;text-align:center}</style></head>
+      <body>
+        <h1>Srinidhi Boutique</h1>
+        <p class="meta">Invoice #${order.orderNumber} &nbsp;|&nbsp; ${new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+        <hr class="divider">
+        <p><strong>Customer:</strong> ${order.customerName}</p>
+        <p><strong>Phone:</strong> ${order.customerPhone}</p>
+        <p><strong>Address:</strong> ${address.line1}${address.line2 ? ', ' + address.line2 : ''}, ${address.city}, ${address.state} — ${address.pincode}</p>
+        <hr class="divider">
+        <table><thead><tr><th>Item</th><th>Size / Color</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead><tbody>
+        ${(order.items || []).map((item: {name:string;size?:string;color?:string;quantity:number;price:number}) =>
+          `<tr><td>${item.name}</td><td>${[item.size, item.color].filter(Boolean).join(' / ') || '—'}</td><td>${item.quantity}</td><td>₹${Number(item.price).toLocaleString('en-IN')}</td><td>₹${(Number(item.price) * item.quantity).toLocaleString('en-IN')}</td></tr>`
+        ).join('')}
+        </tbody></table>
+        <hr class="divider">
+        <p>Subtotal: ₹${Number(order.subtotal).toLocaleString('en-IN')}</p>
+        <p>Shipping: ${Number(order.shipping) === 0 ? 'FREE' : '₹' + Number(order.shipping).toLocaleString('en-IN')}</p>
+        ${Number(order.discount) > 0 ? `<p>Discount: -₹${Number(order.discount).toLocaleString('en-IN')}</p>` : ''}
+        <p class="total">Total: ₹${Number(order.total).toLocaleString('en-IN')}</p>
+        <hr class="divider">
+        <p>Payment: ${order.paymentMethod === 'cod' ? 'Cash on Delivery' : order.paymentMethod} (${order.paymentStatus})</p>
+        <p class="footer">Thank you for shopping with Srinidhi Boutique • hello@srinidhiboutique.com</p>
+      </body></html>
+    `;
+    const win = window.open('', '_blank');
+    if (win) { win.document.write(html); win.document.close(); win.print(); }
+  }
 
   const statusMutation = useMutation({
     mutationFn: ({ status }: { status: string }) =>
@@ -61,9 +96,15 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="space-y-6 pb-10 max-w-3xl">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
         <h1 className="text-3xl font-bold">{order.orderNumber}</h1>
         <StatusBadge status={order.status} />
+        <button
+          onClick={printInvoice}
+          className="ml-auto flex items-center gap-2 btn-action bg-gray-100 text-gray-700 px-4 py-2 text-sm hover:bg-gray-200"
+        >
+          🖨️ Print Invoice
+        </button>
       </div>
 
       {/* Status Update - Big Buttons */}

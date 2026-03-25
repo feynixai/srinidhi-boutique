@@ -12,6 +12,7 @@ import { reviewRoutes } from './routes/reviews';
 import { pincodeRoutes } from './routes/pincode';
 import { paymentRoutes } from './routes/payments';
 import { newsletterRoutes } from './routes/newsletter';
+import { contactRoutes } from './routes/contact';
 import { errorHandler } from './middleware/errorHandler';
 
 dotenv.config();
@@ -32,6 +33,7 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/pincode', pincodeRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/newsletter', newsletterRoutes);
+app.use('/api/contact', contactRoutes);
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

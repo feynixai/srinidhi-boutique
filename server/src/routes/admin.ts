@@ -211,6 +211,23 @@ adminRoutes.patch('/products/:id/stock', async (req: Request, res: Response) => 
   res.json(updated);
 });
 
+// Bulk status update — must be before /:id routes
+adminRoutes.post('/orders/bulk-status', async (req: Request, res: Response) => {
+  const { ids, status } = z
+    .object({
+      ids: z.array(z.string()).min(1),
+      status: z.enum(['placed', 'confirmed', 'packed', 'shipped', 'delivered', 'cancelled', 'returned']),
+    })
+    .parse(req.body);
+
+  const result = await prisma.order.updateMany({
+    where: { id: { in: ids } },
+    data: { status },
+  });
+
+  res.json({ updated: result.count });
+});
+
 adminRoutes.put('/orders/:id/status', async (req: Request, res: Response) => {
   const { status, trackingId } = z
     .object({

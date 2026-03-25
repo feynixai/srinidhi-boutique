@@ -1,0 +1,37 @@
+{
+  "name": "Srinidhi Boutique",
+  "short_name": "Srinidhi",
+  "description": "Premium women's ethnic fashion from Hyderabad",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFFF0",
+  "theme_color": "#B76E79",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["shopping", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "Shop Now",
+      "url": "/shop",
+      "description": "Browse our latest collection"
+    },
+    {
+      "name": "Track Order",
+      "url": "/track-order",
+      "description": "Track your order status"
+    }
+  ]
+}

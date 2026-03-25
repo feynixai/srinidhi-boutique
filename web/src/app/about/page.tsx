@@ -114,6 +114,70 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Our Journey Timeline */}
+      <section className="max-w-3xl mx-auto px-4 sm:px-6 py-16">
+        <div className="text-center mb-10">
+          <h2 className="section-heading">Our Journey</h2>
+          <div className="divider-gold" />
+        </div>
+        <div className="relative">
+          <div className="absolute left-4 top-0 bottom-0 w-px bg-gold/30" />
+          <div className="space-y-10">
+            {[
+              { year: '2015', title: 'The Beginning', desc: 'Srinidhi opened our first small boutique in Banjara Hills with a curated selection of 50 sarees, driven by a passion for authentic Indian textiles.' },
+              { year: '2017', title: 'Expanding the Collection', desc: 'We added kurtis, salwar suits, and lehengas — sourcing directly from weavers in Kanchipuram, Varanasi, and Jaipur for the best fabrics at fair prices.' },
+              { year: '2019', title: 'Going Online', desc: 'Srinidhi Boutique launched online, reaching customers across India and making premium ethnic fashion accessible beyond Hyderabad.' },
+              { year: '2021', title: 'Festival & Bridal Range', desc: 'We launched our exclusive festival and bridal collections — handpicked pieces for weddings, Diwali, Navratri, and every celebration in between.' },
+              { year: '2024', title: 'New Store & 5,000 Happy Customers', desc: 'We moved to a larger store, launched WhatsApp ordering, and celebrated 5,000 happy customers across India. The dream keeps growing!' },
+            ].map((item) => (
+              <div key={item.year} className="flex gap-6 items-start">
+                <div className="w-8 h-8 bg-charcoal border-2 border-gold text-gold font-serif text-xs flex items-center justify-center flex-shrink-0 rounded-full z-10">
+                  ★
+                </div>
+                <div>
+                  <p className="text-xs text-gold uppercase tracking-[0.2em] font-semibold mb-0.5">{item.year}</p>
+                  <h3 className="font-serif text-lg text-charcoal mb-1">{item.title}</h3>
+                  <p className="text-charcoal/60 text-sm leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Team Section */}
+      <section className="bg-cream py-16 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="section-heading">The People Behind Srinidhi</h2>
+            <div className="divider-gold" />
+            <p className="text-charcoal/60 text-sm mt-3">A family that lives and breathes beautiful clothes.</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+            {[
+              { name: 'Srinidhi', role: 'Founder & Head Buyer', img: 'team-srinidhi', desc: 'The heart of the boutique. Srinidhi hand-picks every piece with an eye for quality and an obsession for design.' },
+              { name: 'Kavitha', role: 'Customer Relations', img: 'team-kavitha', desc: 'The first voice you hear on WhatsApp. Kavitha ensures every customer finds exactly what they need.' },
+              { name: 'Ravi', role: 'Operations & Logistics', img: 'team-ravi', desc: 'Ravi keeps everything running smoothly — from packing orders with care to ensuring on-time delivery.' },
+            ].map((member) => (
+              <div key={member.name} className="text-center">
+                <div className="relative w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden bg-gray-200">
+                  <Image
+                    src={`https://picsum.photos/seed/${member.img}/200/200`}
+                    alt={member.name}
+                    fill
+                    className="object-cover"
+                    sizes="128px"
+                  />
+                </div>
+                <h3 className="font-serif text-lg text-charcoal mb-0.5">{member.name}</h3>
+                <p className="text-rose-gold text-xs uppercase tracking-[0.15em] font-semibold mb-2">{member.role}</p>
+                <p className="text-charcoal/60 text-sm leading-relaxed">{member.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="bg-charcoal py-14 text-center px-4">
         <p className="text-gold uppercase tracking-[0.2em] text-xs mb-3 font-medium">Come Visit Us</p>

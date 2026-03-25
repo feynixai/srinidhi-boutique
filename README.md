@@ -180,7 +180,7 @@ scripts/
 ### Quick Setup (automated)
 
 ```bash
-git clone https://github.com/yourusername/srinidhi-boutique.git
+git clone https://github.com/feynixai/srinidhi-boutique.git
 cd srinidhi-boutique
 bash scripts/setup.sh
 ```
@@ -462,6 +462,10 @@ MIT — see [LICENSE](./LICENSE).
 | Build 16 | 2026-03-25 | Apple Liquid Glass UI overhaul — glassmorphism, pill shapes | 1126 |
 | Build 17 | 2026-03-25 | Admin bento dashboard, product hover, trust badges, glass checkout, skeleton loaders, 404/500, accessibility | 1324 |
 | Build 18 | 2026-03-25 | README rewrite, Vercel redeploy, env docs, CONTRIBUTING.md, setup script polish | 1324 |
+| Build 19 | 2026-03-25 | Checkout 4-step flow, page transitions, admin counters, cart/shop/product UX polish | 1324 |
+| Build 20 | 2026-03-25 | Mobile UX, loading states, empty illustrations, brand assets, favicon, OG meta, cookie consent | 1324 |
+| Build 21 | 2026-03-25 | Exit intent popup, cart upsell, trust badges, announcements, sales reports, coupon analytics, social sharing | 1324 |
+| Build 22 | 2026-03-25 | Sticky bar, cart suggestions, countdown timers, size recommender, order tracking, admin bulk actions | 1324 |
 
 ---
 

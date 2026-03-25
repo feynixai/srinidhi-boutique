@@ -111,7 +111,7 @@ export function Sidebar() {
               <div key={href}>
                 <button
                   onClick={() => toggleSection(href)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-base font-medium transition-all mb-1 ${
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-full text-base font-medium transition-all mb-1 ${
                     isChildActive
                       ? 'bg-[#1a1a2e]/10 text-[#1a1a2e]'
                       : 'text-gray-600 hover:bg-white/60 hover:text-[#1a1a2e]'
@@ -130,7 +130,7 @@ export function Sidebar() {
                           key={child.href}
                           href={child.href}
                           onClick={() => setOpen(false)}
-                          className={`flex items-center gap-3 px-4 py-2.5 rounded-2xl text-sm font-medium transition-all ${
+                          className={`flex items-center gap-3 px-4 py-2.5 rounded-full text-sm font-medium transition-all ${
                             childActive
                               ? 'bg-[#1a1a2e] text-white shadow-[0_4px_12px_rgba(26,26,46,0.3)]'
                               : 'text-gray-500 hover:bg-white/60 hover:text-[#1a1a2e]'
@@ -153,7 +153,7 @@ export function Sidebar() {
               key={href}
               href={href}
               onClick={() => setOpen(false)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-base font-medium transition-all mb-1 ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-full text-base font-medium transition-all mb-1 ${
                 active
                   ? 'bg-[#1a1a2e] text-white shadow-[0_4px_12px_rgba(26,26,46,0.3)]'
                   : 'text-gray-600 hover:bg-white/60 hover:text-[#1a1a2e]'

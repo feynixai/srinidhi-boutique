@@ -152,10 +152,15 @@ export const getAdminCustomer = (phone: string) =>
 export interface Analytics {
   totalRevenue: number;
   totalOrders: number;
+  allOrdersInPeriod: number;
   avgOrderValue: number;
-  dailyRevenue: { date: string; revenue: number }[];
+  dailyRevenue: { date: string; revenue: number; orders: number }[];
   topProducts: { productId: string; name: string; _sum: { quantity: number | null } }[];
   revenueByPayment: { paymentMethod: string; _sum: { total: number | null }; _count: number }[];
+  revenueByCategory: { category: string; revenue: number }[];
+  conversionFunnel: { cartItems: number; checkoutStarted: number; paid: number; abandonedCarts: number };
+  customerAcquisition: { newCustomers: number; returningCustomers: number };
+  abandonedCarts: number;
 }
 
 export const getAnalytics = (period = '30') =>

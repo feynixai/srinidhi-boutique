@@ -379,54 +379,127 @@ adminRoutes.get('/customers/:phone', async (req: Request, res: Response) => {
   });
 });
 
-// Analytics
+// Analytics (pro)
 adminRoutes.get('/analytics', async (req: Request, res: Response) => {
   const { period = '30' } = req.query;
   const days = parseInt(period as string, 10);
   const since = new Date();
   since.setDate(since.getDate() - days);
 
-  const [orders, topProducts, revenueByPayment] = await Promise.all([
+  const [
+    orders,
+    topProducts,
+    revenueByPayment,
+    revenueByCategory,
+    allOrders,
+    cartCount,
+    checkoutCount,
+    abandonedCarts,
+  ] = await Promise.all([
     prisma.order.findMany({
       where: { createdAt: { gte: since }, paymentStatus: 'paid' },
-      select: { total: true, createdAt: true, paymentMethod: true },
+      select: { total: true, createdAt: true, paymentMethod: true, userId: true },
       orderBy: { createdAt: 'asc' },
     }),
     prisma.orderItem.groupBy({
       by: ['productId', 'name'],
-      _sum: { quantity: true },
+      where: { order: { createdAt: { gte: since } } },
+      _sum: { quantity: true, price: true },
       _count: true,
       orderBy: { _sum: { quantity: 'desc' } },
       take: 10,
     }),
     prisma.order.groupBy({
       by: ['paymentMethod'],
-      where: { paymentStatus: 'paid' },
+      where: { paymentStatus: 'paid', createdAt: { gte: since } },
       _sum: { total: true },
       _count: true,
+    }),
+    // Revenue by category — join via orderItems → product → category
+    prisma.orderItem.findMany({
+      where: { order: { createdAt: { gte: since }, paymentStatus: 'paid' } },
+      select: {
+        price: true,
+        quantity: true,
+        product: { select: { category: { select: { name: true } } } },
+      },
+    }),
+    // All orders in period (for funnel placed count)
+    prisma.order.count({ where: { createdAt: { gte: since } } }),
+    // Cart items as proxy for "add to cart" activity
+    prisma.cartItem.count(),
+    // Checkout started = orders with any status in period
+    prisma.order.count({ where: { createdAt: { gte: since } } }),
+    // Abandoned carts: cart items older than 24h (started checkout but didn't complete)
+    prisma.cartItem.count({
+      where: { createdAt: { lt: new Date(Date.now() - 24 * 60 * 60 * 1000) } },
     }),
   ]);
 
   // Daily revenue chart
-  const dailyMap = new Map<string, number>();
+  const dailyMap = new Map<string, { revenue: number; orders: number }>();
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
-    dailyMap.set(d.toISOString().slice(0, 10), 0);
+    dailyMap.set(d.toISOString().slice(0, 10), { revenue: 0, orders: 0 });
   }
   for (const o of orders) {
     const key = new Date(o.createdAt).toISOString().slice(0, 10);
-    dailyMap.set(key, (dailyMap.get(key) || 0) + Number(o.total));
+    const entry = dailyMap.get(key) || { revenue: 0, orders: 0 };
+    entry.revenue += Number(o.total);
+    entry.orders += 1;
+    dailyMap.set(key, entry);
   }
-  const dailyRevenue = Array.from(dailyMap.entries()).map(([date, revenue]) => ({ date, revenue }));
+  const dailyRevenue = Array.from(dailyMap.entries()).map(([date, v]) => ({ date, revenue: v.revenue, orders: v.orders }));
+
+  // Revenue by category
+  const catMap = new Map<string, number>();
+  for (const item of revenueByCategory) {
+    const cat = item.product?.category?.name || 'Uncategorised';
+    catMap.set(cat, (catMap.get(cat) || 0) + Number(item.price) * item.quantity);
+  }
+  const revenueByCategory2 = Array.from(catMap.entries())
+    .map(([category, revenue]) => ({ category, revenue }))
+    .sort((a, b) => b.revenue - a.revenue);
+
+  // Customer acquisition: new vs returning (users with > 1 order)
+  const userIds = orders.filter((o) => o.userId).map((o) => o.userId as string);
+  const returningUserIds = new Set<string>();
+  if (userIds.length > 0) {
+    const returning = await prisma.order.groupBy({
+      by: ['userId'],
+      where: { userId: { in: userIds }, paymentStatus: 'paid' },
+      _count: true,
+      having: { userId: { _count: { gt: 1 } } },
+    });
+    returning.forEach((r) => r.userId && returningUserIds.add(r.userId));
+  }
+  const returningCustomers = returningUserIds.size;
+  const newCustomers = orders.filter((o) => !o.userId || !returningUserIds.has(o.userId)).length;
+
+  // Conversion funnel (estimates)
+  const paidOrders = orders.length;
+  const conversionFunnel = {
+    cartItems: cartCount,
+    checkoutStarted: checkoutCount,
+    paid: paidOrders,
+    abandonedCarts,
+  };
+
+  const totalRevenue = orders.reduce((sum, o) => sum + Number(o.total), 0);
 
   res.json({
-    totalRevenue: orders.reduce((sum, o) => sum + Number(o.total), 0),
+    totalRevenue,
     totalOrders: orders.length,
-    avgOrderValue: orders.length > 0 ? orders.reduce((sum, o) => sum + Number(o.total), 0) / orders.length : 0,
+    allOrdersInPeriod: allOrders,
+    avgOrderValue: orders.length > 0 ? totalRevenue / orders.length : 0,
     dailyRevenue,
     topProducts,
     revenueByPayment,
+    revenueByCategory: revenueByCategory2,
+    conversionFunnel,
+    customerAcquisition: { newCustomers, returningCustomers },
+    abandonedCarts,
   });
 });
 

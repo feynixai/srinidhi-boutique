@@ -130,6 +130,8 @@ export async function createTestAdminUser(overrides: Record<string, unknown> = {
 
 export async function cleanupTest() {
   // Delete in FK-safe order
+  await testPrisma.backInStockNotification.deleteMany({});
+  await testPrisma.stockMovement.deleteMany({});
   await testPrisma.recentlyViewed.deleteMany({});
   await testPrisma.wishlistItem.deleteMany({});
   await testPrisma.returnRequest.deleteMany({});

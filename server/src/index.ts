@@ -17,9 +17,15 @@ import { returnRoutes } from './routes/returns';
 import { authRoutes } from './routes/auth';
 import { shippingRoutes } from './routes/shipping';
 import { userRoutes } from './routes/users';
+import { notificationRoutes } from './routes/notifications';
+import { inventoryRoutes } from './routes/inventory';
 import { errorHandler } from './middleware/errorHandler';
+import { validateEnv } from './lib/validateEnv';
+import { prisma } from './lib/prisma';
 
 dotenv.config();
+
+if (process.env.NODE_ENV !== 'test') validateEnv();
 
 const app = express();
 
@@ -43,9 +49,25 @@ app.use('/api/returns', returnRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/shipping', shippingRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/inventory', inventoryRoutes);
 
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get('/health', async (_req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      database: 'connected',
+      env: process.env.NODE_ENV || 'development',
+    });
+  } catch {
+    res.status(503).json({
+      status: 'degraded',
+      timestamp: new Date().toISOString(),
+      database: 'disconnected',
+    });
+  }
 });
 
 app.use(errorHandler);
@@ -53,9 +75,27 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 4000;
 
 if (require.main === module) {
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
+
+  // Graceful shutdown
+  function shutdown(signal: string) {
+    console.log(`\n[shutdown] ${signal} received. Shutting down gracefully...`);
+    server.close(async () => {
+      await prisma.$disconnect();
+      console.log('[shutdown] Done.');
+      process.exit(0);
+    });
+    // Force shutdown after 10s
+    setTimeout(() => {
+      console.error('[shutdown] Forcing exit after timeout.');
+      process.exit(1);
+    }, 10_000);
+  }
+
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
 }
 
 export { app };

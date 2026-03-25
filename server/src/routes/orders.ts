@@ -3,6 +3,14 @@ import { z } from 'zod';
 import { prisma } from '../lib/prisma';
 import { AppError } from '../middleware/errorHandler';
 import { calculateShipping } from './shipping';
+import {
+  sendOrderConfirmationWhatsApp,
+  sendShippingUpdateWhatsApp,
+  sendDeliveryWhatsApp,
+  sendAdminOrderNotification,
+  type OrderDetails,
+} from '../lib/whatsapp';
+import { sendOrderConfirmationEmail, sendShippingEmail, type OrderEmailData } from '../lib/email';
 
 export const orderRoutes = Router();
 
@@ -131,18 +139,63 @@ orderRoutes.post('/', async (req: Request, res: Response) => {
     include: { items: { include: { product: true } } },
   });
 
+  // Decrement stock, auto-disable when stock hits 0, log movement
   await Promise.all(
-    data.items.map((item) =>
-      prisma.product.update({
+    data.items.map(async (item, i) => {
+      const newStock = products[i]!.stock - item.quantity;
+      await prisma.product.update({
         where: { id: item.productId },
-        data: { stock: { decrement: item.quantity } },
-      })
-    )
+        data: { stock: newStock, ...(newStock === 0 ? { active: false } : {}) },
+      });
+      await prisma.stockMovement.create({
+        data: {
+          productId: item.productId,
+          delta: -item.quantity,
+          reason: 'sale',
+          note: `Order ${order.orderNumber}`,
+        },
+      });
+    })
   );
 
   if (data.sessionId) {
     await prisma.cartItem.deleteMany({ where: { sessionId: data.sessionId } });
   }
+
+  // Fire notifications async (don't block response)
+  const orderDetails: OrderDetails = {
+    orderNumber: order.orderNumber,
+    customerName: order.customerName,
+    customerPhone: order.customerPhone,
+    total: Number(order.total),
+    paymentMethod: order.paymentMethod,
+    items: order.items.map((i) => ({ name: i.name, quantity: i.quantity, price: Number(i.price) })),
+  };
+  Promise.all([
+    sendOrderConfirmationWhatsApp(orderDetails),
+    sendAdminOrderNotification(orderDetails),
+    ...(order.customerEmail
+      ? [
+          sendOrderConfirmationEmail(order.customerEmail, {
+            orderNumber: order.orderNumber,
+            customerName: order.customerName,
+            items: order.items.map((i) => ({
+              name: i.name,
+              quantity: i.quantity,
+              price: Number(i.price),
+              size: i.size || undefined,
+              color: i.color || undefined,
+            })),
+            subtotal: Number(order.subtotal),
+            shipping: Number(order.shipping),
+            discount: Number(order.discount),
+            total: Number(order.total),
+            paymentMethod: order.paymentMethod,
+            address: order.address as OrderEmailData['address'],
+          } satisfies OrderEmailData),
+        ]
+      : []),
+  ]).catch(() => {});
 
   res.status(201).json(order);
 });
@@ -201,13 +254,37 @@ orderRoutes.post('/:id/status', async (req: Request, res: Response) => {
     })
     .parse(req.body);
 
-  const order = await prisma.order.findUnique({ where: { id: req.params.id } });
+  const order = await prisma.order.findUnique({
+    where: { id: req.params.id },
+    include: { items: true },
+  });
   if (!order) throw new AppError(404, 'Order not found');
 
   const updated = await prisma.order.update({
     where: { id: req.params.id },
     data: { status, ...(trackingId ? { trackingId } : {}) },
   });
+
+  // Fire status-based notifications async
+  const details: OrderDetails = {
+    orderNumber: order.orderNumber,
+    customerName: order.customerName,
+    customerPhone: order.customerPhone,
+    total: Number(order.total),
+    paymentMethod: order.paymentMethod,
+    trackingId: trackingId || order.trackingId || undefined,
+    items: order.items.map((i) => ({ name: i.name, quantity: i.quantity, price: Number(i.price) })),
+  };
+  if (status === 'shipped') {
+    Promise.all([
+      sendShippingUpdateWhatsApp(details),
+      ...(order.customerEmail
+        ? [sendShippingEmail(order.customerEmail, { customerName: order.customerName, orderNumber: order.orderNumber, trackingId: trackingId || order.trackingId || undefined })]
+        : []),
+    ]).catch(() => {});
+  } else if (status === 'delivered') {
+    sendDeliveryWhatsApp(details).catch(() => {});
+  }
 
   res.json(updated);
 });

@@ -29,11 +29,20 @@ model Product {
   active       Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  orderItems   OrderItem[]
-  cartItems    CartItem[]
-  reviews      Review[]
-  wishlistItems  WishlistItem[]
-  recentlyViewed RecentlyViewed[]
+  orderItems             OrderItem[]
+  cartItems              CartItem[]
+  reviews                Review[]
+  wishlistItems          WishlistItem[]
+  recentlyViewed         RecentlyViewed[]
+  stockMovements         StockMovement[]
+  backInStockNotifications BackInStockNotification[]
+
+  @@index([categoryId])
+  @@index([active, featured])
+  @@index([active, bestSeller])
+  @@index([active, onOffer])
+  @@index([active, stock])
+  @@index([createdAt])
 }
 
 model Category {
@@ -129,6 +138,12 @@ model Order {
   country       String      @default("IN")
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+
+  @@index([customerPhone])
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([createdAt])
+  @@index([userId])
 }
 
 model OrderItem {
@@ -210,6 +225,32 @@ model ContactSubmission {
   email     String?
   message   String
   createdAt DateTime @default(now())
+}
+
+model StockMovement {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  delta     Int      // positive = restock, negative = sale/adjustment
+  reason    String   // "sale", "restock", "adjustment", "return", "csv_import"
+  note      String?
+  adminId   String?
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+  @@index([createdAt])
+}
+
+model BackInStockNotification {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  email     String?
+  phone     String?
+  notified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([productId])
 }
 
 model ReturnRequest {

@@ -48,6 +48,32 @@ cartRoutes.post('/', async (req: Request, res: Response) => {
   res.status(201).json(cartItem);
 });
 
+// GET /api/cart/abandoned — admin: carts older than 24h with items
+cartRoutes.get('/abandoned', async (req: Request, res: Response) => {
+  const hoursAgo = parseInt((req.query.hours as string) || '24', 10);
+  const cutoff = new Date(Date.now() - hoursAgo * 60 * 60 * 1000);
+
+  const sessions = await prisma.cartItem.groupBy({
+    by: ['sessionId'],
+    where: { createdAt: { lt: cutoff } },
+    _count: true,
+    _sum: { quantity: true },
+  });
+
+  res.json({ count: sessions.length, sessions });
+});
+
+// GET /api/cart/reminder/:sessionId — check if session has an old cart (for reminder banner)
+cartRoutes.get('/reminder/:sessionId', async (req: Request, res: Response) => {
+  const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const items = await prisma.cartItem.findMany({
+    where: { sessionId: req.params.sessionId, createdAt: { lt: cutoff } },
+    include: { product: { select: { name: true, images: true, slug: true } } },
+    take: 5,
+  });
+  res.json({ hasAbandonedCart: items.length > 0, items });
+});
+
 cartRoutes.get('/:sessionId', async (req: Request, res: Response) => {
   const items = await prisma.cartItem.findMany({
     where: { sessionId: req.params.sessionId },

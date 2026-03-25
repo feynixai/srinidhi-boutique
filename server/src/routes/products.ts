@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
 import { AppError } from '../middleware/errorHandler';
+import { cache, TTL } from '../lib/cache';
 
 export const productRoutes = Router();
 
@@ -70,12 +71,17 @@ productRoutes.get('/', async (req: Request, res: Response) => {
 });
 
 productRoutes.get('/featured', async (_req: Request, res: Response) => {
+  const cacheKey = 'products:featured';
+  const cached = cache.get(cacheKey);
+  if (cached) return res.json(cached);
+
   const products = await prisma.product.findMany({
     where: { featured: true, active: true },
     include: { category: true },
     orderBy: { createdAt: 'desc' },
     take: 12,
   });
+  cache.set(cacheKey, products, TTL.FEATURED);
   res.json(products);
 });
 
@@ -97,6 +103,46 @@ productRoutes.get('/offers', async (_req: Request, res: Response) => {
     take: 20,
   });
   res.json(products);
+});
+
+// GET /api/products/id/:id — lookup by ID (for recently viewed)
+productRoutes.get('/id/:id', async (req: Request, res: Response) => {
+  const product = await prisma.product.findUnique({
+    where: { id: req.params.id },
+    include: { category: true },
+  });
+  if (!product || !product.active) throw new AppError(404, 'Product not found');
+  res.json(product);
+});
+
+// GET /api/products/:slug/recommendations — same category + price range
+productRoutes.get('/:slug/recommendations', async (req: Request, res: Response) => {
+  const product = await prisma.product.findUnique({ where: { slug: req.params.slug } });
+  if (!product) throw new AppError(404, 'Product not found');
+
+  const priceNum = Number(product.price);
+  const priceRange = priceNum * 0.4; // ±40%
+
+  const recommendations = await prisma.product.findMany({
+    where: {
+      active: true,
+      id: { not: product.id },
+      OR: [
+        { categoryId: product.categoryId || undefined },
+        {
+          price: {
+            gte: priceNum - priceRange,
+            lte: priceNum + priceRange,
+          },
+        },
+      ],
+    },
+    include: { category: true },
+    orderBy: { bestSeller: 'desc' },
+    take: 8,
+  });
+
+  res.json(recommendations);
 });
 
 productRoutes.get('/:slug', async (req: Request, res: Response) => {

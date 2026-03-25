@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { toast } from 'react-hot-toast';
-import { FiUserPlus, FiTrash2, FiMegaphone } from 'react-icons/fi';
+import { FiUserPlus, FiTrash2, FiRadio } from 'react-icons/fi';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -223,7 +223,7 @@ export default function SettingsPage() {
         </div>
         {announcement.active && announcement.text && (
           <div className="bg-[#1a1a2e] text-[#c5a55a] text-xs rounded-lg px-4 py-2.5 flex items-center gap-2">
-            <FiMegaphone size={13} />
+            <FiRadio size={13} />
             <span className="truncate">{announcement.text}</span>
           </div>
         )}

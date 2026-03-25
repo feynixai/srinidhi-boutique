@@ -10,6 +10,8 @@ import { couponRoutes } from './routes/coupons';
 import { adminRoutes } from './routes/admin';
 import { reviewRoutes } from './routes/reviews';
 import { pincodeRoutes } from './routes/pincode';
+import { paymentRoutes } from './routes/payments';
+import { newsletterRoutes } from './routes/newsletter';
 import { errorHandler } from './middleware/errorHandler';
 
 dotenv.config();
@@ -28,6 +30,8 @@ app.use('/api/coupons', couponRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/pincode', pincodeRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/newsletter', newsletterRoutes);
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

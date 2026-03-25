@@ -162,6 +162,23 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
     ? Math.round(((Number(product.comparePrice) - Number(product.price)) / Number(product.comparePrice)) * 100)
     : null;
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: product.description || `${product.name} — Premium Indian ethnic wear from Srinidhi Boutique`,
+    image: product.images,
+    sku: product.id,
+    brand: { '@type': 'Brand', name: 'Srinidhi Boutique' },
+    offers: {
+      '@type': 'Offer',
+      price: Number(product.price).toFixed(2),
+      priceCurrency: 'INR',
+      availability: product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      seller: { '@type': 'Organization', name: 'Srinidhi Boutique' },
+    },
+  };
+
   const whatsappMsg = encodeURIComponent(
     `Hi! I'm interested in buying "${product.name}" (₹${Number(product.price).toLocaleString('en-IN')})${selectedSize ? `, Size: ${selectedSize}` : ''}${selectedColor ? `, Color: ${selectedColor}` : ''}. Can you help me place an order?`
   );
@@ -204,6 +221,11 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
   return (
     <div className="bg-white">
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Breadcrumb */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
         <p className="text-xs text-charcoal/40 tracking-wide">

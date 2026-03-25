@@ -6,6 +6,8 @@ import { toast } from 'react-hot-toast';
 import { useCartStore } from '@/lib/cart-store';
 import { getCart, placeOrder, validateCoupon } from '@/lib/api';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+
 type Step = 'address' | 'payment' | 'confirm';
 
 const UPI_ID = 'srinidhioboutique@ybl';
@@ -111,7 +113,7 @@ export default function CheckoutPage() {
     return true;
   }
 
-  async function handlePlaceOrder() {
+  async function handlePlaceOrder(razorpayPaymentId?: string) {
     if (items.length === 0) { toast.error('Your cart is empty'); return; }
     setSubmitting(true);
     try {
@@ -133,6 +135,7 @@ export default function CheckoutPage() {
           color: i.color,
         })),
         paymentMethod,
+        paymentId: razorpayPaymentId,
         couponCode: couponCode || undefined,
         sessionId,
       });
@@ -142,6 +145,77 @@ export default function CheckoutPage() {
       const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Failed to place order';
       toast.error(msg);
     } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleRazorpayPayment() {
+    if (items.length === 0) { toast.error('Your cart is empty'); return; }
+    setSubmitting(true);
+    try {
+      // Create Razorpay order on server
+      const res = await fetch(`${API_URL}/api/payments/create-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: total, receipt: `cart_${sessionId}` }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to create payment order');
+
+      // Load Razorpay script dynamically
+      if (!(window as unknown as Record<string, unknown>)['Razorpay']) {
+        await new Promise<void>((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+          script.onload = () => resolve();
+          script.onerror = () => reject(new Error('Failed to load Razorpay'));
+          document.body.appendChild(script);
+        });
+      }
+
+      const RazorpayClass = (window as unknown as Record<string, unknown>)['Razorpay'] as new (opts: Record<string, unknown>) => { open(): void };
+      const rzp = new RazorpayClass({
+        key: data.keyId,
+        amount: data.amount,
+        currency: data.currency,
+        name: 'Srinidhi Boutique',
+        description: `Order — ${items.length} item${items.length > 1 ? 's' : ''}`,
+        order_id: data.id,
+        prefill: {
+          name: address.customerName,
+          contact: address.customerPhone,
+          email: address.customerEmail || undefined,
+        },
+        theme: { color: '#B76E79' },
+        handler: async (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
+          try {
+            // Verify payment
+            const verifyRes = await fetch(`${API_URL}/api/payments/verify`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(response),
+            });
+            const verifyData = await verifyRes.json();
+            if (!verifyRes.ok || !verifyData.verified) throw new Error('Payment verification failed');
+
+            toast.success('Payment successful!');
+            await handlePlaceOrder(response.razorpay_payment_id);
+          } catch {
+            toast.error('Payment verification failed. Contact support.');
+            setSubmitting(false);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setSubmitting(false);
+            toast.error('Payment cancelled');
+          },
+        },
+      });
+      rzp.open();
+    } catch (err: unknown) {
+      const msg = (err as Error).message || 'Payment failed';
+      toast.error(msg);
       setSubmitting(false);
     }
   }
@@ -439,11 +513,13 @@ export default function CheckoutPage() {
                   Back
                 </button>
                 <button
-                  onClick={handlePlaceOrder}
+                  onClick={paymentMethod === 'razorpay' ? handleRazorpayPayment : () => handlePlaceOrder()}
                   disabled={submitting}
                   className="btn-primary flex-1 py-3 text-sm tracking-widest disabled:opacity-50"
                 >
-                  {submitting ? 'PLACING ORDER...' : 'PLACE ORDER'}
+                  {submitting
+                    ? (paymentMethod === 'razorpay' ? 'OPENING PAYMENT...' : 'PLACING ORDER...')
+                    : (paymentMethod === 'razorpay' ? 'PAY NOW' : 'PLACE ORDER')}
                 </button>
               </div>
             </div>

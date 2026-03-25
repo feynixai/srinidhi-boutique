@@ -2,6 +2,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getFeaturedProducts, getBestSellers, getOffers, getCategories } from '@/lib/api';
 import { ProductCard } from '@/components/ProductCard';
+import { HeroCarousel } from '@/components/HeroCarousel';
+import { NewsletterSignup } from '@/components/NewsletterSignup';
 
 async function getData() {
   const [featured, bestSellers, offers, categories] = await Promise.all([
@@ -23,53 +25,8 @@ export default async function HomePage() {
         Free Shipping Above ₹999 &nbsp;·&nbsp; New Festival Collection Live &nbsp;·&nbsp; Easy 7-Day Returns
       </div>
 
-      {/* Hero Banner */}
-      <section className="relative h-[85vh] min-h-[560px] overflow-hidden">
-        <div className="absolute inset-0">
-          <Image
-            src="https://picsum.photos/seed/ethnic-hero/1600/1000"
-            alt="Srinidhi Boutique Festival Collection"
-            fill
-            className="object-cover object-top"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-charcoal/80 via-charcoal/50 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-charcoal/40 via-transparent to-transparent" />
-        </div>
-        <div className="relative h-full flex items-center px-6 md:px-16 lg:px-24">
-          <div className="text-white max-w-xl animate-slide-up">
-            <p className="text-gold uppercase tracking-[0.25em] text-xs mb-4 font-medium">
-              New Collection · Festival 2026
-            </p>
-            <h1 className="font-serif text-5xl md:text-7xl leading-[1.1] mb-5">
-              New Festival<br />
-              <span className="text-gold italic">Collection</span>
-            </h1>
-            <p className="text-white/75 text-base md:text-lg mb-8 leading-relaxed max-w-sm">
-              Handpicked sarees, lehengas & kurtis crafted for the modern Indian woman.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Link
-                href="/shop"
-                className="btn-primary px-8 py-4 text-sm tracking-widest text-center inline-block"
-              >
-                SHOP COLLECTION
-              </Link>
-              <Link
-                href="/offers"
-                className="border border-white/60 text-white px-8 py-4 text-sm tracking-widest hover:bg-white/10 transition-colors text-center inline-block"
-              >
-                VIEW OFFERS
-              </Link>
-            </div>
-          </div>
-        </div>
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-white/50">
-          <span className="text-xs tracking-widest uppercase">Scroll</span>
-          <div className="w-px h-8 bg-white/30" />
-        </div>
-      </section>
+      {/* Hero Carousel */}
+      <HeroCarousel />
 
       {/* Trust Badges Strip */}
       <div className="bg-cream border-y border-gold/20">
@@ -223,6 +180,9 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* Newsletter */}
+      <NewsletterSignup />
 
       {/* Instagram-style Social Proof */}
       <section className="bg-charcoal py-14 text-center">

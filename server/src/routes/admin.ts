@@ -419,6 +419,144 @@ adminRoutes.post('/categories', async (req: Request, res: Response) => {
   res.status(201).json(category);
 });
 
+// Invoice generation
+adminRoutes.get('/orders/:id/invoice', async (req: Request, res: Response) => {
+  const order = await prisma.order.findUnique({
+    where: { id: req.params.id },
+    include: { items: { include: { product: { include: { category: true } } } } },
+  });
+  if (!order) throw new AppError(404, 'Order not found');
+
+  const address = order.address as { line1: string; line2?: string; city: string; state: string; pincode: string };
+  const subtotal = Number(order.subtotal);
+  const gstRate = 0.05; // 5% GST on clothing
+  const gstAmount = subtotal * gstRate;
+  const formattedDate = new Date(order.createdAt).toLocaleDateString('en-IN', {
+    day: '2-digit', month: 'long', year: 'numeric',
+  });
+
+  const itemRows = order.items.map((item) => {
+    const itemTotal = Number(item.price) * item.quantity;
+    const itemGst = itemTotal * gstRate;
+    return `
+      <tr>
+        <td style="padding:10px 12px;border-bottom:1px solid #f0e8e8;">${item.name}${item.size ? ` <span style="color:#999;font-size:12px;">(${item.size})</span>` : ''}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #f0e8e8;text-align:center;">${item.quantity}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #f0e8e8;text-align:right;">₹${Number(item.price).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #f0e8e8;text-align:right;">₹${itemGst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #f0e8e8;text-align:right;font-weight:600;">₹${itemTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+      </tr>`;
+  }).join('');
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Invoice ${order.orderNumber}</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 14px; color: #333; background: #fff; }
+  .invoice { max-width: 800px; margin: 0 auto; padding: 40px; }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 3px solid #B76E79; padding-bottom: 24px; }
+  .brand h1 { font-family: Georgia, serif; font-size: 28px; color: #1a1a1a; }
+  .brand p { color: #B76E79; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+  .brand .gstin { color: #666; font-size: 11px; margin-top: 6px; }
+  .invoice-meta { text-align: right; }
+  .invoice-meta h2 { font-size: 22px; color: #B76E79; font-weight: 700; letter-spacing: 1px; }
+  .invoice-meta p { font-size: 12px; color: #666; margin-top: 4px; }
+  .parties { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; }
+  .party h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #B76E79; margin-bottom: 8px; font-weight: 600; }
+  .party p { font-size: 13px; color: #333; line-height: 1.6; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+  th { background: #1a1a1a; color: #fff; padding: 12px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  th:not(:first-child) { text-align: center; }
+  th:last-child, th:nth-child(3), th:nth-child(4) { text-align: right; }
+  td { font-size: 13px; color: #333; }
+  .totals { margin-left: auto; width: 280px; }
+  .totals table { margin: 0; }
+  .totals td { padding: 6px 12px; border: none !important; }
+  .totals tr:last-child td { font-weight: 700; font-size: 16px; color: #1a1a1a; border-top: 2px solid #B76E79 !important; padding-top: 10px; }
+  .footer { margin-top: 40px; border-top: 1px solid #f0e8e8; padding-top: 20px; text-align: center; color: #999; font-size: 12px; }
+  .badge { display: inline-block; background: #f0e8e8; color: #B76E79; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+  @media print { .invoice { padding: 20px; } .no-print { display: none; } }
+</style>
+</head>
+<body>
+<div class="invoice">
+  <div class="header">
+    <div class="brand">
+      <h1>Srinidhi Boutique</h1>
+      <p>Premium Women's Ethnic Fashion</p>
+      <p style="color:#666;font-size:12px;margin-top:6px;">Hyderabad, Telangana — 500001</p>
+      <p class="gstin">GSTIN: 36XXXXX0000X1Z5</p>
+    </div>
+    <div class="invoice-meta">
+      <h2>TAX INVOICE</h2>
+      <p><strong>${order.orderNumber}</strong></p>
+      <p>Date: ${formattedDate}</p>
+      <p style="margin-top:8px;"><span class="badge">${order.status.toUpperCase()}</span></p>
+    </div>
+  </div>
+
+  <div class="parties">
+    <div class="party">
+      <h3>Bill To</h3>
+      <p><strong>${order.customerName}</strong></p>
+      <p>${order.customerPhone}</p>
+      ${order.customerEmail ? `<p>${order.customerEmail}</p>` : ''}
+      <p style="margin-top:4px;">${address.line1}${address.line2 ? ', ' + address.line2 : ''}</p>
+      <p>${address.city}, ${address.state} — ${address.pincode}</p>
+    </div>
+    <div class="party" style="text-align:right;">
+      <h3>Payment</h3>
+      <p><strong>Method:</strong> ${order.paymentMethod === 'cod' ? 'Cash on Delivery' : order.paymentMethod === 'razorpay' ? 'Razorpay (Online)' : 'UPI'}</p>
+      <p><strong>Status:</strong> ${order.paymentStatus}</p>
+      ${order.paymentId ? `<p style="font-size:11px;color:#999;margin-top:4px;">Ref: ${order.paymentId}</p>` : ''}
+      ${order.couponCode ? `<p style="margin-top:4px;"><strong>Coupon:</strong> ${order.couponCode}</p>` : ''}
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:40%;">Item</th>
+        <th style="width:10%;text-align:center;">Qty</th>
+        <th style="width:15%;text-align:right;">Rate</th>
+        <th style="width:15%;text-align:right;">GST (5%)</th>
+        <th style="width:20%;text-align:right;">Amount</th>
+      </tr>
+    </thead>
+    <tbody>${itemRows}</tbody>
+  </table>
+
+  <div class="totals">
+    <table>
+      <tr><td>Subtotal</td><td style="text-align:right;">₹${subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td></tr>
+      <tr><td>GST @ 5%</td><td style="text-align:right;">₹${gstAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td></tr>
+      <tr><td>Shipping</td><td style="text-align:right;">${Number(order.shipping) === 0 ? '<span style="color:green;">FREE</span>' : '₹' + Number(order.shipping).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td></tr>
+      ${Number(order.discount) > 0 ? `<tr><td>Discount</td><td style="text-align:right;color:green;">-₹${Number(order.discount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td></tr>` : ''}
+      ${order.paymentMethod === 'cod' ? `<tr><td>COD Charge</td><td style="text-align:right;">₹50.00</td></tr>` : ''}
+      <tr><td><strong>Total</strong></td><td style="text-align:right;"><strong>₹${Number(order.total).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong></td></tr>
+    </table>
+  </div>
+
+  <div class="footer">
+    <p>Thank you for shopping with Srinidhi Boutique!</p>
+    <p style="margin-top:4px;">For queries: +91-XXXXXXXXXX | srinidhiboutique@gmail.com</p>
+    <p style="margin-top:8px;font-style:italic;">This is a computer-generated invoice and does not require a signature.</p>
+  </div>
+</div>
+<script class="no-print">
+  // Auto-print when opened directly
+  if (window.location.search.includes('print=1')) window.print();
+</script>
+</body>
+</html>`;
+
+  res.setHeader('Content-Type', 'text/html');
+  res.send(html);
+});
+
 adminRoutes.put('/categories/:id', async (req: Request, res: Response) => {
   const { name, image } = z.object({ name: z.string().optional(), image: z.string().optional() }).parse(req.body);
   const existing = await prisma.category.findUnique({ where: { id: req.params.id } });

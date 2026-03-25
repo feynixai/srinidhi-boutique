@@ -125,3 +125,12 @@ model PincodeZone {
   deliveryDays Int      @default(5)
   available    Boolean  @default(true)
 }
+
+model Newsletter {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  active    Boolean  @default(true)
+  source    String?
+  createdAt DateTime @default(now())
+}

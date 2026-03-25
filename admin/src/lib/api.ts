@@ -1,0 +1,124 @@
+import axios from 'axios';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+
+export const api = axios.create({
+  baseURL: API_URL,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+export interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  price: number;
+  comparePrice?: number;
+  images: string[];
+  category?: { id: string; name: string; slug: string };
+  categoryId?: string;
+  sizes: string[];
+  colors: string[];
+  fabric?: string;
+  occasion: string[];
+  stock: number;
+  featured: boolean;
+  bestSeller: boolean;
+  onOffer: boolean;
+  offerPercent?: number;
+  active: boolean;
+  createdAt: string;
+}
+
+export interface Order {
+  id: string;
+  orderNumber: string;
+  items: OrderItem[];
+  customerName: string;
+  customerPhone: string;
+  customerEmail?: string;
+  address: Record<string, string>;
+  subtotal: number;
+  shipping: number;
+  discount: number;
+  total: number;
+  paymentMethod: string;
+  paymentStatus: string;
+  status: string;
+  trackingId?: string;
+  notes?: string;
+  couponCode?: string;
+  createdAt: string;
+}
+
+export interface OrderItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  size?: string;
+  color?: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export interface Coupon {
+  id: string;
+  code: string;
+  discount: number;
+  minOrder?: number;
+  maxUses?: number;
+  usedCount: number;
+  active: boolean;
+  expiresAt?: string;
+}
+
+export interface DashboardStats {
+  todayOrders: number;
+  todayRevenue: number;
+  totalOrders: number;
+  totalRevenue: number;
+  pendingOrders: number;
+  recentOrders: Order[];
+  totalProducts: number;
+  lowStockProducts: number;
+}
+
+export const getDashboard = () =>
+  api.get('/api/admin/dashboard').then((r) => r.data as DashboardStats);
+
+export const getAdminProducts = (params?: Record<string, string>) =>
+  api.get('/api/admin/products', { params }).then((r) => r.data);
+
+export const createProduct = (data: Record<string, unknown>) =>
+  api.post('/api/admin/products', data).then((r) => r.data as Product);
+
+export const updateProduct = (id: string, data: Record<string, unknown>) =>
+  api.put(`/api/admin/products/${id}`, data).then((r) => r.data as Product);
+
+export const deleteProduct = (id: string) =>
+  api.delete(`/api/admin/products/${id}`).then((r) => r.data);
+
+export const getAdminOrders = (params?: Record<string, string>) =>
+  api.get('/api/admin/orders', { params }).then((r) => r.data);
+
+export const updateOrderStatus = (id: string, status: string, trackingId?: string) =>
+  api.put(`/api/admin/orders/${id}/status`, { status, trackingId }).then((r) => r.data as Order);
+
+export const getAdminCoupons = () =>
+  api.get('/api/admin/coupons').then((r) => r.data as Coupon[]);
+
+export const createCoupon = (data: Record<string, unknown>) =>
+  api.post('/api/admin/coupons', data).then((r) => r.data as Coupon);
+
+export const updateCoupon = (id: string, data: Record<string, unknown>) =>
+  api.put(`/api/admin/coupons/${id}`, data).then((r) => r.data as Coupon);
+
+export const deleteCoupon = (id: string) =>
+  api.delete(`/api/admin/coupons/${id}`).then((r) => r.data);
+
+export const getCategories = () =>
+  api.get('/api/categories').then((r) => r.data as Category[]);

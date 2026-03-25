@@ -36,6 +36,7 @@ model Product {
   recentlyViewed         RecentlyViewed[]
   stockMovements         StockMovement[]
   backInStockNotifications BackInStockNotification[]
+  flashSaleProducts      FlashSaleProduct[]
 
   @@index([categoryId])
   @@index([active, featured])
@@ -63,10 +64,13 @@ model User {
   addresses Json     @default("[]")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  orders         Order[]
-  reviews        Review[]
-  wishlistItems  WishlistItem[]
-  recentlyViewed RecentlyViewed[]
+  orders          Order[]
+  reviews         Review[]
+  wishlistItems   WishlistItem[]
+  recentlyViewed  RecentlyViewed[]
+  loyaltyAccount  LoyaltyAccount?
+  referralsMade   Referral[]       @relation("ReferralsMade")
+  referralReceived Referral[]      @relation("ReferralReceived")
 }
 
 model AdminUser {
@@ -263,4 +267,94 @@ model ReturnRequest {
   status        String   @default("pending")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+// ── Build 9 models ──────────────────────────────────────────────────────────
+
+model LoyaltyAccount {
+  id           String         @id @default(cuid())
+  userId       String         @unique
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  points       Int            @default(0)
+  tier         String         @default("Bronze") // Bronze, Silver, Gold
+  totalEarned  Int            @default(0)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  history      LoyaltyHistory[]
+}
+
+model LoyaltyHistory {
+  id               String         @id @default(cuid())
+  loyaltyAccountId String
+  loyaltyAccount   LoyaltyAccount @relation(fields: [loyaltyAccountId], references: [id], onDelete: Cascade)
+  delta            Int            // positive = earn, negative = redeem
+  reason           String         // "purchase", "review", "referral", "redeem", "manual"
+  description      String?
+  orderId          String?
+  createdAt        DateTime       @default(now())
+
+  @@index([loyaltyAccountId])
+}
+
+model Referral {
+  id          String   @id @default(cuid())
+  referrerId  String
+  referrer    User     @relation("ReferralsMade", fields: [referrerId], references: [id])
+  referredId  String?
+  referred    User?    @relation("ReferralReceived", fields: [referredId], references: [id])
+  code        String   @unique
+  status      String   @default("pending") // pending, completed
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([referrerId])
+  @@index([code])
+}
+
+model FlashSale {
+  id              String           @id @default(cuid())
+  title           String
+  discountPercent Int
+  startsAt        DateTime
+  endsAt          DateTime
+  active          Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  products        FlashSaleProduct[]
+}
+
+model FlashSaleProduct {
+  id          String    @id @default(cuid())
+  flashSaleId String
+  flashSale   FlashSale @relation(fields: [flashSaleId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([flashSaleId, productId])
+  @@index([productId])
+}
+
+model Lookbook {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  image       String
+  productIds  String[]
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  message   String
+  reply     String?
+  status    String   @default("open") // open, replied, closed
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
 }

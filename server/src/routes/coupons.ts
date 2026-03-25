@@ -48,3 +48,45 @@ couponRoutes.post('/validate', async (req: Request, res: Response) => {
     message: `${coupon.discount}% off applied!`,
   });
 });
+
+// GET /api/coupons/best?total=XXX — find the best valid coupon for an order total
+couponRoutes.get('/best', async (req: Request, res: Response) => {
+  const total = parseFloat((req.query.total as string) || '0');
+  if (!total || total <= 0) {
+    res.json({ coupons: [], best: null });
+    return;
+  }
+
+  const now = new Date();
+
+  const validCoupons = await prisma.coupon.findMany({
+    where: {
+      active: true,
+      OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
+    },
+  });
+
+  // Filter coupons that meet min order requirement and haven't hit max uses
+  const eligible = validCoupons.filter((c) => {
+    if (c.maxUses !== null && c.usedCount >= c.maxUses) return false;
+    if (c.minOrder && total < Number(c.minOrder)) return false;
+    return true;
+  });
+
+  const withSavings = eligible.map((c) => ({
+    code: c.code,
+    discount: c.discount,
+    discountAmount: Math.round((total * c.discount) / 100),
+    minOrder: c.minOrder ? Number(c.minOrder) : null,
+    message: `${c.discount}% off — saves ₹${Math.round((total * c.discount) / 100)}`,
+  }));
+
+  withSavings.sort((a, b) => b.discountAmount - a.discountAmount);
+
+  const best = withSavings[0] || null;
+  if (best) {
+    (best as Record<string, unknown>).isBestDeal = true;
+  }
+
+  res.json({ coupons: withSavings, best });
+});

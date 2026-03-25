@@ -148,12 +148,82 @@ productRoutes.get('/:slug/recommendations', async (req: Request, res: Response) 
 productRoutes.get('/:slug', async (req: Request, res: Response) => {
   const product = await prisma.product.findUnique({
     where: { slug: req.params.slug },
-    include: { category: true },
+    include: { category: true, reviews: { where: { approved: true } } },
   });
 
   if (!product || !product.active) {
     throw new AppError(404, 'Product not found');
   }
 
-  res.json(product);
+  // Social proof / urgency signals
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const recentPurchases = await prisma.orderItem.count({
+    where: { productId: product.id, order: { createdAt: { gte: sevenDaysAgo } } },
+  });
+
+  const reviews = product.reviews;
+  const avgRating = reviews.length > 0
+    ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+    : null;
+
+  const { reviews: _r, ...productData } = product;
+
+  res.json({
+    ...productData,
+    trending: product.bestSeller,
+    lowStock: product.stock > 0 && product.stock < 5,
+    outOfStock: product.stock === 0,
+    recentPurchases,
+    reviewCount: reviews.length,
+    avgRating: avgRating ? Math.round(avgRating * 10) / 10 : null,
+  });
+});
+
+// GET /api/products/for-you/:userId — personalized recommendations
+productRoutes.get('/for-you/:userId', async (req: Request, res: Response) => {
+  const { userId } = req.params;
+
+  // Get user's recently viewed categories
+  const recentlyViewed = await prisma.recentlyViewed.findMany({
+    where: { userId },
+    include: { product: { select: { categoryId: true } } },
+    orderBy: { viewedAt: 'desc' },
+    take: 10,
+  });
+
+  const viewedCategoryIds = [
+    ...new Set(recentlyViewed.map((rv) => rv.product.categoryId).filter(Boolean)),
+  ] as string[];
+
+  // Get purchased product IDs to exclude
+  const purchasedItems = await prisma.orderItem.findMany({
+    where: { order: { userId } },
+    select: { productId: true },
+  });
+  const purchasedIds = purchasedItems.map((i) => i.productId);
+
+  let products;
+
+  if (viewedCategoryIds.length > 0) {
+    products = await prisma.product.findMany({
+      where: {
+        active: true,
+        categoryId: { in: viewedCategoryIds },
+        id: { notIn: purchasedIds },
+      },
+      include: { category: true },
+      orderBy: [{ bestSeller: 'desc' }, { createdAt: 'desc' }],
+      take: 12,
+    });
+  } else {
+    // Fallback: bestsellers
+    products = await prisma.product.findMany({
+      where: { active: true, bestSeller: true },
+      include: { category: true },
+      orderBy: { createdAt: 'desc' },
+      take: 12,
+    });
+  }
+
+  res.json({ products, personalized: viewedCategoryIds.length > 0 });
 });

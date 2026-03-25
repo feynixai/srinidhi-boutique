@@ -107,7 +107,7 @@ export async function createTestUser(overrides: Record<string, unknown> = {}) {
     data: {
       phone,
       name: 'Test User',
-      email: overrides.email as string || `test${Date.now()}@example.com`,
+      email: overrides.email as string || `test${Date.now()}${Math.floor(Math.random() * 10000)}@example.com`,
       ...(overrides as Record<string, unknown>),
     },
   });
@@ -130,6 +130,13 @@ export async function createTestAdminUser(overrides: Record<string, unknown> = {
 
 export async function cleanupTest() {
   // Delete in FK-safe order
+  await testPrisma.chatMessage.deleteMany({});
+  await testPrisma.lookbook.deleteMany({});
+  await testPrisma.flashSaleProduct.deleteMany({});
+  await testPrisma.flashSale.deleteMany({});
+  await testPrisma.loyaltyHistory.deleteMany({});
+  await testPrisma.loyaltyAccount.deleteMany({});
+  await testPrisma.referral.deleteMany({});
   await testPrisma.backInStockNotification.deleteMany({});
   await testPrisma.stockMovement.deleteMany({});
   await testPrisma.recentlyViewed.deleteMany({});

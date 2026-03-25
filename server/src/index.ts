@@ -19,6 +19,12 @@ import { shippingRoutes } from './routes/shipping';
 import { userRoutes } from './routes/users';
 import { notificationRoutes } from './routes/notifications';
 import { inventoryRoutes } from './routes/inventory';
+import { loyaltyRoutes } from './routes/loyalty';
+import { referralRoutes } from './routes/referrals';
+import { searchRoutes } from './routes/search';
+import { flashSaleRoutes } from './routes/flashsales';
+import { lookbookRoutes } from './routes/lookbook';
+import { chatRoutes } from './routes/chat';
 import { errorHandler } from './middleware/errorHandler';
 import { validateEnv } from './lib/validateEnv';
 import { prisma } from './lib/prisma';
@@ -51,6 +57,12 @@ app.use('/api/shipping', shippingRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/inventory', inventoryRoutes);
+app.use('/api/loyalty', loyaltyRoutes);
+app.use('/api/referrals', referralRoutes);
+app.use('/api/search', searchRoutes);
+app.use('/api/flash-sales', flashSaleRoutes);
+app.use('/api/lookbook', lookbookRoutes);
+app.use('/api/chat', chatRoutes);
 
 app.get('/health', async (_req, res) => {
   try {

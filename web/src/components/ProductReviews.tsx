@@ -67,7 +67,7 @@ export function ProductReviews({ productId }: { productId: string }) {
                 <span className="text-sm text-gray-600">{avgRating.toFixed(1)} out of 5 · {reviews.length} review{reviews.length !== 1 ? 's' : ''}</span>
               </div>
             ) : (
-              <p className="text-sm text-gray-400">No reviews yet — be the first!</p>
+              <p className="text-sm text-gray-600">No reviews yet — be the first!</p>
             )}
           </div>
           <button
@@ -90,7 +90,7 @@ export function ProductReviews({ productId }: { productId: string }) {
                     style={{ width: reviews.length > 0 ? `${(d.count / reviews.length) * 100}%` : '0%' }}
                   />
                 </div>
-                <span className="text-xs text-gray-400 w-5">{d.count}</span>
+                <span className="text-xs text-gray-600 w-5">{d.count}</span>
               </div>
             ))}
           </div>
@@ -167,14 +167,14 @@ export function ProductReviews({ productId }: { productId: string }) {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1">Photo URL <span className="text-gray-400 font-normal">(optional — share your photo!)</span></label>
+              <label className="block text-xs font-medium mb-1">Photo URL <span className="text-gray-600 font-normal">(optional — share your photo!)</span></label>
               <input
                 value={form.imageUrl}
                 onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
                 placeholder="https://... (link to your photo)"
                 className="w-full border border-gray-200 rounded-sm px-3 py-2 text-sm focus:outline-none focus:border-rose-gold"
               />
-              <p className="text-[11px] text-gray-400 mt-1">Upload your photo to Imgur, Google Photos, or any image host and paste the link here.</p>
+              <p className="text-[11px] text-gray-600 mt-1">Upload your photo to Imgur, Google Photos, or any image host and paste the link here.</p>
             </div>
             <button type="submit" disabled={mutation.isPending} className="btn-primary px-6 py-2.5 text-sm disabled:opacity-50">
               {mutation.isPending ? 'Submitting...' : 'Submit Review'}
@@ -188,7 +188,7 @@ export function ProductReviews({ productId }: { productId: string }) {
             {[1, 2].map((i) => <div key={i} className="h-20 bg-gray-50 animate-pulse rounded" />)}
           </div>
         ) : reviews.length === 0 ? (
-          <p className="text-gray-400 text-sm py-6 text-center">No reviews yet. Be the first to review this product!</p>
+          <p className="text-gray-600 text-sm py-6 text-center">No reviews yet. Be the first to review this product!</p>
         ) : (
           <div className="space-y-5">
             {displayed.map((review) => (
@@ -197,7 +197,7 @@ export function ProductReviews({ productId }: { productId: string }) {
                   <div>
                     <span className="font-medium text-sm">{review.customerName}</span>
                   </div>
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-gray-600">
                     {new Date(review.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                   </span>
                 </div>

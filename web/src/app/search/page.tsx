@@ -3,7 +3,7 @@ import { getProducts } from '@/lib/api';
 import { ProductCard } from '@/components/ProductCard';
 
 async function SearchResults({ query }: { query: string }) {
-  if (!query) return <p className="text-gray-400 text-center py-10">Enter a search term above</p>;
+  if (!query) return <p className="text-gray-600 text-center py-10">Enter a search term above</p>;
 
   const data = await getProducts({ search: query }).catch(() => ({ products: [], total: 0 }));
 

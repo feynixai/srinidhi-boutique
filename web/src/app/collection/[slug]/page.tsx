@@ -96,7 +96,7 @@ export default async function CollectionPage({ params }: { params: { slug: strin
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                        <span className="text-gray-400 text-sm">No image</span>
+                        <span className="text-gray-600 text-sm">No image</span>
                       </div>
                     )}
                     {discount > 0 && (

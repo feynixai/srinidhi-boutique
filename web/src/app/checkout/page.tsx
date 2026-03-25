@@ -352,11 +352,11 @@ export default function CheckoutPage() {
           return (
             <div key={s.key} className="flex items-center">
               <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
-                done ? 'bg-green-500 text-white' : active ? 'bg-[#1a1a2e] text-[#c5a55a]' : 'bg-gray-100 text-gray-400'
+                done ? 'bg-green-500 text-white' : active ? 'bg-[#1a1a2e] text-[#c5a55a]' : 'bg-gray-100 text-gray-600'
               }`}>
                 {done ? '✓' : i + 1}
               </div>
-              <span className={`ml-1.5 text-xs hidden sm:block font-medium transition-colors ${active ? 'text-[#1a1a2e]' : done ? 'text-green-600' : 'text-gray-400'}`}>
+              <span className={`ml-1.5 text-xs hidden sm:block font-medium transition-colors ${active ? 'text-[#1a1a2e]' : done ? 'text-green-600' : 'text-gray-600'}`}>
                 {s.label}
               </span>
               {i < 3 && (
@@ -393,7 +393,7 @@ export default function CheckoutPage() {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium line-clamp-2 text-[#1a1a2e]">{item.product.name}</p>
                       {(item.size || item.color) && (
-                        <p className="text-xs text-gray-400 mt-0.5">{[item.size, item.color].filter(Boolean).join(' · ')}</p>
+                        <p className="text-xs text-gray-600 mt-0.5">{[item.size, item.color].filter(Boolean).join(' · ')}</p>
                       )}
                       <div className="flex items-center justify-between mt-2">
                         <span className="text-xs text-gray-500">Qty: {item.quantity}</span>
@@ -814,14 +814,14 @@ export default function CheckoutPage() {
                   <span className="font-bold">✓</span> Trusted by 10,000+ customers across India
                 </p>
                 <div className="flex items-center gap-3 pt-1 flex-wrap">
-                  <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Accepted payments:</span>
+                  <span className="text-[10px] font-medium text-gray-600 uppercase tracking-wider">Accepted payments:</span>
                   {['UPI', 'PhonePe', 'GPay', 'Paytm', 'Visa', 'Mastercard', 'COD'].map((p) => (
                     <span key={p} className="text-[10px] font-semibold bg-gray-100 text-gray-600 px-2 py-0.5 rounded border border-gray-200">
                       {p}
                     </span>
                   ))}
                 </div>
-                <p className="text-[10px] text-gray-400 pt-1">Powered by Razorpay · PCI-DSS Compliant</p>
+                <p className="text-[10px] text-gray-600 pt-1">Powered by Razorpay · PCI-DSS Compliant</p>
               </div>
 
               <div className="flex gap-3 mt-4">
@@ -855,7 +855,7 @@ export default function CheckoutPage() {
                 {items.map((item) => (
                   <div key={item.id} className="flex items-center gap-3 text-sm">
                     <span className="font-medium flex-1 line-clamp-1">{item.product.name}</span>
-                    {item.size && <span className="text-gray-400 text-xs">({item.size})</span>}
+                    {item.size && <span className="text-gray-600 text-xs">({item.size})</span>}
                     <span className="text-gray-500">×{item.quantity}</span>
                     <span className="font-medium">₹{(Number(item.product.price) * item.quantity).toLocaleString('en-IN')}</span>
                   </div>
@@ -927,7 +927,7 @@ export default function CheckoutPage() {
           )}
           <div className="mt-4 space-y-1.5">
             {['Secure checkout', 'Easy 7-day returns', 'Genuine products'].map((t) => (
-              <p key={t} className="text-xs text-gray-400 flex items-center gap-1.5">
+              <p key={t} className="text-xs text-gray-600 flex items-center gap-1.5">
                 <span className="text-green-500">✓</span> {t}
               </p>
             ))}

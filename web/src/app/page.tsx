@@ -94,7 +94,7 @@ export default async function HomePage() {
                 <span className="text-[#c5a55a] leading-none">{b.icon}</span>
                 <div>
                   <p className="text-xs font-semibold text-[#1a1a2e] leading-tight">{b.text}</p>
-                  <p className="text-[10px] text-[#1a1a2e]/50 leading-tight">{b.sub}</p>
+                  <p className="text-[10px] text-[#1a1a2e]/70 leading-tight">{b.sub}</p>
                 </div>
               </div>
             ))}
@@ -109,7 +109,7 @@ export default async function HomePage() {
             <div className="text-center mb-10">
               <h2 className="section-heading">Shop by Category</h2>
               <div className="divider-gold mx-auto" />
-              <p className="text-[#1a1a2e]/50 text-sm mt-2 tracking-wide">
+              <p className="text-[#1a1a2e]/70 text-base mt-2 tracking-wide">
                 Curated for every occasion
               </p>
             </div>
@@ -136,7 +136,7 @@ export default async function HomePage() {
                     <h3 className="text-white font-serif text-xl group-hover:text-[#c5a55a] transition-colors">
                       {cat.name}
                     </h3>
-                    <p className="text-white/70 text-xs mt-0.5 tracking-wide">Explore →</p>
+                    <p className="text-white/90 text-xs mt-0.5 tracking-wide">Explore →</p>
                   </div>
                 </Link>
               ))}
@@ -156,7 +156,7 @@ export default async function HomePage() {
           <div className="text-center mb-10">
             <h2 className="section-heading">Hot Collections</h2>
             <div className="divider-gold mx-auto" />
-            <p className="text-[#1a1a2e]/50 text-sm mt-2 tracking-wide">
+            <p className="text-[#1a1a2e]/70 text-base mt-2 tracking-wide">
               Shop by mood, season &amp; occasion
             </p>
           </div>
@@ -185,7 +185,7 @@ export default async function HomePage() {
                 <div className="absolute bottom-0 left-0 right-0 p-4">
                   <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-3">
                     <h3 className="text-white font-bold text-base leading-tight group-hover:text-[#c5a55a] transition-colors">{col.name}</h3>
-                    <p className="text-white/60 text-xs mt-0.5 tracking-wide">{col.sub}</p>
+                    <p className="text-white/80 text-xs mt-0.5 tracking-wide">{col.sub}</p>
                   </div>
                 </div>
               </Link>
@@ -214,7 +214,7 @@ export default async function HomePage() {
               Festival Ready
             </h2>
             <div className="divider-gold mx-auto" />
-            <p className="text-white/60 mt-4 mb-8 text-base leading-relaxed">
+            <p className="text-white/80 mt-4 mb-8 text-base leading-relaxed">
               Navratri · Diwali · Weddings · Sangeet — dress for every celebration.
             </p>
             <Link
@@ -267,7 +267,7 @@ export default async function HomePage() {
                 </p>
                 <h2 className="section-heading">Sale Now On</h2>
                 <div className="divider-gold mt-2" />
-                <p className="text-[#1a1a2e]/60 mt-3 text-sm leading-relaxed">
+                <p className="text-[#1a1a2e]/80 mt-3 text-sm leading-relaxed">
                   Up to 25% off on selected sarees, kurtis &amp; lehengas.
                 </p>
                 <div className="mt-4">
@@ -278,7 +278,7 @@ export default async function HomePage() {
                 <div className="inline-block bg-blue-600 text-white px-8 py-4 rounded-3xl font-serif text-3xl italic mb-2 shadow-card">
                   25% OFF
                 </div>
-                <p className="text-[#1a1a2e]/50 text-xs tracking-widest uppercase mt-2">
+                <p className="text-[#1a1a2e]/70 text-xs tracking-widest uppercase mt-2">
                   Selected styles only
                 </p>
                 <Link
@@ -308,7 +308,7 @@ export default async function HomePage() {
               <div>
                 <h2 className="section-heading">Best Sellers</h2>
                 <div className="divider-gold mt-2" />
-                <p className="text-[#1a1a2e]/50 text-sm mt-1">Most loved by our customers</p>
+                <p className="text-[#1a1a2e]/70 text-base mt-1">Most loved by our customers</p>
               </div>
               <Link
                 href="/shop?bestSeller=true"
@@ -334,7 +334,7 @@ export default async function HomePage() {
             <p className="text-[#c5a55a] uppercase tracking-[0.2em] text-xs font-semibold mb-3">Our Promise</p>
             <h2 className="section-heading">Why Shop With Us</h2>
             <div className="divider-gold mx-auto" />
-            <p className="text-[#1a1a2e]/50 text-sm mt-3 max-w-md mx-auto">
+            <p className="text-[#1a1a2e]/70 text-base mt-3 max-w-md mx-auto">
               Everything we do is designed to make your ethnic fashion experience effortless and joyful.
             </p>
           </div>
@@ -373,7 +373,7 @@ export default async function HomePage() {
                 <div className="text-[#c5a55a] flex justify-center mb-3">{b.icon}</div>
                 <h3 className="font-semibold text-[#1a1a2e] text-base mb-0.5">{b.title}</h3>
                 <p className="text-[#c5a55a] text-xs font-medium uppercase tracking-wider mb-3">{b.subtitle}</p>
-                <p className="text-[#1a1a2e]/60 text-sm leading-relaxed">{b.desc}</p>
+                <p className="text-[#1a1a2e]/80 text-sm leading-relaxed">{b.desc}</p>
               </div>
             ))}
           </div>
@@ -390,10 +390,10 @@ export default async function HomePage() {
                 Our Promise of Quality &amp; Authenticity
               </h2>
               <div className="w-12 h-px bg-[#c5a55a] mb-6" />
-              <p className="text-white/60 text-sm leading-relaxed mb-5">
+              <p className="text-white/80 text-sm leading-relaxed mb-5">
                 Every product at Srinidhi Boutique is personally inspected by our founder before it reaches you. We source directly from weavers in Kanchipuram, artisans in Lucknow, craftsmen in Jaipur, and textile hubs across India.
               </p>
-              <p className="text-white/60 text-sm leading-relaxed mb-6">
+              <p className="text-white/80 text-sm leading-relaxed mb-6">
                 We never sell mass-produced replicas or compromise on fabric quality. What you see is exactly what you get — and if it's not perfect, our 7-day return policy means you're always protected.
               </p>
               <div className="grid grid-cols-3 gap-4 text-center">
@@ -435,7 +435,7 @@ export default async function HomePage() {
           <div className="text-center mb-10">
             <h2 className="section-heading">What Our Customers Say</h2>
             <div className="divider-gold mx-auto" />
-            <p className="text-[#1a1a2e]/50 text-sm mt-2">Real reviews from real customers across India</p>
+            <p className="text-[#1a1a2e]/70 text-sm mt-2">Real reviews from real customers across India</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
@@ -523,7 +523,7 @@ export default async function HomePage() {
                 <p className="text-[#1a1a2e]/80 text-sm leading-relaxed mb-4 italic">&ldquo;{t.text}&rdquo;</p>
                 <div>
                   <p className="text-sm font-semibold text-[#1a1a2e]">{t.name}</p>
-                  <p className="text-xs text-[#1a1a2e]/50">{t.location}</p>
+                  <p className="text-xs text-[#1a1a2e]/70">{t.location}</p>
                 </div>
               </div>
             ))}

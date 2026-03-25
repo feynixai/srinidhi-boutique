@@ -71,7 +71,7 @@ export default function NotificationsPage() {
   if (!userId) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-20 text-center">
-        <BellIcon className="w-16 h-16 mx-auto text-gray-300 mb-4" />
+        <BellIcon className="w-16 h-16 mx-auto text-gray-500 mb-4" />
         <h1 className="font-serif text-2xl text-charcoal mb-3">Notifications</h1>
         <p className="text-charcoal/60 mb-6">Please log in to view your notifications.</p>
         <Link href="/login" className="btn-gold px-8 py-3 text-sm tracking-widest">LOGIN</Link>

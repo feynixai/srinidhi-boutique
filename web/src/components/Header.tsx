@@ -168,8 +168,8 @@ export function Header() {
 
             {/* Logo */}
             <Link href="/" className="flex-1 md:flex-none text-center md:text-left">
-              <span className="font-serif text-xl md:text-2xl text-[#1a1a2e] tracking-wide">
-                Srinidhi <span className="text-[#c5a55a]">Boutique</span>
+              <span className="font-serif text-2xl md:text-3xl font-bold text-[#1a1a1a] tracking-wide">
+                Srinidhi <span className="text-[#9a7b4f] font-bold">Boutique</span>
               </span>
             </Link>
 

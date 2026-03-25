@@ -71,7 +71,7 @@ export function ExitIntentPopup() {
 
         <button
           onClick={dismiss}
-          className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all z-10"
+          className="absolute top-4 right-4 p-2 text-gray-600 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all z-10"
           aria-label="Close"
         >
           <FiX size={18} />
@@ -95,7 +95,7 @@ export function ExitIntentPopup() {
 
             <form onSubmit={handleSubmit} className="space-y-3">
               <div className="relative">
-                <FiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                <FiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-600" size={15} />
                 <input
                   type="email"
                   value={email}
@@ -115,7 +115,7 @@ export function ExitIntentPopup() {
 
             <button
               onClick={dismiss}
-              className="w-full text-center text-xs text-gray-400 hover:text-gray-600 mt-3 transition-colors"
+              className="w-full text-center text-xs text-gray-600 hover:text-gray-600 mt-3 transition-colors"
             >
               No thanks, I'll pay full price
             </button>

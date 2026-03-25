@@ -112,11 +112,11 @@ h1, h2, h3, h4 {
   }
 
   .section-heading {
-    @apply font-serif text-3xl md:text-4xl text-[#1a1a1a] font-bold tracking-tight;
+    @apply font-serif text-4xl md:text-5xl text-[#1a1a1a] font-bold tracking-tight;
   }
 
   .divider-gold {
-    @apply w-16 h-0.5 bg-[#c5a55a] my-3;
+    @apply w-20 h-1 bg-[#9a7b4f] my-4 rounded-full;
   }
 
   .safe-area-pb {

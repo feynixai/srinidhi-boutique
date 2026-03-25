@@ -114,7 +114,7 @@ export default function LoginPage() {
                 <FcGoogle size={22} />
                 Continue with Google
               </button>
-              <p className="text-xs text-center text-gray-400">
+              <p className="text-xs text-center text-gray-600">
                 Secure sign-in with your Google account
               </p>
             </div>
@@ -179,7 +179,7 @@ export default function LoginPage() {
           )}
 
           <div className="mt-6 pt-6 border-t border-gray-100 text-center">
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-gray-600">
               By signing in, you agree to our{' '}
               <a href="/shipping" className="text-[#B76E79] hover:underline">Terms & Privacy Policy</a>
             </p>

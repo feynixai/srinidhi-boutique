@@ -50,7 +50,7 @@ export default function NotFound() {
         </div>
       </div>
 
-      <p className="mt-6 text-sm text-gray-400">
+      <p className="mt-6 text-sm text-gray-600">
         Popular:{' '}
         {['Sarees', 'Kurtis', 'Lehengas'].map((cat, i) => (
           <span key={cat}>

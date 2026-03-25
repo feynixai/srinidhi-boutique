@@ -71,7 +71,7 @@ export default function ComparePage() {
               </span>
             )}
             {product.comparePrice && (
-              <span className="text-xs text-gray-400 line-through">
+              <span className="text-xs text-gray-600 line-through">
                 &#x20B9;{Number(product.comparePrice).toLocaleString('en-IN')}
               </span>
             )}
@@ -88,7 +88,7 @@ export default function ComparePage() {
                     {s}
                   </span>
                 ))
-              : <span className="text-sm text-gray-400">—</span>}
+              : <span className="text-sm text-gray-600">—</span>}
           </div>
         );
       case 'colors':
@@ -100,7 +100,7 @@ export default function ComparePage() {
                     {c}
                   </span>
                 ))
-              : <span className="text-sm text-gray-400">—</span>}
+              : <span className="text-sm text-gray-600">—</span>}
           </div>
         );
       case 'category':
@@ -134,7 +134,7 @@ export default function ComparePage() {
         <table className="w-full min-w-[480px]">
           <thead>
             <tr className="border-b border-[#e8d8c8]">
-              <th className="w-36 p-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-400 bg-[#f5f0eb]/60">
+              <th className="w-36 p-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 bg-[#f5f0eb]/60">
                 Feature
               </th>
               {items.map((product) => (
@@ -177,7 +177,7 @@ export default function ComparePage() {
               {Array.from({ length: 3 - items.length }).map((_, i) => (
                 <th key={i} className="p-4 text-center">
                   <div className="w-24 h-32 mx-auto rounded-xl border-2 border-dashed border-[#e8d8c8] flex items-center justify-center mb-2">
-                    <span className="text-gray-300 text-2xl">+</span>
+                    <span className="text-gray-500 text-2xl">+</span>
                   </div>
                   <Link href="/shop" className="text-xs text-[#c5a55a] hover:underline">
                     Add product

@@ -66,7 +66,7 @@ export default function BackInStockButton({ productId, productName }: Props) {
             onChange={(e) => setEmail(e.target.value)}
             className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-rose-gold"
           />
-          <p className="text-xs text-center text-gray-400">or</p>
+          <p className="text-xs text-center text-gray-600">or</p>
           <input
             type="tel"
             placeholder="Phone number"
@@ -86,7 +86,7 @@ export default function BackInStockButton({ productId, productName }: Props) {
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="px-3 py-2 text-gray-400 hover:text-gray-600 text-sm"
+              className="px-3 py-2 text-gray-600 hover:text-gray-600 text-sm"
             >
               Cancel
             </button>

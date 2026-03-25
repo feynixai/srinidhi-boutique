@@ -217,7 +217,7 @@ export default function CartPage() {
                   {item.product.name}
                 </Link>
                 {(item.size || item.color) && (
-                  <p className="text-sm text-gray-400 mt-0.5">
+                  <p className="text-sm text-gray-600 mt-0.5">
                     {[item.size, item.color].filter(Boolean).join(' · ')}
                   </p>
                 )}
@@ -267,7 +267,7 @@ export default function CartPage() {
                       className={`transition-colors p-1.5 rounded-full ${
                         inWishlist(item.product.id)
                           ? 'text-[#c5a55a] bg-[#c5a55a]/10'
-                          : 'text-gray-400 hover:text-[#c5a55a] hover:bg-[#c5a55a]/10'
+                          : 'text-gray-600 hover:text-[#c5a55a] hover:bg-[#c5a55a]/10'
                       }`}
                       title="Save for later"
                     >
@@ -281,7 +281,7 @@ export default function CartPage() {
                       onClick={() => {
                         if (confirm('Remove this item?')) removeMutation.mutate(item.id);
                       }}
-                      className="text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all p-1.5 rounded-full"
+                      className="text-gray-600 hover:text-red-500 hover:bg-red-50 transition-all p-1.5 rounded-full"
                       aria-label="Remove item"
                     >
                       <FiTrash2 size={16} />
@@ -385,7 +385,7 @@ export default function CartPage() {
             </Link>
             <Link
               href="/shop"
-              className="block text-center text-xs text-gray-400 hover:text-[#1a1a2e] mt-3"
+              className="block text-center text-xs text-gray-600 hover:text-[#1a1a2e] mt-3"
             >
               Continue Shopping
             </Link>

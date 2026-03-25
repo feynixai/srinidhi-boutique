@@ -42,7 +42,7 @@ export function ShopSortBar({ total, shown, searchParams }: ShopSortBarProps) {
         )}
       </div>
       <div className="flex items-center gap-2">
-        <span className="text-xs text-gray-400 hidden sm:block">Sort:</span>
+        <span className="text-xs text-gray-600 hidden sm:block">Sort:</span>
         <select
           value={activeSort}
           onChange={(e) => handleSort(e.target.value)}

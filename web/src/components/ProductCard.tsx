@@ -217,7 +217,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
       {/* Product info */}
       <div className="p-3 pb-4">
-        <p className="text-xs text-gray-400 mb-0.5 uppercase tracking-wider">
+        <p className="text-xs text-gray-600 mb-0.5 uppercase tracking-wider">
           {product.category?.name || product.occasion[0]}
         </p>
         <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug mb-2">{product.name}</h3>
@@ -226,7 +226,7 @@ export function ProductCard({ product }: ProductCardProps) {
             &#x20B9;{displayPrice.toLocaleString('en-IN')}
           </span>
           {(displayPrice < Number(product.price) || product.comparePrice) && (
-            <span className="text-gray-400 text-xs line-through">
+            <span className="text-gray-600 text-xs line-through">
               &#x20B9;{(displayPrice < Number(product.price) ? Number(product.price) : Number(product.comparePrice)).toLocaleString('en-IN')}
             </span>
           )}

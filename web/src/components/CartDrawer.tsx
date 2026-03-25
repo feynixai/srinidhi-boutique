@@ -112,7 +112,7 @@ export function CartDrawer() {
                 <path d="M48 22 C44 22 41 25 41 29 L55 29 C55 25 52 22 48 22Z" stroke="#c5a55a" strokeWidth="1.5" strokeLinecap="round" fill="none" strokeOpacity="0.5"/>
               </svg>
               <p className="font-serif text-lg text-[#1a1a2e] mb-1">Your bag is empty</p>
-              <p className="text-gray-400 text-xs mb-5">Add your favourite pieces to get started</p>
+              <p className="text-gray-600 text-xs mb-5">Add your favourite pieces to get started</p>
               <button onClick={closeCart} className="btn-primary text-sm px-6">
                 Start Shopping
               </button>
@@ -139,7 +139,7 @@ export function CartDrawer() {
                     {item.product.name}
                   </p>
                   {(item.size || item.color) && (
-                    <p className="text-xs text-gray-400 mt-0.5">
+                    <p className="text-xs text-gray-600 mt-0.5">
                       {[item.size, item.color].filter(Boolean).join(' · ')}
                     </p>
                   )}
@@ -171,7 +171,7 @@ export function CartDrawer() {
                     </div>
                     <button
                       onClick={() => removeMutation.mutate(item.id)}
-                      className="ml-auto p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
+                      className="ml-auto p-1.5 text-gray-600 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
                     >
                       <FiTrash2 size={14} />
                     </button>
@@ -275,7 +275,7 @@ export function CartDrawer() {
             </Link>
             <button
               onClick={closeCart}
-              className="w-full text-center text-xs text-gray-400 hover:text-[#1a1a2e] mt-3 transition-colors"
+              className="w-full text-center text-xs text-gray-600 hover:text-[#1a1a2e] mt-3 transition-colors"
             >
               Continue Shopping
             </button>

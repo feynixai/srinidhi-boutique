@@ -167,7 +167,7 @@ export default function TrackOrderPage() {
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-sm z-10 border-2 transition-colors ${
                             done ? 'bg-charcoal border-charcoal' : 'bg-white border-gray-200'
                           }`}>
-                            {done ? (current ? <span>{step.icon}</span> : <span className="text-gold text-xs font-bold">✓</span>) : <span className="text-gray-300">{step.icon}</span>}
+                            {done ? (current ? <span>{step.icon}</span> : <span className="text-gold text-xs font-bold">✓</span>) : <span className="text-gray-500">{step.icon}</span>}
                           </div>
                           <div className={`pt-1 ${done ? '' : 'opacity-40'}`}>
                             <div className="flex items-center gap-2 flex-wrap">

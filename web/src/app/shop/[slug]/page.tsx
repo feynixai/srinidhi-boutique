@@ -774,7 +774,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                   </tbody>
                 </table>
               </div>
-              <p className="text-xs text-gray-400 mt-4">Tip: If you are between sizes, choose the larger size for comfort.</p>
+              <p className="text-xs text-gray-600 mt-4">Tip: If you are between sizes, choose the larger size for comfort.</p>
             </div>
           )}
         </div>

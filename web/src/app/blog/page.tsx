@@ -102,7 +102,7 @@ export default function BlogPage() {
                 <span className="text-xs text-rose-gold uppercase tracking-wider font-medium">{post.category}</span>
                 <h3 className="font-serif text-lg mt-2 mb-2 line-clamp-2 leading-snug">{post.title}</h3>
                 <p className="text-gray-500 text-sm line-clamp-2 mb-4">{post.excerpt}</p>
-                <div className="flex items-center justify-between text-xs text-gray-400">
+                <div className="flex items-center justify-between text-xs text-gray-600">
                   <span>{post.date}</span>
                   <span>{post.readTime}</span>
                 </div>
@@ -124,7 +124,7 @@ export default function BlogPage() {
           />
           <button className="btn-primary px-5 py-2.5 text-sm whitespace-nowrap">Subscribe</button>
         </div>
-        <p className="text-xs text-gray-400 mt-3">No spam. Unsubscribe anytime.</p>
+        <p className="text-xs text-gray-600 mt-3">No spam. Unsubscribe anytime.</p>
       </div>
 
       <div className="mt-8 text-center">

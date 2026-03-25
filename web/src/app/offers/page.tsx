@@ -13,7 +13,7 @@ export default async function OffersPage() {
       </div>
 
       {products.length === 0 ? (
-        <div className="text-center py-20 text-gray-400">No offers available right now.</div>
+        <div className="text-center py-20 text-gray-600">No offers available right now.</div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {products.map((p) => <ProductCard key={p.id} product={p} />)}

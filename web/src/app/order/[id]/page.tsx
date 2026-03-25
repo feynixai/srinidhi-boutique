@@ -34,7 +34,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
 
   if (!order) return (
     <div className="max-w-2xl mx-auto px-4 py-20 text-center">
-      <p className="text-gray-400">Order not found</p>
+      <p className="text-gray-600">Order not found</p>
     </div>
   );
 
@@ -160,7 +160,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
             {STATUS_STEPS.map((s, i) => (
               <div key={s} className="flex flex-col items-center">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium mb-1 ${
-                  i <= currentStepIndex ? 'bg-rose-gold text-white' : 'bg-gray-100 text-gray-400'
+                  i <= currentStepIndex ? 'bg-rose-gold text-white' : 'bg-gray-100 text-gray-600'
                 }`}>
                   {i <= currentStepIndex ? '✓' : i + 1}
                 </div>
@@ -181,7 +181,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
               )}
               {order.awbNumber && (
                 <p>AWB: <span className="font-medium">{order.awbNumber}</span>
-                  {order.courierName && <span className="text-gray-400"> via {order.courierName}</span>}
+                  {order.courierName && <span className="text-gray-600"> via {order.courierName}</span>}
                 </p>
               )}
             </div>

@@ -137,7 +137,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
                 ₹{displayPrice.toLocaleString('en-IN')}
               </span>
               {displayPrice < originalPrice && (
-                <span className="text-gray-400 text-sm line-through">
+                <span className="text-gray-600 text-sm line-through">
                   ₹{originalPrice.toLocaleString('en-IN')}
                 </span>
               )}

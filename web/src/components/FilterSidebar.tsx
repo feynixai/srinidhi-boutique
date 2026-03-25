@@ -102,7 +102,7 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
             onChange={(e) => updateParam('minPrice', e.target.value || null)}
             className="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-rose-gold"
           />
-          <span className="text-gray-400">–</span>
+          <span className="text-gray-600">–</span>
           <input
             type="number"
             placeholder="Max"

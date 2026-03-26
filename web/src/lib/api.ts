@@ -100,7 +100,7 @@ const DEMO_PRODUCTS: Product[] = [
     id: 'demo-1', name: 'Red Kanjivaram Silk Saree', slug: 'red-kanjivaram-silk-saree',
     description: 'Exquisite handwoven Kanjivaram silk saree in rich red with gold zari border. Traditional temple motifs woven by master artisans from Kanchipuram. Comes with matching blouse piece. Perfect for weddings, festivals, and auspicious occasions.',
     price: 12500, comparePrice: 15000,
-    images: ['https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&h=800&fit=crop', 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=600&h=800&fit=crop', 'https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=600&h=800&fit=crop'],
+    images: ['https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&h=800&fit=crop', 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=600&h=800&fit=crop', 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&h=900&fit=crop'],
     sizes: ['Free Size'], colors: ['Red', 'Gold'], fabric: 'Pure Silk', occasion: ['wedding', 'festival', 'pooja'],
     stock: 5, featured: true, bestSeller: true, onOffer: false, active: true, createdAt: new Date().toISOString(),
   },

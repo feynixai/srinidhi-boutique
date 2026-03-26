@@ -381,7 +381,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
           {/* Image Gallery */}
           <div className="flex gap-3">
             {product.images.length > 1 && (
-              <div className="flex flex-col gap-2 w-[72px] flex-shrink-0">
+              <div className="hidden sm:flex flex-col gap-2 w-[72px] flex-shrink-0">
                 {product.images.map((img, i) => (
                   <button
                     key={i}

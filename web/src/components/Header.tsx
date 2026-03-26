@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { FiSearch, FiShoppingBag, FiMenu, FiX, FiHeart, FiChevronDown, FiChevronRight } from 'react-icons/fi';
 import { useCartStore } from '@/lib/cart-store';
 import { useWishlistStore } from '@/lib/wishlist-store';
@@ -289,17 +290,45 @@ export function Header() {
           </div>
         </div>
 
-        {/* Mobile Nav Drawer - glass panel */}
-        {mobileOpen && (
-          <div className="md:hidden bg-white/90 backdrop-blur-xl border-t border-white/30">
-            <div className="max-w-7xl mx-auto px-4 py-2">
+      </header>
+      </div>
+
+      {/* Mobile Nav — Full-screen slide-in drawer (portaled to body) */}
+      {mobileOpen && typeof document !== 'undefined' && createPortal(
+        <div className="md:hidden" style={{ position: 'fixed', inset: 0, zIndex: 9999 }}>
+          {/* Backdrop */}
+          <div
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)' }}
+            onClick={() => setMobileOpen(false)}
+          />
+          {/* Drawer — slides in from left */}
+          <div
+            style={{
+              position: 'fixed', top: 0, left: 0, bottom: 0, width: '85vw', maxWidth: 360,
+              background: '#f5f5f0', zIndex: 10000,
+              boxShadow: '8px 0 32px rgba(0,0,0,0.15)',
+              display: 'flex', flexDirection: 'column',
+            }}
+          >
+            {/* Drawer header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200/50">
+              <span className="font-serif text-xl font-bold text-[#1a1a2e]">
+                Srinidhi <span className="text-[#c5a55a]">Boutique</span>
+              </span>
+              <button onClick={() => setMobileOpen(false)} className="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                <FiX size={22} className="text-[#1a1a2e]" />
+              </button>
+            </div>
+
+            {/* Scrollable menu */}
+            <div className="flex-1 overflow-y-auto px-5 py-3">
               {megaMenu.map((item) => (
                 <div key={item.label}>
                   {item.columns.length > 0 ? (
                     <>
                       <button
                         onClick={() => setMobileExpanded(mobileExpanded === item.label ? null : item.label)}
-                        className={`w-full flex items-center justify-between py-3.5 text-base font-medium tracking-wide border-b border-black/5 ${
+                        className={`w-full flex items-center justify-between py-3.5 text-base font-medium tracking-wide border-b border-gray-100 ${
                           item.highlight ? 'text-[#c5a55a]' : 'text-[#1a1a2e]'
                         }`}
                       >
@@ -310,7 +339,7 @@ export function Header() {
                         />
                       </button>
                       {mobileExpanded === item.label && (
-                        <div className="pl-4 pb-2 animate-fade-in">
+                        <div className="pl-4 pb-2">
                           {item.columns.map((col) => (
                             <div key={col.heading} className="mb-3">
                               <p className="text-xs text-[#c5a55a] font-semibold uppercase tracking-wider mb-1.5">{col.heading}</p>
@@ -318,7 +347,7 @@ export function Header() {
                                 <Link
                                   key={link.label}
                                   href={link.href}
-                                  className="block py-1.5 text-sm text-[#1a1a2e]/70 hover:text-[#1a1a2e]"
+                                  className="block py-2 text-sm text-[#1a1a2e]/70 hover:text-[#1a1a2e] active:text-[#c5a55a]"
                                   onClick={() => setMobileOpen(false)}
                                 >
                                   {link.label}
@@ -339,8 +368,8 @@ export function Header() {
                   ) : (
                     <Link
                       href={item.href}
-                      className={`block py-3.5 text-base font-medium tracking-wide border-b border-black/5 ${
-                        item.highlight ? 'text-[#c5a55a]' : 'text-[#1a1a2e] hover:text-[#c5a55a]'
+                      className={`block py-3.5 text-base font-medium tracking-wide border-b border-gray-100 ${
+                        item.highlight ? 'text-[#c5a55a]' : 'text-[#1a1a2e]'
                       }`}
                       onClick={() => setMobileOpen(false)}
                     >
@@ -349,12 +378,19 @@ export function Header() {
                   )}
                 </div>
               ))}
-              <Link href="/orders" className="block py-3.5 text-base font-medium text-[#1a1a2e] hover:text-[#c5a55a] border-b border-black/5" onClick={() => setMobileOpen(false)}>{t.myOrders}</Link>
-              <Link href="/wishlist" className="block py-3.5 text-base font-medium text-[#1a1a2e] hover:text-[#c5a55a] border-b border-black/5" onClick={() => setMobileOpen(false)}>{t.wishlist}</Link>
-              <Link href="/blog" className="block py-3.5 text-base font-medium text-[#1a1a2e] hover:text-[#c5a55a] border-b border-black/5" onClick={() => setMobileOpen(false)}>{t.blog}</Link>
+
+              <div className="mt-4 pt-4 border-t border-gray-200 space-y-1">
+                <Link href="/orders" className="block py-3 text-base font-medium text-[#1a1a2e]/70" onClick={() => setMobileOpen(false)}>{t.myOrders}</Link>
+                <Link href="/wishlist" className="block py-3 text-base font-medium text-[#1a1a2e]/70" onClick={() => setMobileOpen(false)}>{t.wishlist}</Link>
+                <Link href="/blog" className="block py-3 text-base font-medium text-[#1a1a2e]/70" onClick={() => setMobileOpen(false)}>{t.blog}</Link>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="px-5 py-4 border-t border-gray-200/50">
               <button
                 onClick={() => { setLang(lang === 'en' ? 'hi' : 'en'); setMobileOpen(false); }}
-                className="w-full text-left py-3.5 text-base font-medium text-[#c5a55a] flex items-center gap-2"
+                className="flex items-center gap-2 text-sm font-medium text-[#c5a55a]"
               >
                 <span className={lang === 'en' ? 'font-bold' : 'opacity-50'}>EN</span>
                 <span className="opacity-30">|</span>
@@ -362,9 +398,9 @@ export function Header() {
               </button>
             </div>
           </div>
-        )}
-      </header>
-      </div>
+        </div>,
+        document.body
+      )}
     </>
   );
 }

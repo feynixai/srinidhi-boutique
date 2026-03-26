@@ -1,6 +1,7 @@
 'use client';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { FiFilter, FiX, FiCheck } from 'react-icons/fi';
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
@@ -241,20 +242,13 @@ export function FilterSidebar() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
 
   const filterCount = ['size', 'occasion', 'color', 'fabric', 'minPrice', 'maxPrice'].filter(
     (k) => searchParams.get(k)
   ).length;
-
-  // Lock body scroll when filter sheet is open
-  useState(() => {
-    if (typeof window === 'undefined') return;
-    if (mobileOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-  });
 
   const openSheet = () => {
     setMobileOpen(true);
@@ -300,16 +294,16 @@ export function FilterSidebar() {
       </div>
 
       {/* Mobile/Tablet: Full-height bottom sheet */}
-      {mobileOpen && (
+      {/* Portal the bottom sheet to body to escape transform containing block */}
+      {mobileOpen && mounted && createPortal(
         <div
-          className="lg:hidden"
           style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999 }}
           onClick={closeSheet}
         >
           {/* Backdrop */}
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)' }} />
+          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)' }} />
           
-          {/* Bottom sheet — anchored to actual screen bottom */}
+          {/* Bottom sheet */}
           <div
             style={{
               position: 'fixed',
@@ -322,7 +316,7 @@ export function FilterSidebar() {
               borderTopLeftRadius: 28,
               borderTopRightRadius: 28,
               display: 'flex',
-              flexDirection: 'column',
+              flexDirection: 'column' as const,
               boxShadow: '0 -8px 32px rgba(0,0,0,0.2)',
             }}
             onClick={(e) => e.stopPropagation()}
@@ -337,7 +331,8 @@ export function FilterSidebar() {
               <FilterContent onClose={closeSheet} onApply={closeSheet} />
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Desktop Sidebar — only on lg+ */}

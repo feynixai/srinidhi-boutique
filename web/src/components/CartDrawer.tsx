@@ -219,74 +219,36 @@ export function CartDrawer() {
           )}
         </div>
 
-        {/* Frequently Bought Together / Upsell */}
-        {items.length > 0 && upsellProducts && upsellProducts.length > 0 && (
-          <div className="px-5 pb-3">
-            <p className="text-xs font-semibold uppercase tracking-wider text-[#1a1a2e]/50 mb-2">You may also like</p>
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-              {upsellProducts
-                .filter((p) => !items.some((i) => i.productId === p.id))
-                .slice(0, 4)
-                .map((p) => (
-                  <div key={p.id} className="flex-shrink-0 w-28 bg-white/60 backdrop-blur-lg border border-white/30 rounded-2xl overflow-hidden">
-                    <Link href={`/shop/${p.slug}`} onClick={closeCart}>
-                      <div className="relative w-28 h-32 bg-gray-50">
-                        {p.images[0] && (
-                          <Image src={p.images[0]} alt={p.name} fill className="object-cover" sizes="112px" />
-                        )}
-                      </div>
-                      <div className="p-2">
-                        <p className="text-xs font-medium line-clamp-1 text-[#1a1a2e]">{p.name}</p>
-                        <p className="text-xs font-bold text-[#c5a55a] mt-0.5">₹{Number(p.price).toLocaleString('en-IN')}</p>
-                      </div>
-                    </Link>
-                  </div>
-                ))}
-            </div>
-          </div>
-        )}
+        {/* Upsell removed from here — cart items should be front and center */}
 
-        {/* Footer summary */}
+        {/* Compact footer */}
         {items.length > 0 && (
-          <div className="px-5 py-4 bg-white/70 backdrop-blur-lg border-t border-white/30">
-            <div className="space-y-2 text-sm mb-4">
-              <div className="flex justify-between text-[#1a1a2e]/70">
-                <span>Subtotal</span>
-                <span>&#x20B9;{subtotal.toLocaleString('en-IN')}</span>
+          <div className="px-4 py-3 bg-white/80 backdrop-blur-lg border-t border-white/30">
+            {/* Total — single line */}
+            <div className="flex justify-between items-center mb-3">
+              <div>
+                <span className="text-sm text-[#1a1a2e]/60">Total</span>
+                {shipping === 0 && <span className="text-[10px] text-green-600 ml-2">FREE shipping</span>}
               </div>
-              <div className="flex justify-between text-[#1a1a2e]/70">
-                <span>Shipping</span>
-                <span className={shipping === 0 ? 'text-green-600 font-semibold' : ''}>
-                  {shipping === 0 ? 'FREE' : `₹${shipping}`}
-                </span>
-              </div>
-              <div className="flex justify-between font-bold text-base border-t border-black/5 pt-2 mt-2 text-[#1a1a2e]">
-                <span>Total</span>
-                <span>&#x20B9;{(subtotal + shipping).toLocaleString('en-IN')}</span>
-              </div>
+              <span className="text-lg font-bold text-[#1a1a2e]">₹{(subtotal + shipping).toLocaleString('en-IN')}</span>
             </div>
 
-            {/* Coupon */}
+            {/* Coupon — collapsed by default */}
             {appliedCoupon ? (
-              <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-full px-4 py-2 mb-3 text-sm">
-                <span className="text-green-700 flex items-center gap-1.5">
-                  <FiTag size={13} />
-                  <span className="font-semibold">{appliedCoupon}</span> applied
+              <div className="flex items-center justify-between bg-green-50 rounded-full px-3 py-1.5 mb-2 text-xs">
+                <span className="text-green-700 flex items-center gap-1">
+                  <FiTag size={11} />
+                  <span className="font-semibold">{appliedCoupon}</span>
                 </span>
-                <button
-                  onClick={() => setAppliedCoupon('')}
-                  className="text-green-600 hover:text-green-800 text-xs underline"
-                >
-                  Remove
-                </button>
+                <button onClick={() => setAppliedCoupon('')} className="text-green-600 text-xs underline">Remove</button>
               </div>
             ) : (
-              <div className="flex gap-2 mb-3">
+              <div className="flex gap-1.5 mb-2">
                 <input
                   value={couponInput}
                   onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
                   placeholder="Coupon code"
-                  className="flex-1 bg-white/80 border border-gray-200 rounded-full px-4 py-2 text-xs focus:outline-none focus:border-[#c5a55a]"
+                  className="flex-1 bg-white border border-gray-200 rounded-full px-3 py-1.5 text-xs focus:outline-none focus:border-[#c5a55a]"
                 />
                 <button
                   onClick={() => {
@@ -296,40 +258,34 @@ export function CartDrawer() {
                       toast.success('Coupon applied!');
                     }
                   }}
-                  className="bg-[#c5a55a] text-[#1a1a2e] px-4 py-2 text-xs rounded-full font-semibold hover:opacity-90 transition-all"
+                  className="bg-[#c5a55a] text-[#1a1a2e] px-3 py-1.5 text-xs rounded-full font-semibold"
                 >
                   Apply
                 </button>
               </div>
             )}
 
-            <Link
-              href={`/checkout${appliedCoupon ? `?coupon=${appliedCoupon}` : ''}`}
-              onClick={closeCart}
-              className="btn-primary w-full text-center block text-sm tracking-widest"
-            >
-              PROCEED TO CHECKOUT
-            </Link>
-
-            {/* WhatsApp help — sends all items with product links */}
-            <a
-              href={getAllItemsWhatsAppLink()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-2 mt-2 py-2.5 rounded-full border border-green-200 bg-green-50 text-green-700 text-xs font-semibold hover:bg-green-100 transition-all"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-              </svg>
-              Need help? WhatsApp us with your cart
-            </a>
-
-            <button
-              onClick={closeCart}
-              className="w-full text-center text-xs text-gray-600 hover:text-[#1a1a2e] mt-2 transition-colors"
-            >
-              Continue Shopping
-            </button>
+            {/* CTA buttons — checkout + WhatsApp side by side */}
+            <div className="flex gap-2">
+              <Link
+                href={`/checkout${appliedCoupon ? `?coupon=${appliedCoupon}` : ''}`}
+                onClick={closeCart}
+                className="flex-1 bg-[#1a1a2e] text-white text-center py-3 rounded-full text-sm font-semibold tracking-wide"
+              >
+                CHECKOUT
+              </Link>
+              <a
+                href={getAllItemsWhatsAppLink()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center w-12 h-12 rounded-full bg-[#25D366] text-white flex-shrink-0"
+                title="WhatsApp us with your cart"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                </svg>
+              </a>
+            </div>
           </div>
         )}
       </div>

@@ -1,7 +1,10 @@
 'use client';
 import { useEffect, useState } from 'react';
 
+import { useCartStore } from '@/lib/cart-store';
+
 export function WhatsAppButton() {
+  const { isCartOpen } = useCartStore();
   const number = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+918309949805').replace('+', '');
   const href = `https://wa.me/${number}?text=${encodeURIComponent('Hi! I have a question about Srinidhi Boutique')}`;
   const [bounced, setBounced] = useState(false);
@@ -10,6 +13,9 @@ export function WhatsAppButton() {
     const timer = setTimeout(() => setBounced(true), 1200);
     return () => clearTimeout(timer);
   }, []);
+
+  // Hide when cart is open
+  if (isCartOpen) return null;
 
   return (
     <a

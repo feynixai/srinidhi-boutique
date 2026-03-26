@@ -202,25 +202,25 @@ export function FilterSidebar() {
 
   return (
     <>
-      {/* Mobile filter button */}
-      <div className="md:hidden mb-4">
+      {/* Mobile/Tablet floating filter pill — visible below lg */}
+      <div className="lg:hidden fixed bottom-[76px] left-1/2 -translate-x-1/2 z-40">
         <button
           onClick={() => setMobileOpen(true)}
-          className="flex items-center gap-2 glass-card-sm px-4 py-2.5 text-sm font-medium text-[#1a1a2e] transition-all"
+          className="flex items-center gap-2 bg-[#1a1a2e]/90 backdrop-blur-xl text-white px-5 py-2.5 rounded-full text-sm font-semibold shadow-lg transition-all active:scale-95"
         >
-          <FiFilter size={16} />
+          <FiFilter size={14} />
           Filters
           {filterCount > 0 && (
-            <span className="bg-rose-gold text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-semibold">
+            <span className="bg-[#c5a55a] text-[#1a1a2e] text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
               {filterCount}
             </span>
           )}
         </button>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Mobile/Tablet Drawer — visible below lg */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 md:hidden" onClick={() => setMobileOpen(false)}>
+        <div className="fixed inset-0 z-50 lg:hidden" onClick={() => setMobileOpen(false)}>
           <div className="absolute inset-0 bg-black/40" />
           <div
             className="absolute left-0 top-0 bottom-0 w-80 bg-[#f5f5f0]/95 backdrop-blur-xl border-r border-white/40 shadow-xl p-5 overflow-y-auto"
@@ -231,8 +231,8 @@ export function FilterSidebar() {
         </div>
       )}
 
-      {/* Desktop Sidebar */}
-      <aside className="w-64 flex-shrink-0 hidden md:block">
+      {/* Desktop Sidebar — only on lg+ */}
+      <aside className="w-64 flex-shrink-0 hidden lg:block">
         <FilterContent />
       </aside>
     </>

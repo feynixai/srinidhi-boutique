@@ -1,9 +1,19 @@
 import { Suspense } from 'react';
+import { Metadata } from 'next';
 import { getProducts } from '@/lib/api';
 import { ProductCard } from '@/components/ProductCard';
 import { FilterSidebar } from '@/components/FilterSidebar';
 import { ShopSortBar } from '@/components/ShopSortBar';
 import { ScrollRestorer } from '@/components/ScrollRestorer';
+
+export const metadata: Metadata = {
+  title: 'Shop Sarees, Kurtis & Lehengas Online | Srinidhi Boutique',
+  description: 'Browse our curated collection of premium sarees, kurtis, lehengas and ethnic wear. Free shipping above ₹999. Easy 7-day returns. Shop now at Srinidhi Boutique, Hyderabad.',
+  openGraph: {
+    title: 'Shop Sarees, Kurtis & Lehengas Online | Srinidhi Boutique',
+    description: 'Browse our curated collection of premium sarees, kurtis, lehengas and ethnic wear. Free shipping above ₹999. Easy 7-day returns.',
+  },
+};
 
 interface ShopPageProps {
   searchParams: Record<string, string>;
@@ -25,7 +35,7 @@ async function ProductGrid({ searchParams }: { searchParams: Record<string, stri
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-3 lg:gap-6">
           {data.products.map((p) => <ProductCard key={p.id} product={p} />)}
         </div>
       )}
@@ -35,16 +45,16 @@ async function ProductGrid({ searchParams }: { searchParams: Record<string, stri
 
 export default function ShopPage({ searchParams }: ShopPageProps) {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-10">
       <ScrollRestorer />
-      <h1 className="font-bold text-3xl mb-8 text-[#1a1a2e] tracking-tight">All Products</h1>
-      <div className="flex gap-10">
-        <Suspense fallback={<div className="w-64 flex-shrink-0" />}>
+      <h1 className="font-bold text-2xl sm:text-3xl mb-4 sm:mb-8 text-[#1a1a2e] tracking-tight">All Products</h1>
+      <div className="lg:flex lg:gap-10">
+        <Suspense fallback={<div className="w-64 flex-shrink-0 hidden lg:block" />}>
           <FilterSidebar />
         </Suspense>
         <div className="flex-1 min-w-0">
           <Suspense fallback={
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 lg:gap-4">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="aspect-[3/4] bg-white/60 animate-pulse rounded-2xl" />
               ))}

@@ -219,6 +219,20 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
     return () => observer.disconnect();
   }, [product]);
 
+  // Dynamic page title and meta description for SEO
+  useEffect(() => {
+    if (!product) return;
+    const price = product.salePrice ?? Number(product.price);
+    document.title = `${product.name} — ₹${price.toLocaleString('en-IN')} | Srinidhi Boutique`;
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (!metaDesc) {
+      metaDesc = document.createElement('meta');
+      metaDesc.setAttribute('name', 'description');
+      document.head.appendChild(metaDesc);
+    }
+    metaDesc.setAttribute('content', `Buy ${product.name} online at ₹${price.toLocaleString('en-IN')}. ${product.description?.slice(0, 120) || 'Premium Indian ethnic wear from Srinidhi Boutique, Hyderabad.'}. Free shipping above ₹999. Easy 7-day returns.`);
+  }, [product]);
+
   // Track recently viewed
   useEffect(() => {
     if (!product) return;

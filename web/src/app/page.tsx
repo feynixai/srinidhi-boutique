@@ -35,8 +35,36 @@ export default async function HomePage() {
   const { featured, bestSellers, offers, categories, activeSale } = await getData();
   const flashSaleEnd = getFlashSaleEnd();
 
+  const orgJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Srinidhi Boutique',
+    url: 'https://srinidhiboutique.com',
+    logo: 'https://srinidhiboutique.com/logo.png',
+    description: 'Premium Indian ethnic wear — Sarees, Kurtis, Lehengas & more. Curated in Hyderabad.',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Hyderabad',
+      addressRegion: 'Telangana',
+      addressCountry: 'IN',
+    },
+    sameAs: [
+      'https://instagram.com/srinidhiboutique',
+    ],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer service',
+      availableLanguage: ['English', 'Hindi', 'Telugu'],
+    },
+  };
+
   return (
     <div className="bg-[#f5f5f0]">
+      {/* Organization JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+      />
       {/* Dynamic Flash Sale Countdown Banner */}
       {activeSale && <FlashSaleBanner sale={activeSale} />}
 

@@ -102,7 +102,7 @@ export function ProductCard({ product }: ProductCardProps) {
         )}
 
         {/* Top-left badge stack */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
+        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 flex flex-col gap-1 sm:gap-1.5 z-10">
           {isSale && (
             <span className="bg-blue-600/90 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full font-semibold shadow-sm">
               {discountPct ? `${discountPct}% OFF` : 'SALE'}
@@ -179,19 +179,19 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Wishlist + Compare buttons */}
-        <div className="absolute top-3 right-3 flex flex-col gap-1.5 z-10">
+        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 flex flex-col gap-1 sm:gap-1.5 z-10">
           <button
             onClick={(e) => {
               e.preventDefault();
               toggleWishlist({ id: product.id, name: product.name, slug: product.slug, price: Number(product.price), comparePrice: product.comparePrice ? Number(product.comparePrice) : undefined, images: product.images });
               toast(inWishlist(product.id) ? 'Removed from wishlist' : 'Added to wishlist');
             }}
-            className="p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition-all"
+            className="p-1.5 sm:p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition-all"
             aria-label="Add to wishlist"
           >
             <FiHeart
-              size={16}
-              className={inWishlist(product.id) ? 'fill-[#c5a55a] text-[#c5a55a]' : 'text-[#1a1a2e]'}
+              size={14}
+              className={`sm:w-4 sm:h-4 ${inWishlist(product.id) ? 'fill-[#c5a55a] text-[#c5a55a]' : 'text-[#1a1a2e]'}`}
             />
           </button>
           <button
@@ -205,28 +205,28 @@ export function ProductCard({ product }: ProductCardProps) {
                 toast('Added to compare');
               }
             }}
-            className={`p-2 backdrop-blur-sm rounded-full shadow-sm transition-all ${
+            className={`p-1.5 sm:p-2 backdrop-blur-sm rounded-full shadow-sm transition-all ${
               inCompare(product.id) ? 'bg-[#1a1a2e] text-white' : 'bg-white/80 hover:bg-white text-[#1a1a2e]'
             }`}
             aria-label="Compare product"
           >
-            <FiBarChart2 size={16} />
+            <FiBarChart2 size={14} className="sm:w-4 sm:h-4" />
           </button>
         </div>
       </div>
 
       {/* Product info */}
-      <div className="p-3 pb-4">
-        <p className="text-xs text-gray-600 mb-0.5 uppercase tracking-wider">
+      <div className="p-2 pb-3 sm:p-3 sm:pb-4">
+        <p className="text-[10px] sm:text-xs text-gray-600 mb-0.5 uppercase tracking-wider truncate">
           {product.category?.name || product.occasion[0]}
         </p>
-        <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug mb-2">{product.name}</h3>
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="bg-blue-600 text-white text-sm font-bold px-3 py-1 rounded-full">
+        <h3 className="text-xs sm:text-sm font-semibold text-gray-900 line-clamp-2 leading-snug mb-1.5 sm:mb-2">{product.name}</h3>
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+          <span className="bg-blue-600 text-white text-xs sm:text-sm font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full">
             &#x20B9;{displayPrice.toLocaleString('en-IN')}
           </span>
           {(displayPrice < Number(product.price) || product.comparePrice) && (
-            <span className="text-gray-600 text-xs line-through">
+            <span className="text-gray-600 text-[10px] sm:text-xs line-through">
               &#x20B9;{(displayPrice < Number(product.price) ? Number(product.price) : Number(product.comparePrice)).toLocaleString('en-IN')}
             </span>
           )}

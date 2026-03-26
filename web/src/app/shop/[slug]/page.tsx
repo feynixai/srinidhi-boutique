@@ -376,10 +376,10 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 items-start">
 
-          {/* Image Gallery */}
-          <div className="flex gap-3">
+          {/* Image Gallery — sticky on desktop */}
+          <div className="flex gap-3 md:sticky md:top-20">
             {product.images.length > 1 && (
               <div className="hidden sm:flex flex-col gap-2 w-[72px] flex-shrink-0">
                 {product.images.map((img, i) => (
@@ -458,8 +458,8 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
             </div>
           </div>
 
-          {/* Product Info - glass card */}
-          <div className="space-y-5 bg-white/50 backdrop-blur-sm border border-white/40 rounded-3xl p-6 shadow-soft">
+          {/* Product Info */}
+          <div className="space-y-4 md:pt-0">
             {product.category && (
               <p className="text-xs text-[#c5a55a] uppercase tracking-[0.2em] font-semibold">{product.category.name}</p>
             )}

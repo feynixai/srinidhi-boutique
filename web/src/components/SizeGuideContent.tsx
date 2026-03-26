@@ -67,7 +67,7 @@ export function SizeGuideContent({ whatsappLink }: SizeGuideContentProps = {}) {
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
               activeTab === tab
                 ? 'bg-[#c5a55a] text-white shadow-lg shadow-[#c5a55a]/30'
-                : 'bg-[#1a1a2e]/5 text-[#1a1a2e]/50 hover:bg-white/20 hover:text-white'
+                : 'bg-[#1a1a2e]/5 text-[#1a1a2e]/50 hover:bg-gray-100 hover:text-[#1a1a2e]'
             }`}
           >
             {tab}

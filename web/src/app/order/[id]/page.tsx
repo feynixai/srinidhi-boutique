@@ -194,7 +194,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
         <div className="p-4">
           <h2 className="font-medium mb-3">Order Items</h2>
           <div className="space-y-2">
-            {order.items.map((item) => (
+            {order.items.map((item: { id: string; name?: string; productName?: string; quantity: number; price: number; size?: string; color?: string }) => (
               <div key={item.id} className="flex justify-between text-sm">
                 <div>
                   <p className="font-medium">{item.name}</p>

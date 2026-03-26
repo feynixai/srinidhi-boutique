@@ -147,16 +147,16 @@ export function Header() {
 
   return (
     <>
-      <div className="sticky top-0 z-50 px-3 sm:px-4 pt-2">
+      <div className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'px-4 sm:px-6 pt-1.5' : 'px-3 sm:px-4 pt-2'}`}>
       <header
-        className={`transition-all duration-300 rounded-2xl ${
+        className={`transition-all duration-300 ${
           scrolled
-            ? 'bg-white/85 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-white/40'
-            : 'bg-white/60 backdrop-blur-lg border border-white/30'
+            ? 'bg-white/90 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] border border-white/50 rounded-full'
+            : 'bg-white/60 backdrop-blur-lg border border-white/30 rounded-2xl'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-16 md:h-[72px]">
+        <div className={`max-w-7xl mx-auto transition-all duration-300 ${scrolled ? 'px-3 sm:px-5' : 'px-4 sm:px-6'}`}>
+          <div className={`flex items-center justify-between transition-all duration-300 ${scrolled ? 'h-12 md:h-14' : 'h-16 md:h-[72px]'}`}>
             {/* Mobile menu button */}
             <button
               className="md:hidden p-2 text-[#1a1a2e] rounded-full hover:bg-white/60 transition-colors"
@@ -168,13 +168,13 @@ export function Header() {
 
             {/* Logo */}
             <Link href="/" className="flex-1 md:flex-none text-center md:text-left">
-              <span className="font-serif text-2xl md:text-3xl font-bold text-[#1a1a1a] tracking-wide">
+              <span className={`font-serif font-bold text-[#1a1a1a] tracking-wide transition-all duration-300 ${scrolled ? 'text-lg md:text-xl' : 'text-2xl md:text-3xl'}`}>
                 Srinidhi <span className="text-[#9a7b4f] font-bold">Boutique</span>
               </span>
             </Link>
 
             {/* Desktop Mega Menu */}
-            <nav className="hidden md:flex items-center space-x-6 mx-8" ref={menuRef}>
+            <nav className={`hidden md:flex items-center mx-8 transition-all duration-300 ${scrolled ? 'space-x-4' : 'space-x-6'}`} ref={menuRef}>
               {megaMenu.map((item) => (
                 <div
                   key={item.label}
@@ -243,7 +243,7 @@ export function Header() {
             </nav>
 
             {/* Action icons */}
-            <div className="flex items-center space-x-1">
+            <div className={`flex items-center transition-all duration-300 ${scrolled ? 'space-x-0' : 'space-x-1'}`}>
               {/* Language toggle */}
               <button
                 onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}

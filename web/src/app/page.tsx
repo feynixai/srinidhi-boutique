@@ -147,7 +147,7 @@ export default async function HomePage() {
                   key={cat.id}
                   href={`/category/${cat.slug}`}
                   className={`group relative overflow-hidden rounded-3xl bg-gray-100 shadow-card hover:-translate-y-1 hover:shadow-card-hover transition-all duration-300 ${
-                    i === 0 ? 'row-span-2 aspect-[4/5]' : 'aspect-square'
+                    i === 0 ? 'aspect-[4/5] md:aspect-square' : 'aspect-square'
                   }`}
                 >
                   {cat.image && (

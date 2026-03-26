@@ -147,11 +147,11 @@ const DEMO_PRODUCTS: Product[] = [
 ];
 
 const DEMO_CATEGORIES: Category[] = [
-  { id: 'cat-1', name: 'Sarees', slug: 'sarees', image: 'https://picsum.photos/seed/cat-sarees/600/600', _count: { products: 3 } },
-  { id: 'cat-2', name: 'Kurtis', slug: 'kurtis', image: 'https://picsum.photos/seed/cat-kurtis/600/600', _count: { products: 3 } },
-  { id: 'cat-3', name: 'Lehengas', slug: 'lehengas', image: 'https://picsum.photos/seed/cat-lehengas/600/600', _count: { products: 1 } },
-  { id: 'cat-4', name: 'Blouses', slug: 'blouses', image: 'https://picsum.photos/seed/cat-blouses/600/600', _count: { products: 0 } },
-  { id: 'cat-5', name: 'Accessories', slug: 'accessories', image: 'https://picsum.photos/seed/cat-accessories/600/600', _count: { products: 0 } },
+  { id: 'cat-1', name: 'Sarees', slug: 'sarees', image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&h=600&fit=crop', _count: { products: 3 } },
+  { id: 'cat-2', name: 'Kurtis', slug: 'kurtis', image: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=600&h=600&fit=crop', _count: { products: 3 } },
+  { id: 'cat-3', name: 'Lehengas', slug: 'lehengas', image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600&h=600&fit=crop', _count: { products: 1 } },
+  { id: 'cat-4', name: 'Blouses', slug: 'blouses', image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=600&h=600&fit=crop', _count: { products: 0 } },
+  { id: 'cat-5', name: 'Accessories', slug: 'accessories', image: 'https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?w=600&h=600&fit=crop', _count: { products: 0 } },
 ];
 
 // ── Products ──────────────────────────────────────────────────────────────

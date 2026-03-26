@@ -45,10 +45,10 @@ async function ProductGrid({ searchParams }: { searchParams: Record<string, stri
 
 export default function ShopPage({ searchParams }: ShopPageProps) {
   return (
-    <div className="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-10">
+    <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
       <ScrollRestorer />
-      <h1 className="font-bold text-2xl sm:text-3xl mb-4 sm:mb-8 text-[#1a1a2e] tracking-tight">All Products</h1>
-      <div className="lg:flex lg:gap-8">
+      <h1 className="font-poppins font-semibold text-xl sm:text-2xl mb-3 sm:mb-5 text-[#1a1a2e]">All Products</h1>
+      <div className="lg:flex lg:gap-6">
         <Suspense fallback={<div className="w-56 flex-shrink-0 hidden lg:block" />}>
           <FilterSidebar />
         </Suspense>

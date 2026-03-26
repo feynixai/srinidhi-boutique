@@ -220,7 +220,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <p className="text-[11px] sm:text-xs text-gray-600 mb-1 uppercase tracking-wider truncate">
           {product.category?.name || product.occasion[0]}
         </p>
-        <h3 className="font-poppins text-sm font-semibold text-[#1a1a2e] line-clamp-2 leading-snug mb-2">{product.name}</h3>
+        <h3 className="font-poppins text-sm font-medium text-[#1a1a2e] line-clamp-2 leading-snug mb-2">{product.name}</h3>
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-[#1a1a2e] text-sm sm:text-base font-bold">
             &#x20B9;{displayPrice.toLocaleString('en-IN')}

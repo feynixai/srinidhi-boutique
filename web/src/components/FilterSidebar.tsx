@@ -336,7 +336,7 @@ export function FilterSidebar() {
       )}
 
       {/* Desktop Sidebar — only on lg+ */}
-      <aside className="w-64 flex-shrink-0 hidden lg:block">
+      <aside className="w-56 flex-shrink-0 hidden lg:block">
         <div className="sticky top-4">
           <FilterContent />
         </div>

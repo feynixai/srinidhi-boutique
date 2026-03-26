@@ -35,7 +35,7 @@ async function ProductGrid({ searchParams }: { searchParams: Record<string, stri
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-3 lg:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
           {data.products.map((p) => <ProductCard key={p.id} product={p} />)}
         </div>
       )}
@@ -48,14 +48,14 @@ export default function ShopPage({ searchParams }: ShopPageProps) {
     <div className="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-10">
       <ScrollRestorer />
       <h1 className="font-bold text-2xl sm:text-3xl mb-4 sm:mb-8 text-[#1a1a2e] tracking-tight">All Products</h1>
-      <div className="lg:flex lg:gap-10">
-        <Suspense fallback={<div className="w-64 flex-shrink-0 hidden lg:block" />}>
+      <div className="lg:flex lg:gap-8">
+        <Suspense fallback={<div className="w-56 flex-shrink-0 hidden lg:block" />}>
           <FilterSidebar />
         </Suspense>
         <div className="flex-1 min-w-0">
           <Suspense fallback={
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 lg:gap-4">
-              {[...Array(6)].map((_, i) => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+              {[...Array(8)].map((_, i) => (
                 <div key={i} className="aspect-[3/4] bg-white/60 animate-pulse rounded-2xl" />
               ))}
             </div>

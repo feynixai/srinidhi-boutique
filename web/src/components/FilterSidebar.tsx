@@ -1,27 +1,25 @@
 'use client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useState } from 'react';
-import { FiFilter, FiX } from 'react-icons/fi';
+import { FiFilter, FiX, FiCheck } from 'react-icons/fi';
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
-const OCCASIONS = ['wedding', 'festival', 'casual', 'party'];
-const FABRICS = ['Silk', 'Cotton', 'Georgette', 'Chiffon', 'Linen', 'Rayon', 'Velvet', 'Net'];
+const OCCASIONS = ['Wedding', 'Festival', 'Casual', 'Party', 'Office', 'Pooja'];
+const FABRICS = ['Silk', 'Cotton', 'Georgette', 'Chiffon', 'Linen', 'Rayon', 'Organza'];
 const COLOR_MAP: Record<string, string> = {
-  Red: '#DC2626',
-  Blue: '#2563EB',
-  Green: '#16A34A',
-  Pink: '#EC4899',
-  Yellow: '#EAB308',
-  Orange: '#EA580C',
-  Purple: '#9333EA',
-  White: '#F9FAFB',
-  Black: '#111827',
-  Gold: '#D97706',
-  Maroon: '#991B1B',
-  Ivory: '#FFFFF0',
+  Red: '#DC2626', Blue: '#2563EB', Green: '#16A34A', Pink: '#EC4899',
+  Yellow: '#EAB308', Orange: '#EA580C', Purple: '#9333EA', White: '#F9FAFB',
+  Black: '#111827', Gold: '#D97706', Maroon: '#991B1B',
 };
 
-function FilterContent({ onClose }: { onClose?: () => void }) {
+const PRICE_RANGES = [
+  { label: 'Under ₹1,000', min: '', max: '1000' },
+  { label: '₹1,000 – ₹3,000', min: '1000', max: '3000' },
+  { label: '₹3,000 – ₹10,000', min: '3000', max: '10000' },
+  { label: 'Above ₹10,000', min: '10000', max: '' },
+];
+
+function FilterContent({ onClose, onApply }: { onClose?: () => void; onApply?: () => void }) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -35,6 +33,11 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
     },
     [router, searchParams]
   );
+
+  const clearAll = () => {
+    router.push('/shop');
+    onApply?.();
+  };
 
   const minPrice = searchParams.get('minPrice') || '';
   const maxPrice = searchParams.get('maxPrice') || '';
@@ -53,36 +56,42 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
   ].filter(Boolean) as { key: string; label: string }[];
 
   const hasFilters = activeFilters.length > 0;
+  const activePriceRange = PRICE_RANGES.find(r => r.min === minPrice && r.max === maxPrice);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
+      {/* Header — mobile only */}
       {onClose && (
-        <div className="flex items-center justify-between pb-2 border-b">
-          <h3 className="font-serif text-xl">Filters</h3>
-          <button onClick={onClose} className="p-1 hover:text-[#c5a55a]">
-            <FiX size={20} />
-          </button>
+        <div className="flex items-center justify-between pb-3 border-b border-gray-200">
+          <h3 className="font-serif text-xl text-[#1a1a2e]">Filters</h3>
+          <div className="flex items-center gap-2">
+            {hasFilters && (
+              <button onClick={clearAll} className="text-xs text-red-500 font-medium px-3 py-1.5 bg-red-50 rounded-full">
+                Clear All
+              </button>
+            )}
+            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+              <FiX size={20} className="text-[#1a1a2e]" />
+            </button>
+          </div>
         </div>
       )}
 
       {/* Active Filter Chips */}
       {hasFilters && (
         <div>
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-charcoal/60">Active Filters</h3>
-            <button
-              onClick={() => router.push('/shop')}
-              className="text-xs text-[#c5a55a] hover:underline"
-            >
-              Clear all
-            </button>
-          </div>
+          {!onClose && (
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Active</span>
+              <button onClick={clearAll} className="text-xs text-red-500 hover:underline font-medium">Clear all</button>
+            </div>
+          )}
           <div className="flex flex-wrap gap-1.5">
             {activeFilters.map((f) => (
               <button
                 key={f.key}
                 onClick={() => updateParam(f.key, null)}
-                className="flex items-center gap-1 bg-rose-gold/10 text-[#c5a55a] text-xs px-2.5 py-1 rounded-full hover:bg-rose-gold/20 transition-colors"
+                className="flex items-center gap-1.5 bg-[#c5a55a]/10 text-[#c5a55a] text-xs font-medium px-3 py-1.5 rounded-full hover:bg-[#c5a55a]/20 transition-colors"
               >
                 {f.label} <FiX size={10} />
               </button>
@@ -91,40 +100,52 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
         </div>
       )}
 
-      {/* Price Range */}
+      {/* Price Range — pill buttons instead of text inputs */}
       <div>
-        <h3 className="font-serif text-base mb-3">Price Range</h3>
-        <div className="flex items-center gap-2">
-          <input
-            type="number"
-            placeholder="Min"
-            value={minPrice}
-            onChange={(e) => updateParam('minPrice', e.target.value || null)}
-            className="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-rose-gold"
-          />
-          <span className="text-gray-600">–</span>
-          <input
-            type="number"
-            placeholder="Max"
-            value={maxPrice}
-            onChange={(e) => updateParam('maxPrice', e.target.value || null)}
-            className="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-rose-gold"
-          />
+        <h3 className="text-sm font-semibold text-[#1a1a2e] mb-3">Price</h3>
+        <div className="flex flex-wrap gap-2">
+          {PRICE_RANGES.map((range) => {
+            const isActive = activePriceRange === range;
+            return (
+              <button
+                key={range.label}
+                onClick={() => {
+                  if (isActive) {
+                    updateParam('minPrice', null);
+                    updateParam('maxPrice', null);
+                  } else {
+                    const params = new URLSearchParams(searchParams.toString());
+                    if (range.min) params.set('minPrice', range.min); else params.delete('minPrice');
+                    if (range.max) params.set('maxPrice', range.max); else params.delete('maxPrice');
+                    params.delete('page');
+                    router.push(`/shop?${params.toString()}`);
+                  }
+                }}
+                className={`px-3 py-2 text-xs rounded-full border transition-all ${
+                  isActive
+                    ? 'border-[#c5a55a] bg-[#c5a55a] text-[#1a1a2e] font-semibold'
+                    : 'border-gray-200 bg-white/70 text-[#1a1a2e]/70 hover:border-[#c5a55a]'
+                }`}
+              >
+                {range.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Size */}
       <div>
-        <h3 className="font-serif text-base mb-3">Size</h3>
+        <h3 className="text-sm font-semibold text-[#1a1a2e] mb-3">Size</h3>
         <div className="flex flex-wrap gap-2">
           {SIZES.map((size) => (
             <button
               key={size}
               onClick={() => updateParam('size', activeSize === size ? null : size)}
-              className={`px-3 py-1.5 text-xs border rounded-full transition-all ${
+              className={`px-3.5 py-2 text-xs border rounded-full transition-all ${
                 activeSize === size
                   ? 'border-[#c5a55a] bg-[#c5a55a] text-[#1a1a2e] font-semibold'
-                  : 'border-white/50 bg-white/60 hover:border-[#c5a55a] text-[#1a1a2e]'
+                  : 'border-gray-200 bg-white/70 text-[#1a1a2e]/70 hover:border-[#c5a55a]'
               }`}
             >
               {size}
@@ -133,61 +154,85 @@ function FilterContent({ onClose }: { onClose?: () => void }) {
         </div>
       </div>
 
+      {/* Occasion */}
+      <div>
+        <h3 className="text-sm font-semibold text-[#1a1a2e] mb-3">Occasion</h3>
+        <div className="flex flex-wrap gap-2">
+          {OCCASIONS.map((occ) => {
+            const val = occ.toLowerCase();
+            return (
+              <button
+                key={occ}
+                onClick={() => updateParam('occasion', activeOccasion === val ? null : val)}
+                className={`px-3.5 py-2 text-xs rounded-full border transition-all flex items-center gap-1.5 ${
+                  activeOccasion === val
+                    ? 'border-[#c5a55a] bg-[#c5a55a] text-[#1a1a2e] font-semibold'
+                    : 'border-gray-200 bg-white/70 text-[#1a1a2e]/70 hover:border-[#c5a55a]'
+                }`}
+              >
+                {activeOccasion === val && <FiCheck size={10} />}
+                {occ}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Color */}
       <div>
-        <h3 className="font-serif text-base mb-3">Color</h3>
-        <div className="flex flex-wrap gap-2">
+        <h3 className="text-sm font-semibold text-[#1a1a2e] mb-3">
+          Color {activeColor && <span className="text-[#c5a55a] font-normal capitalize">— {activeColor}</span>}
+        </h3>
+        <div className="flex flex-wrap gap-2.5">
           {Object.entries(COLOR_MAP).map(([name, hex]) => (
             <button
               key={name}
               onClick={() => updateParam('color', activeColor === name ? null : name)}
               title={name}
-              className={`w-7 h-7 rounded-full border-2 transition-all ${
-                activeColor === name ? 'border-[#c5a55a] scale-110 shadow-sm' : 'border-white/50 hover:border-[#6b7280]'
+              className={`w-8 h-8 rounded-full border-2 transition-all flex items-center justify-center ${
+                activeColor === name ? 'border-[#c5a55a] scale-110 shadow-md' : 'border-gray-200 hover:border-gray-400'
               }`}
               style={{ backgroundColor: hex }}
-            />
+            >
+              {activeColor === name && (
+                <FiCheck size={12} className={hex === '#F9FAFB' || hex === '#FFFFF0' ? 'text-gray-800' : 'text-white'} />
+              )}
+            </button>
           ))}
         </div>
-        {activeColor && (
-          <p className="text-xs text-charcoal/60 mt-1.5 capitalize">{activeColor} selected</p>
-        )}
       </div>
 
       {/* Fabric */}
       <div>
-        <h3 className="font-serif text-base mb-3">Fabric</h3>
-        <select
-          value={activeFabric || ''}
-          onChange={(e) => updateParam('fabric', e.target.value || null)}
-          className="w-full bg-white/70 border border-white/50 rounded-full px-4 py-1.5 text-sm focus:outline-none focus:border-[#c5a55a]"
-        >
-          <option value="">All Fabrics</option>
+        <h3 className="text-sm font-semibold text-[#1a1a2e] mb-3">Fabric</h3>
+        <div className="flex flex-wrap gap-2">
           {FABRICS.map((f) => (
-            <option key={f} value={f}>{f}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* Occasion */}
-      <div>
-        <h3 className="font-serif text-base mb-3">Occasion</h3>
-        <div className="space-y-2">
-          {OCCASIONS.map((occ) => (
-            <label key={occ} className="flex items-center gap-2 cursor-pointer group">
-              <input
-                type="checkbox"
-                checked={activeOccasion === occ}
-                onChange={() => updateParam('occasion', activeOccasion === occ ? null : occ)}
-                className="accent-[#c5a55a]"
-              />
-              <span className="text-sm capitalize group-hover:text-[#c5a55a] transition-colors">
-                {occ}
-              </span>
-            </label>
+            <button
+              key={f}
+              onClick={() => updateParam('fabric', activeFabric === f ? null : f)}
+              className={`px-3.5 py-2 text-xs rounded-full border transition-all ${
+                activeFabric === f
+                  ? 'border-[#c5a55a] bg-[#c5a55a] text-[#1a1a2e] font-semibold'
+                  : 'border-gray-200 bg-white/70 text-[#1a1a2e]/70 hover:border-[#c5a55a]'
+              }`}
+            >
+              {f}
+            </button>
           ))}
         </div>
       </div>
+
+      {/* Apply button — mobile only */}
+      {onClose && (
+        <div className="pt-3 border-t border-gray-200 sticky bottom-0 bg-[#f5f5f0]/95 backdrop-blur-xl pb-2">
+          <button
+            onClick={() => { onApply?.(); onClose(); }}
+            className="w-full bg-[#1a1a2e] text-white py-3.5 rounded-full text-sm font-semibold tracking-wide hover:bg-[#2d2d4e] transition-colors"
+          >
+            Show Results
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -202,38 +247,67 @@ export function FilterSidebar() {
 
   return (
     <>
-      {/* Mobile/Tablet floating filter pill — visible below lg */}
-      <div className="lg:hidden fixed bottom-[76px] left-1/2 -translate-x-1/2 z-40">
-        <button
-          onClick={() => setMobileOpen(true)}
-          className="flex items-center gap-2 bg-[#1a1a2e]/90 backdrop-blur-xl text-white px-5 py-2.5 rounded-full text-sm font-semibold shadow-lg transition-all active:scale-95"
-        >
-          <FiFilter size={14} />
-          Filters
+      {/* Mobile/Tablet: Sticky top bar with filter + sort */}
+      <div className="lg:hidden sticky top-0 z-30 -mx-4 px-4 py-2 bg-[#f5f5f0]/90 backdrop-blur-xl border-b border-gray-200/50">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setMobileOpen(true)}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all ${
+              filterCount > 0
+                ? 'bg-[#c5a55a] text-[#1a1a2e]'
+                : 'bg-white border border-gray-200 text-[#1a1a2e]'
+            }`}
+          >
+            <FiFilter size={14} />
+            Filters
+            {filterCount > 0 && (
+              <span className="bg-[#1a1a2e] text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                {filterCount}
+              </span>
+            )}
+          </button>
+
+          {/* Quick clear */}
           {filterCount > 0 && (
-            <span className="bg-[#c5a55a] text-[#1a1a2e] text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
-              {filterCount}
-            </span>
+            <button
+              onClick={() => { const router = document.querySelector('a[href="/shop"]'); if (router) (router as HTMLAnchorElement).click(); else window.location.href = '/shop'; }}
+              className="px-3 py-2.5 rounded-full text-xs font-medium text-red-500 bg-red-50 border border-red-100"
+            >
+              Clear ({filterCount})
+            </button>
           )}
-        </button>
+        </div>
       </div>
 
-      {/* Mobile/Tablet Drawer — visible below lg */}
+      {/* Mobile/Tablet: Bottom sheet drawer */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden" onClick={() => setMobileOpen(false)}>
-          <div className="absolute inset-0 bg-black/40" />
+        <div className="fixed inset-0 z-50 lg:hidden">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+          
+          {/* Bottom sheet */}
           <div
-            className="absolute left-0 top-0 bottom-0 w-80 bg-[#f5f5f0]/95 backdrop-blur-xl border-r border-white/40 shadow-xl p-5 overflow-y-auto"
+            className="absolute bottom-0 left-0 right-0 bg-[#f5f5f0] rounded-t-3xl shadow-2xl max-h-[85vh] flex flex-col animate-slide-up"
             onClick={(e) => e.stopPropagation()}
           >
-            <FilterContent onClose={() => setMobileOpen(false)} />
+            {/* Drag handle */}
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="w-10 h-1 bg-gray-300 rounded-full" />
+            </div>
+
+            {/* Scrollable content */}
+            <div className="overflow-y-auto px-5 pb-4 flex-1">
+              <FilterContent onClose={() => setMobileOpen(false)} onApply={() => setMobileOpen(false)} />
+            </div>
           </div>
         </div>
       )}
 
       {/* Desktop Sidebar — only on lg+ */}
       <aside className="w-64 flex-shrink-0 hidden lg:block">
-        <FilterContent />
+        <div className="sticky top-4">
+          <FilterContent />
+        </div>
       </aside>
     </>
   );

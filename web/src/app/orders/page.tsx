@@ -173,7 +173,7 @@ export default function OrdersPage() {
                         <p className="text-xs text-[#6b7280]">
                           Qty: {item.quantity}{item.size ? ` · ${item.size}` : ''}{item.color ? ` · ${item.color}` : ''}
                         </p>
-                        <span className="bg-blue-600 text-white text-xs font-bold px-2.5 py-0.5 rounded-full inline-block mt-0.5">
+                        <span className="text-[#1a1a2e] text-sm font-bold inline-block mt-0.5">
                           ₹{Number(item.price).toLocaleString('en-IN')}
                         </span>
                       </div>

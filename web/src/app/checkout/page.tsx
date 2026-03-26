@@ -841,7 +841,7 @@ export default function CheckoutPage() {
                 <p className="text-sm text-gray-600">{address.line1}{address.line2 ? `, ${address.line2}` : ''}</p>
                 <p className="text-sm text-gray-600">{address.city}, {address.state && `${address.state}, `}{address.pincode}</p>
                 <p className="text-sm text-gray-600">{country.name}</p>
-                <p className="text-xs text-blue-600 mt-1">Est. delivery: {getDelivery(selectedCountry)}</p>
+                <p className="text-xs text-[#c5a55a] mt-1">Est. delivery: {getDelivery(selectedCountry)}</p>
               </div>
               <div className="bg-warm-white rounded-sm p-4">
                 <h3 className="text-sm font-medium mb-1">Payment Method</h3>

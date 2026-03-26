@@ -303,7 +303,7 @@ export default async function HomePage() {
                 </div>
               </div>
               <div className="text-center md:text-right">
-                <div className="inline-block bg-blue-600 text-white px-8 py-4 rounded-3xl font-serif text-3xl italic mb-2 shadow-card">
+                <div className="inline-block bg-[#c5a55a] text-[#1a1a2e] px-8 py-4 rounded-3xl font-serif text-3xl italic mb-2 shadow-card">
                   25% OFF
                 </div>
                 <p className="text-[#1a1a2e]/70 text-xs tracking-widest uppercase mt-2">

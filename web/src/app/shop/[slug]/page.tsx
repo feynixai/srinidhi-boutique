@@ -433,7 +433,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
                   />
                 )}
                 {discountPct && (
-                  <span className="absolute top-3 left-3 bg-blue-500 text-white text-xs px-3 py-1 rounded-full font-semibold tracking-wide z-10">
+                  <span className="absolute top-3 left-3 bg-rose-600 text-white text-xs px-3 py-1 rounded-full font-semibold tracking-wide z-10">
                     {discountPct}% OFF
                   </span>
                 )}
@@ -467,7 +467,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
 
             {/* Price */}
             <div className="flex items-center gap-3 flex-wrap">
-              <span className="bg-blue-500 text-white font-bold text-xl px-4 py-1.5 rounded-full">₹{displayPrice.toLocaleString('en-IN')}</span>
+              <span className="text-[#1a1a2e] font-bold text-2xl">₹{displayPrice.toLocaleString('en-IN')}</span>
               {(displayPrice < originalPrice || product.comparePrice) && (
                 <span className="text-lg text-[#1a1a2e]/40 line-through">
                   ₹{(displayPrice < originalPrice ? originalPrice : Number(product.comparePrice)).toLocaleString('en-IN')}
@@ -634,7 +634,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
               const end = new Date(Date.now() + 5 * 864e5);
               const fmt = (d: Date) => d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
               return (
-                <div className="flex items-center gap-2 text-xs text-[#1a1a2e]/60 bg-blue-50/80 border border-blue-100 rounded-xl px-3 py-2.5">
+                <div className="flex items-center gap-2 text-xs text-[#1a1a2e]/60 bg-[#f5f0eb] border border-[#c5a55a]/15 rounded-xl px-3 py-2.5">
                   <svg viewBox="0 0 24 24" className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
                   <span>Estimated delivery: <strong className="text-[#1a1a2e]/80">{fmt(start)} – {fmt(end)}</strong></span>
                 </div>
@@ -669,7 +669,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
                 href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productUrl)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-full px-3 py-1.5 text-xs font-medium hover:bg-blue-100 transition-colors"
+                className="flex items-center gap-1.5 bg-[#c5a55a]/10 text-[#c5a55a] border border-[#c5a55a]/20 rounded-full px-3 py-1.5 text-xs font-medium hover:bg-[#c5a55a]/15 transition-colors"
                 aria-label="Share on Facebook"
               >
                 <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
@@ -885,7 +885,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
           )}
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-[#1a1a2e] truncate">{product.name}</p>
-            <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">₹{displayPrice.toLocaleString('en-IN')}</span>
+            <span className="text-[#1a1a2e] text-sm font-bold">₹{displayPrice.toLocaleString('en-IN')}</span>
           </div>
           <button
             onClick={handleAddToCart}

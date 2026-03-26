@@ -118,7 +118,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
                 </div>
               )}
               {discountPct && (
-                <span className="absolute top-3 left-3 bg-blue-600 text-white text-xs px-3 py-1 rounded-full font-semibold">
+                <span className="absolute top-3 left-3 bg-rose-600 text-white text-xs px-3 py-1 rounded-full font-semibold">
                   {discountPct}% OFF
                 </span>
               )}
@@ -146,7 +146,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
 
             {/* Price */}
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="bg-blue-600 text-white font-bold text-base sm:text-lg px-3 py-1 rounded-full">
+              <span className="text-[#1a1a2e] font-bold text-xl sm:text-2xl">
                 ₹{displayPrice.toLocaleString('en-IN')}
               </span>
               {displayPrice < originalPrice && (

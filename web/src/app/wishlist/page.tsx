@@ -75,7 +75,7 @@ export default function WishlistPage() {
                 <p className="text-sm font-medium line-clamp-2 mb-2 hover:text-[#c5a55a] transition-colors text-[#1a1a2e]">{item.name}</p>
               </Link>
               <div className="flex items-center gap-2 mb-3">
-                <span className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                <span className="text-[#1a1a2e] text-sm font-bold">
                   ₹{Number(item.price).toLocaleString('en-IN')}
                 </span>
                 {item.comparePrice && Number(item.comparePrice) > Number(item.price) && (

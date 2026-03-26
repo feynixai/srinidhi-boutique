@@ -301,14 +301,14 @@ export function FilterSidebar() {
 
       {/* Mobile/Tablet: Full-height bottom sheet */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-[100] lg:hidden" onClick={closeSheet}>
+        <div className="fixed inset-0 lg:hidden" style={{ zIndex: 9999 }} onClick={closeSheet}>
           {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/60" />
           
-          {/* Bottom sheet — fills 90% of screen */}
+          {/* Bottom sheet — fills 85% of screen */}
           <div
-            className="absolute bottom-0 left-0 right-0 bg-[#f5f5f0] rounded-t-[28px] shadow-2xl flex flex-col animate-slide-up"
-            style={{ height: '90vh' }}
+            className="absolute bottom-0 left-0 right-0 bg-[#f5f5f0] rounded-t-[28px] shadow-2xl flex flex-col"
+            style={{ height: '85vh', zIndex: 10000 }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Drag handle */}
@@ -317,7 +317,7 @@ export function FilterSidebar() {
             </div>
 
             {/* Scrollable filter content */}
-            <div className="flex-1 overflow-y-auto overscroll-contain px-5 pb-6 -webkit-overflow-scrolling-touch">
+            <div className="flex-1 overflow-y-auto overscroll-contain px-5 pb-8" style={{ WebkitOverflowScrolling: 'touch' }}>
               <FilterContent onClose={closeSheet} onApply={closeSheet} />
             </div>
           </div>

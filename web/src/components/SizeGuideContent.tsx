@@ -85,12 +85,12 @@ export function SizeGuideContent({ whatsappLink }: SizeGuideContentProps = {}) {
 
       {/* How to Measure */}
       <div className="border-t border-gray-200 pt-6">
-        <h4 className="font-serif text-lg text-white mb-4">📐 How to Measure</h4>
+        <h4 className="font-serif text-lg text-[#1a1a2e] mb-4">📐 How to Measure</h4>
         <div className="space-y-3">
           {HOW_TO_MEASURE.map((item) => (
             <div key={item.point} className="bg-[#1a1a2e]/5 rounded-2xl p-3">
               <p className="text-[#c5a55a] text-sm font-semibold mb-1">{item.point}</p>
-              <p className="text-white/70 text-sm leading-relaxed">{item.instruction}</p>
+              <p className="text-[#1a1a2e]/60 text-sm leading-relaxed">{item.instruction}</p>
             </div>
           ))}
         </div>
@@ -109,7 +109,7 @@ export function SizeGuideContent({ whatsappLink }: SizeGuideContentProps = {}) {
         Not sure? WhatsApp us!
       </a>
 
-      <p className="text-center text-white/40 text-xs">
+      <p className="text-center text-[#1a1a2e]/30 text-xs">
         Tip: If you&apos;re between sizes, go one size up for a comfortable fit.
       </p>
     </div>
@@ -133,7 +133,7 @@ function SareeTab() {
 
       <div className="bg-[#1a1a2e]/5 rounded-2xl p-4">
         <h4 className="text-[#c5a55a] font-semibold text-sm mb-3">Draping Style Tips</h4>
-        <div className="space-y-2 text-sm text-white/70">
+        <div className="space-y-2 text-sm text-[#1a1a2e]/60">
           <DrapeTip title="Nivi Style (Most common)" desc="The pallu is draped over the left shoulder. Works for all body types and occasions." />
           <DrapeTip title="Gujarati / Seedha Pallu" desc="Pallu is brought from back to front over the right shoulder. Great for heavy-border sarees." />
           <DrapeTip title="Bengali Style" desc="No pleats at the front. Pallu is pinned at the left shoulder with decorative key-hole pleats." />
@@ -254,7 +254,7 @@ function BlouseTab({ unit, setUnit }: { unit: 'in' | 'cm'; setUnit: (u: 'in' | '
           <button
             onClick={() => setUnit('in')}
             className={`px-3 py-1 text-xs rounded-full font-medium transition-all ${
-              unit === 'in' ? 'bg-[#c5a55a] text-white' : 'text-[#1a1a2e]/50 hover:text-white'
+              unit === 'in' ? 'bg-[#c5a55a] text-white' : 'text-[#1a1a2e]/50 hover:text-[#1a1a2e]'
             }`}
           >
             Inches
@@ -262,7 +262,7 @@ function BlouseTab({ unit, setUnit }: { unit: 'in' | 'cm'; setUnit: (u: 'in' | '
           <button
             onClick={() => setUnit('cm')}
             className={`px-3 py-1 text-xs rounded-full font-medium transition-all ${
-              unit === 'cm' ? 'bg-[#c5a55a] text-white' : 'text-[#1a1a2e]/50 hover:text-white'
+              unit === 'cm' ? 'bg-[#c5a55a] text-white' : 'text-[#1a1a2e]/50 hover:text-[#1a1a2e]'
             }`}
           >
             CM

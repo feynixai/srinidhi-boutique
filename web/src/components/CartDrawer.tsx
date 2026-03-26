@@ -14,6 +14,16 @@ export function CartDrawer() {
   const [couponInput, setCouponInput] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState('');
 
+  // Lock body scroll when cart is open
+  useEffect(() => {
+    if (isCartOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isCartOpen]);
+
   const { data: cart } = useQuery({
     queryKey: ['cart', sessionId],
     queryFn: () => getCart(sessionId),

@@ -301,19 +301,35 @@ export function FilterSidebar() {
 
       {/* Mobile/Tablet: Full-height bottom sheet */}
       {mobileOpen && (
-        <div className="fixed inset-0 lg:hidden" style={{ zIndex: 9999 }} onClick={closeSheet}>
+        <div
+          className="lg:hidden"
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999 }}
+          onClick={closeSheet}
+        >
           {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/60" />
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)' }} />
           
-          {/* Bottom sheet — fills 85% of screen */}
+          {/* Bottom sheet — anchored to actual screen bottom */}
           <div
-            className="absolute bottom-0 left-0 right-0 bg-[#f5f5f0] rounded-t-[28px] shadow-2xl flex flex-col"
-            style={{ height: '85dvh', zIndex: 10000, transform: 'translateY(0)', opacity: 1 }}
+            style={{
+              position: 'fixed',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: '85vh',
+              zIndex: 10000,
+              background: '#f5f5f0',
+              borderTopLeftRadius: 28,
+              borderTopRightRadius: 28,
+              display: 'flex',
+              flexDirection: 'column',
+              boxShadow: '0 -8px 32px rgba(0,0,0,0.2)',
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Drag handle */}
-            <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
-              <div className="w-10 h-1 bg-gray-300 rounded-full" />
+            <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 12, paddingBottom: 4, flexShrink: 0 }}>
+              <div style={{ width: 40, height: 4, background: '#ccc', borderRadius: 4 }} />
             </div>
 
             {/* Scrollable filter content */}

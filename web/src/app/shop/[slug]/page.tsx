@@ -174,8 +174,8 @@ function Accordion({ title, children, defaultOpen = false }: { title: string; ch
   );
 }
 
-export default function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params);
+export default function ProductPage({ params }: { params: { slug: string } }) {
+  const { slug } = params;
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState<string>('');
   const [selectedImage, setSelectedImage] = useState(0);

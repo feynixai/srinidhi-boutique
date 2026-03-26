@@ -184,9 +184,26 @@ export const getCategories = () =>
   api.get('/api/categories').then((r) => r.data as Category[])
     .catch(() => DEMO_CATEGORIES);
 
-// Cart
+// ── Cart (localStorage fallback when backend is offline) ──────────────────
+const CART_KEY = 'srinidhi_cart';
+
+function getLocalCart(): CartItem[] {
+  if (typeof window === 'undefined') return [];
+  try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch { return []; }
+}
+
+function saveLocalCart(items: CartItem[]) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(CART_KEY, JSON.stringify(items));
+}
+
 export const getCart = (sessionId: string) =>
-  api.get(`/api/cart/${sessionId}`).then((r) => r.data as { items: CartItem[]; subtotal: number });
+  api.get(`/api/cart/${sessionId}`).then((r) => r.data as { items: CartItem[]; subtotal: number })
+    .catch(() => {
+      const items = getLocalCart();
+      const subtotal = items.reduce((sum, item) => sum + Number(item.product.price) * item.quantity, 0);
+      return { items, subtotal };
+    });
 
 export const addToCart = (data: {
   sessionId: string;
@@ -194,13 +211,48 @@ export const addToCart = (data: {
   quantity: number;
   size?: string;
   color?: string;
-}) => api.post('/api/cart', data).then((r) => r.data as CartItem);
+}) => api.post('/api/cart', data).then((r) => r.data as CartItem)
+  .catch(() => {
+    // Fallback: add to localStorage cart
+    const items = getLocalCart();
+    const product = DEMO_PRODUCTS.find(p => p.id === data.productId);
+    if (!product) throw new Error('Product not found');
+    
+    const existingIdx = items.findIndex(i => i.productId === data.productId && i.size === data.size && i.color === data.color);
+    if (existingIdx >= 0) {
+      items[existingIdx].quantity += data.quantity;
+    } else {
+      const newItem: CartItem = {
+        id: `local-${Date.now()}`,
+        sessionId: data.sessionId,
+        productId: data.productId,
+        product,
+        quantity: data.quantity,
+        size: data.size,
+        color: data.color,
+      };
+      items.push(newItem);
+    }
+    saveLocalCart(items);
+    return items[items.length - 1];
+  });
 
 export const updateCartItem = (id: string, quantity: number) =>
-  api.put(`/api/cart/${id}`, { quantity }).then((r) => r.data);
+  api.put(`/api/cart/${id}`, { quantity }).then((r) => r.data)
+    .catch(() => {
+      const items = getLocalCart();
+      const item = items.find(i => i.id === id);
+      if (item) { item.quantity = quantity; saveLocalCart(items); }
+      return item;
+    });
 
 export const removeCartItem = (id: string) =>
-  api.delete(`/api/cart/${id}`).then((r) => r.data);
+  api.delete(`/api/cart/${id}`).then((r) => r.data)
+    .catch(() => {
+      const items = getLocalCart().filter(i => i.id !== id);
+      saveLocalCart(items);
+      return { success: true };
+    });
 
 // Orders
 export const placeOrder = (data: Record<string, unknown>) =>

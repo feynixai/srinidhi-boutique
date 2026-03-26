@@ -308,7 +308,7 @@ export function FilterSidebar() {
           {/* Bottom sheet — fills 85% of screen */}
           <div
             className="absolute bottom-0 left-0 right-0 bg-[#f5f5f0] rounded-t-[28px] shadow-2xl flex flex-col"
-            style={{ height: '85vh', zIndex: 10000 }}
+            style={{ height: '85dvh', zIndex: 10000, transform: 'translateY(0)', opacity: 1 }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Drag handle */}

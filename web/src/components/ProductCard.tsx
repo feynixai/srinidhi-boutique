@@ -216,17 +216,17 @@ export function ProductCard({ product }: ProductCardProps) {
       </div>
 
       {/* Product info */}
-      <div className="p-2 pb-3 sm:p-3 sm:pb-4">
-        <p className="text-[10px] sm:text-xs text-gray-600 mb-0.5 uppercase tracking-wider truncate">
+      <div className="p-3 pb-3.5 sm:p-3 sm:pb-4">
+        <p className="text-[11px] sm:text-xs text-gray-600 mb-1 uppercase tracking-wider truncate">
           {product.category?.name || product.occasion[0]}
         </p>
-        <h3 className="text-xs sm:text-sm font-semibold text-gray-900 line-clamp-2 leading-snug mb-1.5 sm:mb-2">{product.name}</h3>
-        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-          <span className="bg-blue-600 text-white text-xs sm:text-sm font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full">
+        <h3 className="text-sm sm:text-sm font-semibold text-gray-900 line-clamp-2 leading-snug mb-2">{product.name}</h3>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="bg-blue-600 text-white text-sm font-bold px-3 py-0.5 sm:py-1 rounded-full">
             &#x20B9;{displayPrice.toLocaleString('en-IN')}
           </span>
           {(displayPrice < Number(product.price) || product.comparePrice) && (
-            <span className="text-gray-600 text-[10px] sm:text-xs line-through">
+            <span className="text-gray-600 text-xs line-through">
               &#x20B9;{(displayPrice < Number(product.price) ? Number(product.price) : Number(product.comparePrice)).toLocaleString('en-IN')}
             </span>
           )}

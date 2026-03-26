@@ -238,6 +238,7 @@ function FilterContent({ onClose, onApply }: { onClose?: () => void; onApply?: (
 }
 
 export function FilterSidebar() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -245,17 +246,37 @@ export function FilterSidebar() {
     (k) => searchParams.get(k)
   ).length;
 
+  // Lock body scroll when filter sheet is open
+  useState(() => {
+    if (typeof window === 'undefined') return;
+    if (mobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  });
+
+  const openSheet = () => {
+    setMobileOpen(true);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeSheet = () => {
+    setMobileOpen(false);
+    document.body.style.overflow = '';
+  };
+
   return (
     <>
       {/* Mobile/Tablet: Sticky top bar with filter + sort */}
-      <div className="lg:hidden sticky top-0 z-30 -mx-4 px-4 py-2 bg-[#f5f5f0]/90 backdrop-blur-xl border-b border-gray-200/50">
+      <div className="lg:hidden sticky top-0 z-30 -mx-3 sm:-mx-6 px-3 sm:px-6 py-2.5 bg-[#f5f5f0]/95 backdrop-blur-xl border-b border-gray-200/50">
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setMobileOpen(true)}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all ${
+            onClick={openSheet}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all active:scale-95 ${
               filterCount > 0
-                ? 'bg-[#c5a55a] text-[#1a1a2e]'
-                : 'bg-white border border-gray-200 text-[#1a1a2e]'
+                ? 'bg-[#c5a55a] text-[#1a1a2e] shadow-sm'
+                : 'bg-white border border-gray-200 text-[#1a1a2e] shadow-sm'
             }`}
           >
             <FiFilter size={14} />
@@ -267,11 +288,10 @@ export function FilterSidebar() {
             )}
           </button>
 
-          {/* Quick clear */}
           {filterCount > 0 && (
             <button
-              onClick={() => { const router = document.querySelector('a[href="/shop"]'); if (router) (router as HTMLAnchorElement).click(); else window.location.href = '/shop'; }}
-              className="px-3 py-2.5 rounded-full text-xs font-medium text-red-500 bg-red-50 border border-red-100"
+              onClick={() => router.push('/shop')}
+              className="px-3 py-2.5 rounded-full text-xs font-medium text-red-500 bg-red-50 border border-red-100 active:scale-95 transition-all"
             >
               Clear ({filterCount})
             </button>
@@ -279,25 +299,26 @@ export function FilterSidebar() {
         </div>
       </div>
 
-      {/* Mobile/Tablet: Bottom sheet drawer */}
+      {/* Mobile/Tablet: Full-height bottom sheet */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
+        <div className="fixed inset-0 z-[100] lg:hidden" onClick={closeSheet}>
           {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
           
-          {/* Bottom sheet */}
+          {/* Bottom sheet — fills 90% of screen */}
           <div
-            className="absolute bottom-0 left-0 right-0 bg-[#f5f5f0] rounded-t-3xl shadow-2xl max-h-[85vh] flex flex-col animate-slide-up"
+            className="absolute bottom-0 left-0 right-0 bg-[#f5f5f0] rounded-t-[28px] shadow-2xl flex flex-col animate-slide-up"
+            style={{ height: '90vh' }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Drag handle */}
-            <div className="flex justify-center pt-3 pb-1">
+            <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
               <div className="w-10 h-1 bg-gray-300 rounded-full" />
             </div>
 
-            {/* Scrollable content */}
-            <div className="overflow-y-auto px-5 pb-4 flex-1">
-              <FilterContent onClose={() => setMobileOpen(false)} onApply={() => setMobileOpen(false)} />
+            {/* Scrollable filter content */}
+            <div className="flex-1 overflow-y-auto overscroll-contain px-5 pb-6 -webkit-overflow-scrolling-touch">
+              <FilterContent onClose={closeSheet} onApply={closeSheet} />
             </div>
           </div>
         </div>

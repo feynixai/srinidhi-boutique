@@ -25,10 +25,16 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
 
   useEffect(() => {
     setMounted(true);
+    // Lock background scroll
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     // Close on ESC
     function onKey(e: KeyboardEvent) { if (e.key === 'Escape') onClose(); }
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener('keydown', onKey);
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -70,70 +76,77 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[150] flex items-center justify-center p-4"
+      className="fixed inset-0 z-[150] flex items-end sm:items-center justify-center sm:p-4"
       onClick={(e) => { e.preventDefault(); e.stopPropagation(); onClose(); }}
     >
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
-      {/* Modal */}
+      {/* Modal — bottom sheet on mobile, centered on desktop */}
       <div
-        className="relative bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        className="relative bg-white/95 backdrop-blur-xl shadow-2xl w-full sm:max-w-2xl sm:rounded-3xl rounded-t-3xl max-h-[92vh] sm:max-h-[90vh] overflow-y-auto animate-slide-up sm:animate-none"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Drag indicator on mobile */}
+        <div className="sm:hidden flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1 bg-gray-300 rounded-full" />
+        </div>
+
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors"
+          className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 p-2.5 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors"
           aria-label="Close"
         >
           <FiX size={18} className="text-[#1a1a2e]" />
         </button>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-0">
-          {/* Image */}
-          <div className="relative aspect-[3/4] bg-[#f5f0eb] rounded-t-3xl sm:rounded-l-3xl sm:rounded-tr-none overflow-hidden">
-            {product.images[selectedImage] ? (
-              <Image
-                src={product.images[selectedImage]}
-                alt={product.name}
-                fill
-                className="object-cover"
-                sizes="(max-width: 640px) 100vw, 300px"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <span className="text-[#c5a55a] font-serif text-2xl">SB</span>
-              </div>
-            )}
-            {discountPct && (
-              <span className="absolute top-3 left-3 bg-blue-600 text-white text-xs px-3 py-1 rounded-full font-semibold">
-                {discountPct}% OFF
-              </span>
-            )}
-            {/* Thumbnail strip */}
-            {product.images.length > 1 && (
-              <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
-                {product.images.slice(0, 5).map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setSelectedImage(i)}
-                    className={`w-1.5 h-1.5 rounded-full transition-all ${i === selectedImage ? 'bg-white w-4' : 'bg-white/50'}`}
-                  />
-                ))}
-              </div>
-            )}
+          {/* Image — max 50vh on mobile */}
+          <div className="relative w-full bg-[#f5f0eb] rounded-t-3xl sm:rounded-l-3xl sm:rounded-tr-none overflow-hidden" style={{ maxHeight: '50vh' }}>
+            <div className="relative aspect-[3/4] sm:aspect-auto sm:h-full">
+              {product.images[selectedImage] ? (
+                <Image
+                  src={product.images[selectedImage]}
+                  alt={product.name}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 100vw, 300px"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center min-h-[200px]">
+                  <span className="text-[#c5a55a] font-serif text-2xl">SB</span>
+                </div>
+              )}
+              {discountPct && (
+                <span className="absolute top-3 left-3 bg-blue-600 text-white text-xs px-3 py-1 rounded-full font-semibold">
+                  {discountPct}% OFF
+                </span>
+              )}
+              {/* Dot indicators */}
+              {product.images.length > 1 && (
+                <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
+                  {product.images.slice(0, 5).map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setSelectedImage(i)}
+                      className={`w-2 h-2 rounded-full transition-all ${i === selectedImage ? 'bg-white w-5' : 'bg-white/50'}`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Info */}
-          <div className="p-6 space-y-4">
+          <div className="p-5 sm:p-6 space-y-4">
             {product.category && (
               <p className="text-xs text-[#c5a55a] uppercase tracking-[0.2em] font-semibold">{product.category.name}</p>
             )}
-            <h2 className="font-serif text-xl leading-snug text-[#1a1a2e]">{product.name}</h2>
+            <h2 className="font-serif text-lg sm:text-xl leading-snug text-[#1a1a2e]">{product.name}</h2>
 
             {/* Price */}
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="bg-blue-600 text-white font-bold text-lg px-3 py-1 rounded-full">
+              <span className="bg-blue-600 text-white font-bold text-base sm:text-lg px-3 py-1 rounded-full">
                 ₹{displayPrice.toLocaleString('en-IN')}
               </span>
               {displayPrice < originalPrice && (
@@ -154,7 +167,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
                     <button
                       key={color}
                       onClick={() => setSelectedColor(color)}
-                      className={`px-3 py-1.5 text-xs rounded-full border transition-all ${
+                      className={`min-w-[44px] min-h-[44px] px-4 py-2 text-sm rounded-full border transition-all ${
                         selectedColor === color
                           ? 'border-[#c5a55a] bg-[#c5a55a] text-[#1a1a2e] font-semibold'
                           : 'border-gray-200 hover:border-[#c5a55a] text-[#1a1a2e]'
@@ -178,7 +191,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
                     <button
                       key={size}
                       onClick={() => setSelectedSize(size)}
-                      className={`min-w-[44px] h-[44px] px-3 rounded-full border text-sm font-medium transition-all ${
+                      className={`min-w-[44px] h-[44px] px-4 rounded-full border text-sm font-medium transition-all ${
                         selectedSize === size
                           ? 'border-[#1a1a2e] bg-[#1a1a2e] text-white'
                           : 'border-gray-200 hover:border-[#1a1a2e] text-[#1a1a2e]'
@@ -193,7 +206,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
 
             {/* Stock warning */}
             {product.stock > 0 && product.stock <= 5 && (
-              <p className="text-orange-500 text-xs font-medium">Only {product.stock} left!</p>
+              <p className="text-orange-500 text-sm font-medium">Only {product.stock} left!</p>
             )}
 
             {/* CTA */}
@@ -201,7 +214,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
               <button
                 onClick={handleAddToCart}
                 disabled={adding || product.stock === 0}
-                className="flex-1 flex items-center justify-center gap-2 bg-[#1a1a2e] text-white py-3 rounded-full text-sm font-semibold tracking-wide hover:bg-[#2d2d4e] transition-colors disabled:opacity-50"
+                className="flex-1 flex items-center justify-center gap-2 bg-[#1a1a2e] text-white py-3.5 rounded-full text-sm font-semibold tracking-wide hover:bg-[#2d2d4e] transition-colors disabled:opacity-50"
               >
                 <FiShoppingBag size={16} />
                 {product.stock === 0 ? 'Out of Stock' : adding ? 'Adding...' : 'Add to Bag'}
@@ -212,7 +225,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
                   toggleWishlist({ id: product.id, name: product.name, slug: product.slug, price: Number(product.price), comparePrice: product.comparePrice ? Number(product.comparePrice) : undefined, images: product.images });
                   toast(inWishlist(product.id) ? 'Removed from wishlist' : 'Saved to wishlist!');
                 }}
-                className={`p-3 rounded-full border transition-all ${inWishlist(product.id) ? 'border-red-400 text-red-500 bg-red-50' : 'border-gray-200 text-[#1a1a2e]/50 hover:border-red-300 hover:text-red-400'}`}
+                className={`min-w-[44px] min-h-[44px] p-3 rounded-full border transition-all ${inWishlist(product.id) ? 'border-red-400 text-red-500 bg-red-50' : 'border-gray-200 text-[#1a1a2e]/50 hover:border-red-300 hover:text-red-400'}`}
                 aria-label="Wishlist"
               >
                 <FiHeart size={18} fill={inWishlist(product.id) ? 'currentColor' : 'none'} />
@@ -222,7 +235,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
             <Link
               href={`/shop/${product.slug}`}
               onClick={onClose}
-              className="block text-center text-xs text-[#c5a55a] hover:text-[#1a1a2e] transition-colors pt-1"
+              className="block text-center text-sm text-[#c5a55a] hover:text-[#1a1a2e] transition-colors pt-1 font-medium"
             >
               View full details →
             </Link>

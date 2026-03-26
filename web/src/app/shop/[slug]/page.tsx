@@ -521,7 +521,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
                   <p className="text-xs uppercase tracking-[0.15em] font-semibold text-[#1a1a2e]/60">
                     Size: {selectedSize && <span className="text-[#1a1a2e] normal-case tracking-normal font-normal">{selectedSize}</span>}
                   </p>
-                  <SizeGuideModal />
+                  <SizeGuideModal productName={product.name} productUrl={typeof window !== 'undefined' ? window.location.href : ''} />
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {product.sizes.map((size) => (

@@ -48,7 +48,11 @@ const HOW_TO_MEASURE = [
 
 /* ── Component ────────────────────────────────────────────────────── */
 
-export function SizeGuideContent() {
+interface SizeGuideContentProps {
+  whatsappLink?: string;
+}
+
+export function SizeGuideContent({ whatsappLink }: SizeGuideContentProps = {}) {
   const [activeTab, setActiveTab] = useState<Tab>('Sarees');
   const [unit, setUnit] = useState<'in' | 'cm'>('in');
 
@@ -63,7 +67,7 @@ export function SizeGuideContent() {
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
               activeTab === tab
                 ? 'bg-[#c5a55a] text-white shadow-lg shadow-[#c5a55a]/30'
-                : 'bg-white/10 text-white/60 hover:bg-white/20 hover:text-white'
+                : 'bg-[#1a1a2e]/5 text-[#1a1a2e]/50 hover:bg-white/20 hover:text-white'
             }`}
           >
             {tab}
@@ -80,11 +84,11 @@ export function SizeGuideContent() {
       </div>
 
       {/* How to Measure */}
-      <div className="border-t border-white/10 pt-6">
+      <div className="border-t border-gray-200 pt-6">
         <h4 className="font-serif text-lg text-white mb-4">📐 How to Measure</h4>
         <div className="space-y-3">
           {HOW_TO_MEASURE.map((item) => (
-            <div key={item.point} className="bg-white/5 rounded-2xl p-3">
+            <div key={item.point} className="bg-[#1a1a2e]/5 rounded-2xl p-3">
               <p className="text-[#c5a55a] text-sm font-semibold mb-1">{item.point}</p>
               <p className="text-white/70 text-sm leading-relaxed">{item.instruction}</p>
             </div>
@@ -94,10 +98,10 @@ export function SizeGuideContent() {
 
       {/* WhatsApp CTA */}
       <a
-        href="https://wa.me/918309949805?text=Hi%2C%20I%20need%20help%20with%20sizing"
+        href={whatsappLink || "https://wa.me/918309949805?text=Hi%2C%20I%20need%20help%20with%20sizing"}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center justify-center gap-2 w-full py-3.5 bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold rounded-full transition-colors text-sm"
+        className="flex items-center justify-center gap-2 w-full py-3.5 bg-[#25D366] hover:bg-[#20bd5a] text-[#1a1a2e] font-semibold rounded-full transition-colors text-sm"
       >
         <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
           <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
@@ -117,7 +121,7 @@ export function SizeGuideContent() {
 function SareeTab() {
   return (
     <div className="space-y-4">
-      <div className="bg-white/5 rounded-2xl p-4 space-y-3">
+      <div className="bg-[#1a1a2e]/5 rounded-2xl p-4 space-y-3">
         <h4 className="text-[#c5a55a] font-semibold text-sm">Standard Saree</h4>
         <div className="grid grid-cols-2 gap-3 text-sm">
           <InfoCard label="Length" value="5.5 metres" />
@@ -127,7 +131,7 @@ function SareeTab() {
         </div>
       </div>
 
-      <div className="bg-white/5 rounded-2xl p-4">
+      <div className="bg-[#1a1a2e]/5 rounded-2xl p-4">
         <h4 className="text-[#c5a55a] font-semibold text-sm mb-3">Draping Style Tips</h4>
         <div className="space-y-2 text-sm text-white/70">
           <DrapeTip title="Nivi Style (Most common)" desc="The pallu is draped over the left shoulder. Works for all body types and occasions." />
@@ -137,7 +141,7 @@ function SareeTab() {
         </div>
       </div>
 
-      <div className="bg-[#c5a55a]/10 border border-[#c5a55a]/20 rounded-2xl p-4 text-sm text-white/80">
+      <div className="bg-[#c5a55a]/10 border border-[#c5a55a]/20 rounded-2xl p-4 text-sm text-[#1a1a2e]/70">
         <p className="font-medium text-[#c5a55a] mb-1">💡 Pro Tip</p>
         <p>All our sarees come with an unstitched blouse piece. You can get it stitched to your exact measurements at any local tailor.</p>
       </div>
@@ -148,7 +152,7 @@ function SareeTab() {
 function KurtiTab() {
   return (
     <div className="space-y-4">
-      <p className="text-white/60 text-xs">All measurements in inches. Measure at the fullest point.</p>
+      <p className="text-[#1a1a2e]/50 text-xs">All measurements in inches. Measure at the fullest point.</p>
       <div className="overflow-x-auto -mx-2 px-2">
         <table className="w-full text-sm border-collapse min-w-[500px]">
           <thead>
@@ -162,19 +166,19 @@ function KurtiTab() {
           </thead>
           <tbody>
             {KURTI_SIZES.map((r) => (
-              <tr key={r.size} className="border-t border-white/5 hover:bg-white/5 transition-colors">
+              <tr key={r.size} className="border-t border-white/5 hover:bg-[#1a1a2e]/5 transition-colors">
                 <td className="py-2.5 px-2 font-semibold text-[#c5a55a]">{r.size}</td>
-                <td className="py-2.5 px-2 text-white/80">{r.chest}</td>
-                <td className="py-2.5 px-2 text-white/80">{r.waist}</td>
-                <td className="py-2.5 px-2 text-white/80">{r.hip}</td>
-                <td className="py-2.5 px-2 text-white/80">{r.sleeve}</td>
+                <td className="py-2.5 px-2 text-[#1a1a2e]/70">{r.chest}</td>
+                <td className="py-2.5 px-2 text-[#1a1a2e]/70">{r.waist}</td>
+                <td className="py-2.5 px-2 text-[#1a1a2e]/70">{r.hip}</td>
+                <td className="py-2.5 px-2 text-[#1a1a2e]/70">{r.sleeve}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <div className="bg-white/5 rounded-2xl p-4">
+      <div className="bg-[#1a1a2e]/5 rounded-2xl p-4">
         <h4 className="text-[#c5a55a] font-semibold text-sm mb-3">Length Options</h4>
         <div className="overflow-x-auto -mx-2 px-2">
           <table className="w-full text-sm border-collapse min-w-[400px]">
@@ -188,11 +192,11 @@ function KurtiTab() {
             </thead>
             <tbody>
               {KURTI_SIZES.map((r) => (
-                <tr key={r.size} className="border-t border-white/5 hover:bg-white/5 transition-colors">
+                <tr key={r.size} className="border-t border-white/5 hover:bg-[#1a1a2e]/5 transition-colors">
                   <td className="py-2 px-2 font-semibold text-[#c5a55a]">{r.size}</td>
-                  <td className="py-2 px-2 text-white/80">{r.shortLen}</td>
-                  <td className="py-2 px-2 text-white/80">{r.regLen}</td>
-                  <td className="py-2 px-2 text-white/80">{r.longLen}</td>
+                  <td className="py-2 px-2 text-[#1a1a2e]/70">{r.shortLen}</td>
+                  <td className="py-2 px-2 text-[#1a1a2e]/70">{r.regLen}</td>
+                  <td className="py-2 px-2 text-[#1a1a2e]/70">{r.longLen}</td>
                 </tr>
               ))}
             </tbody>
@@ -206,7 +210,7 @@ function KurtiTab() {
 function LehengaTab() {
   return (
     <div className="space-y-4">
-      <p className="text-white/60 text-xs">All measurements in inches.</p>
+      <p className="text-[#1a1a2e]/50 text-xs">All measurements in inches.</p>
       <div className="overflow-x-auto -mx-2 px-2">
         <table className="w-full text-sm border-collapse min-w-[400px]">
           <thead>
@@ -220,19 +224,19 @@ function LehengaTab() {
           </thead>
           <tbody>
             {LEHENGA_SIZES.map((r) => (
-              <tr key={r.size} className="border-t border-white/5 hover:bg-white/5 transition-colors">
+              <tr key={r.size} className="border-t border-white/5 hover:bg-[#1a1a2e]/5 transition-colors">
                 <td className="py-2.5 px-2 font-semibold text-[#c5a55a]">{r.size}</td>
-                <td className="py-2.5 px-2 text-white/80">{r.waist}</td>
-                <td className="py-2.5 px-2 text-white/80">{r.hip}</td>
-                <td className="py-2.5 px-2 text-white/80">{r.length}</td>
-                <td className="py-2.5 px-2 text-white/80">{r.canCan}</td>
+                <td className="py-2.5 px-2 text-[#1a1a2e]/70">{r.waist}</td>
+                <td className="py-2.5 px-2 text-[#1a1a2e]/70">{r.hip}</td>
+                <td className="py-2.5 px-2 text-[#1a1a2e]/70">{r.length}</td>
+                <td className="py-2.5 px-2 text-[#1a1a2e]/70">{r.canCan}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <div className="bg-[#c5a55a]/10 border border-[#c5a55a]/20 rounded-2xl p-4 text-sm text-white/80">
+      <div className="bg-[#c5a55a]/10 border border-[#c5a55a]/20 rounded-2xl p-4 text-sm text-[#1a1a2e]/70">
         <p className="font-medium text-[#c5a55a] mb-1">About Can-Can Layers</p>
         <p>Can-Can (net underskirt) gives the lehenga its flare and volume. More layers = more volume. Heavy lehengas usually need 2-3 layers for the perfect shape.</p>
       </div>
@@ -245,12 +249,12 @@ function BlouseTab({ unit, setUnit }: { unit: 'in' | 'cm'; setUnit: (u: 'in' | '
     <div className="space-y-4">
       {/* Unit toggle */}
       <div className="flex items-center justify-between">
-        <p className="text-white/60 text-xs">Blouse measurements</p>
-        <div className="flex bg-white/10 rounded-full p-0.5">
+        <p className="text-[#1a1a2e]/50 text-xs">Blouse measurements</p>
+        <div className="flex bg-[#1a1a2e]/5 rounded-full p-0.5">
           <button
             onClick={() => setUnit('in')}
             className={`px-3 py-1 text-xs rounded-full font-medium transition-all ${
-              unit === 'in' ? 'bg-[#c5a55a] text-white' : 'text-white/60 hover:text-white'
+              unit === 'in' ? 'bg-[#c5a55a] text-white' : 'text-[#1a1a2e]/50 hover:text-white'
             }`}
           >
             Inches
@@ -258,7 +262,7 @@ function BlouseTab({ unit, setUnit }: { unit: 'in' | 'cm'; setUnit: (u: 'in' | '
           <button
             onClick={() => setUnit('cm')}
             className={`px-3 py-1 text-xs rounded-full font-medium transition-all ${
-              unit === 'cm' ? 'bg-[#c5a55a] text-white' : 'text-white/60 hover:text-white'
+              unit === 'cm' ? 'bg-[#c5a55a] text-white' : 'text-[#1a1a2e]/50 hover:text-white'
             }`}
           >
             CM
@@ -279,19 +283,19 @@ function BlouseTab({ unit, setUnit }: { unit: 'in' | 'cm'; setUnit: (u: 'in' | '
           </thead>
           <tbody>
             {BLOUSE_SIZES.map((r) => (
-              <tr key={r.size} className="border-t border-white/5 hover:bg-white/5 transition-colors">
+              <tr key={r.size} className="border-t border-white/5 hover:bg-[#1a1a2e]/5 transition-colors">
                 <td className="py-2.5 px-2 font-semibold text-[#c5a55a]">{r.size}</td>
-                <td className="py-2.5 px-2 text-white/80">{unit === 'in' ? `${r.chest.in}"` : `${r.chest.cm}`}</td>
-                <td className="py-2.5 px-2 text-white/80">{unit === 'in' ? `${r.shoulder.in}"` : `${r.shoulder.cm}`}</td>
-                <td className="py-2.5 px-2 text-white/80">{unit === 'in' ? `${r.sleeve.in}"` : `${r.sleeve.cm}`}</td>
-                <td className="py-2.5 px-2 text-white/80">{unit === 'in' ? `${r.back.in}"` : `${r.back.cm}`}</td>
+                <td className="py-2.5 px-2 text-[#1a1a2e]/70">{unit === 'in' ? `${r.chest.in}"` : `${r.chest.cm}`}</td>
+                <td className="py-2.5 px-2 text-[#1a1a2e]/70">{unit === 'in' ? `${r.shoulder.in}"` : `${r.shoulder.cm}`}</td>
+                <td className="py-2.5 px-2 text-[#1a1a2e]/70">{unit === 'in' ? `${r.sleeve.in}"` : `${r.sleeve.cm}`}</td>
+                <td className="py-2.5 px-2 text-[#1a1a2e]/70">{unit === 'in' ? `${r.back.in}"` : `${r.back.cm}`}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <div className="bg-[#c5a55a]/10 border border-[#c5a55a]/20 rounded-2xl p-4 text-sm text-white/80">
+      <div className="bg-[#c5a55a]/10 border border-[#c5a55a]/20 rounded-2xl p-4 text-sm text-[#1a1a2e]/70">
         <p className="font-medium text-[#c5a55a] mb-1">💡 Blouse Fitting Tip</p>
         <p>For a perfect fit, we recommend getting measured by a tailor. Our blouse pieces come unstitched — your tailor can customize the neckline, sleeve style, and back design.</p>
       </div>
@@ -303,25 +307,25 @@ function BlouseTab({ unit, setUnit }: { unit: 'in' | 'cm'; setUnit: (u: 'in' | '
 
 function InfoCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-white/5 rounded-xl p-3">
-      <p className="text-white/50 text-xs mb-0.5">{label}</p>
-      <p className="text-white font-medium text-sm">{value}</p>
+    <div className="bg-[#1a1a2e]/5 rounded-xl p-3">
+      <p className="text-[#1a1a2e]/40 text-xs mb-0.5">{label}</p>
+      <p className="text-[#1a1a2e] font-medium text-sm">{value}</p>
     </div>
   );
 }
 
 function DrapeTip({ title, desc }: { title: string; desc: string }) {
   return (
-    <div className="bg-white/5 rounded-xl p-3">
-      <p className="text-white font-medium text-sm mb-1">{title}</p>
-      <p className="text-white/60 text-xs leading-relaxed">{desc}</p>
+    <div className="bg-[#1a1a2e]/5 rounded-xl p-3">
+      <p className="text-[#1a1a2e] font-medium text-sm mb-1">{title}</p>
+      <p className="text-[#1a1a2e]/50 text-xs leading-relaxed">{desc}</p>
     </div>
   );
 }
 
 function Th({ children }: { children: React.ReactNode }) {
   return (
-    <th className="py-2 px-2 text-xs font-semibold text-white/50 uppercase tracking-wider">
+    <th className="py-2 px-2 text-xs font-semibold text-[#1a1a2e]/40 uppercase tracking-wider">
       {children}
     </th>
   );

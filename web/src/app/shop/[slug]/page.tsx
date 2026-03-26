@@ -272,6 +272,18 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
     } catch {}
   }, [product]);
 
+  const displayPrice = product ? (product.salePrice ?? Number(product.price)) : 0;
+  const originalPrice = product ? Number(product.price) : 0;
+  const discountPct = product
+    ? (product.salePct && product.salePct > 0
+      ? product.salePct
+      : product.onOffer && product.offerPercent
+      ? product.offerPercent
+      : product.comparePrice
+      ? Math.round(((Number(product.comparePrice) - originalPrice) / Number(product.comparePrice)) * 100)
+      : null)
+    : null;
+
   if (isLoading) return (
     <div className="max-w-7xl mx-auto px-4 py-10">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -294,16 +306,6 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
   if (!product) return (
     <div className="text-center py-20 text-[#6b7280] text-xl">Product not found</div>
   );
-
-  const displayPrice = product.salePrice ?? Number(product.price);
-  const originalPrice = Number(product.price);
-  const discountPct = product.salePct && product.salePct > 0
-    ? product.salePct
-    : product.onOffer && product.offerPercent
-    ? product.offerPercent
-    : product.comparePrice
-    ? Math.round(((Number(product.comparePrice) - originalPrice) / Number(product.comparePrice)) * 100)
-    : null;
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -345,10 +347,10 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
 
   // Sale timer hours (random-ish but consistent per product)
   const saleHoursLeft = useMemo(() => {
-    if (!discountPct) return 0;
+    if (!discountPct || !product) return 0;
     const hash = product.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
     return (hash % 18) + 6; // 6-23 hours
-  }, [product.id, discountPct]);
+  }, [product?.id, discountPct]);
 
   const isFreeShipping = displayPrice > 999;
 

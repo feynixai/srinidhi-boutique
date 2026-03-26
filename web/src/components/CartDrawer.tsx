@@ -2,7 +2,8 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FiX, FiTrash2, FiPlus, FiMinus, FiTag, FiMessageCircle } from 'react-icons/fi';
+import { FiX, FiTrash2, FiPlus, FiMinus, FiTag } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { useCartStore } from '@/lib/cart-store';
@@ -204,7 +205,7 @@ export function CartDrawer() {
                       className="ml-auto p-1.5 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-full transition-all"
                       title="Ask about this on WhatsApp"
                     >
-                      <FiMessageCircle size={14} />
+                      <FaWhatsapp size={14} />
                     </a>
                     <button
                       onClick={() => removeMutation.mutate(item.id)}

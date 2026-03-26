@@ -463,7 +463,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
             {product.category && (
               <p className="text-xs text-[#c5a55a] uppercase tracking-[0.2em] font-semibold">{product.category.name}</p>
             )}
-            <h1 className="font-serif text-2xl md:text-3xl lg:text-4xl leading-tight text-[#1a1a2e]">{product.name}</h1>
+            <h1 className="font-poppins text-xl md:text-2xl lg:text-3xl leading-tight text-[#1a1a2e] font-bold">{product.name}</h1>
 
             {/* Price */}
             <div className="flex items-center gap-3 flex-wrap">

@@ -57,11 +57,12 @@ export function MobileBottomNav() {
               isActive ? 'bg-[#1a1a2e]/5' : ''
             }`;
 
+            // Bottom nav cart goes to full cart page, header cart icon opens sidebar
             if (isCart) {
               return (
-                <button key={href} onClick={openCart} className={className} aria-label="Open cart">
+                <Link key={href} href="/cart" className={className} aria-label="Cart">
                   {content}
-                </button>
+                </Link>
               );
             }
 

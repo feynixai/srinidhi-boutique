@@ -35,7 +35,7 @@ export default function GlobalError({
       </div>
       <p className="mt-6 text-xs text-gray-600">
         Need help?{' '}
-        <a href="https://wa.me/919999999999" className="text-[#c5a55a] hover:underline">
+        <a href="https://wa.me/919849067035" className="text-[#c5a55a] hover:underline">
           WhatsApp us
         </a>
       </p>

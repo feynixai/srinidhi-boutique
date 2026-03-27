@@ -37,7 +37,7 @@ const REASONS = [
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 export default function ReturnsPage() {
-  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+919876543210';
+  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+919849067035';
   const waLink = `https://wa.me/${whatsappNumber.replace('+', '')}?text=Hi! I'd like to initiate a return for my order.`;
 
   const [form, setForm] = useState({

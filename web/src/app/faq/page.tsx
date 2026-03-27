@@ -162,7 +162,7 @@ export default function FAQPage() {
           Can't find what you're looking for? We're always here to help.
         </p>
         <a
-          href="https://wa.me/919876543210?text=Hi! I have a question."
+          href="https://wa.me/919849067035?text=Hi! I have a question."
           target="_blank"
           rel="noopener noreferrer"
           className="inline-block mt-4 text-sm text-green-600 font-medium hover:underline"
@@ -190,7 +190,7 @@ export default function FAQPage() {
           <p className="text-charcoal/60 text-sm mb-4">Our team is available 9 AM – 9 PM, 7 days a week.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a
-              href="https://wa.me/919876543210"
+              href="https://wa.me/919849067035"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-gold px-8 py-3 text-sm tracking-widest inline-block"

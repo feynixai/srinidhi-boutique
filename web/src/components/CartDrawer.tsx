@@ -50,7 +50,7 @@ export function CartDrawer() {
     },
   });
 
-  const waNumber = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+918309949805').replace('+', '');
+  const waNumber = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+919849067035').replace('+', '');
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://srinidhiboutique.com';
 
   function getWhatsAppLink(item: { product: { name: string; slug: string; price: unknown }; size?: string; color?: string }) {

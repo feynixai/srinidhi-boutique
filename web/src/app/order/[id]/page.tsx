@@ -18,7 +18,7 @@ const STATUS_LABELS: Record<string, string> = {
 
 export default function OrderPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const waNumber = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+919876543210').replace('+', '');
+  const waNumber = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+919849067035').replace('+', '');
 
   const { data: order, isLoading } = useQuery({
     queryKey: ['order', id],

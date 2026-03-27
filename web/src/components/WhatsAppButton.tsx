@@ -5,7 +5,7 @@ import { useCartStore } from '@/lib/cart-store';
 
 export function WhatsAppButton() {
   const { isCartOpen } = useCartStore();
-  const number = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+918309949805').replace('+', '');
+  const number = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+919849067035').replace('+', '');
   const href = `https://wa.me/${number}?text=${encodeURIComponent('Hi! I have a question about Srinidhi Boutique')}`;
   const [bounced, setBounced] = useState(false);
 

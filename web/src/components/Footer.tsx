@@ -3,7 +3,7 @@ import { FiInstagram, FiFacebook, FiYoutube } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 
 export function Footer() {
-  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+919876543210';
+  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+919849067035';
   const waLink = `https://wa.me/${whatsappNumber.replace('+', '')}?text=Hi! I'd like to know more about your collection.`;
   const instagramLink = process.env.NEXT_PUBLIC_INSTAGRAM_URL || 'https://instagram.com/srinidhiboutique';
   const facebookLink = process.env.NEXT_PUBLIC_FACEBOOK_URL || 'https://facebook.com/srinidhiboutique';

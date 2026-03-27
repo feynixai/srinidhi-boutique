@@ -26,7 +26,7 @@ export function SizeGuideModal({ productName, productUrl }: SizeGuideModalProps)
   }, []);
 
   // Build WhatsApp message with product context
-  const waNumber = '918309949805';
+  const waNumber = '919849067035';
   const waMsg = productName
     ? `Hi! I need help with sizing for "${productName}".${productUrl ? `\n${productUrl}` : ''}\nCan you help me choose the right size?`
     : 'Hi! I need help with sizing. Can you guide me?';

@@ -98,7 +98,7 @@ export function SizeGuideContent({ whatsappLink }: SizeGuideContentProps = {}) {
 
       {/* WhatsApp CTA */}
       <a
-        href={whatsappLink || "https://wa.me/918309949805?text=Hi%2C%20I%20need%20help%20with%20sizing"}
+        href={whatsappLink || "https://wa.me/919849067035?text=Hi%2C%20I%20need%20help%20with%20sizing"}
         target="_blank"
         rel="noopener noreferrer"
         className="flex items-center justify-center gap-2 w-full py-3.5 bg-[#25D366] hover:bg-[#20bd5a] text-[#1a1a2e] font-semibold rounded-full transition-colors text-sm"

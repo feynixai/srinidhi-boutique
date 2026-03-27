@@ -23,7 +23,7 @@ const MISSION_POINTS = [
 ];
 
 export default function AboutPage() {
-  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+919876543210';
+  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+919849067035';
   const waLink = `https://wa.me/${whatsappNumber.replace('+', '')}?text=Hi Srinidhi Boutique! I'd love to know more.`;
 
   return (

@@ -136,7 +136,7 @@ export default function ShippingPage() {
         <div className="bg-rose-gold/5 border border-rose-gold/20 rounded-sm p-5 text-center">
           <p className="text-sm text-charcoal">Questions about your shipment?</p>
           <a
-            href="https://wa.me/919876543210?text=Hi! I have a question about my order shipping."
+            href="https://wa.me/919849067035?text=Hi! I have a question about my order shipping."
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 mt-3 bg-green-500 text-white px-6 py-2.5 rounded-sm text-sm font-medium hover:bg-green-600 transition-colors"

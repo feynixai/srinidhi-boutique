@@ -134,7 +134,7 @@ export default function OrderPage({ params }: { params: Promise<{ id: string }> 
           <p className="text-xs text-gray-500 mb-3">Tell your friends about your new find from Srinidhi Boutique.</p>
           {(() => {
             const firstItem = order.items[0];
-            const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://proofcrest.com';
+            const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://thesrinidhiboutique.com';
             const shareMsg = encodeURIComponent(
               `Just ordered "${firstItem?.name || 'something beautiful'}" from Srinidhi Boutique! Check out their amazing collection at ${siteUrl}`
             );

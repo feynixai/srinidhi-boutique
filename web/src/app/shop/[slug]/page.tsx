@@ -296,7 +296,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
   };
 
   const waNumber = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+919849067035').replace('+', '');
-  const productUrl = typeof window !== 'undefined' ? window.location.href : `https://proofcrest.com/shop/${product.slug}`;
+  const productUrl = typeof window !== 'undefined' ? window.location.href : `https://thesrinidhiboutique.com/shop/${product.slug}`;
   const whatsappOrderMsg = encodeURIComponent(
     `Hi! I'm interested in buying "${product.name}" (₹${displayPrice.toLocaleString('en-IN')})${selectedSize ? ` · Size: ${selectedSize}` : ''}${selectedColor ? ` · Colour: ${selectedColor}` : ''}. Can you help me place an order?\n${productUrl}`
   );

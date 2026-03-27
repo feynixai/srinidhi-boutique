@@ -2,9 +2,9 @@
 
 Premium women's ethnic wear e-commerce platform built for Srinidhi Boutique — a women's clothing store in Hyderabad, India.
 
-![Srinidhi Boutique Store](https://via.placeholder.com/1200x600/1a1a2e/c5a55a?text=Srinidhi+Boutique+—+Live+at+proofcrest.com)
+![Srinidhi Boutique Store](https://via.placeholder.com/1200x600/1a1a2e/c5a55a?text=Srinidhi+Boutique+—+Live+at+thesrinidhiboutique.com)
 
-> **Live store:** [proofcrest.com](https://proofcrest.com) &nbsp;|&nbsp; **Admin:** [admin-cyan-one-44.vercel.app](https://admin-cyan-one-44.vercel.app)
+> **Live store:** [thesrinidhiboutique.com](https://thesrinidhiboutique.com) &nbsp;|&nbsp; **Admin:** [admin-cyan-one-44.vercel.app](https://admin-cyan-one-44.vercel.app)
 
 ---
 
@@ -13,7 +13,7 @@ Premium women's ethnic wear e-commerce platform built for Srinidhi Boutique — 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  Customer Store (Next.js 14)    Admin Dashboard (Next.js 14)    │
-│  https://proofcrest.com         https://admin-cyan-one-44...    │
+│  https://thesrinidhiboutique.com         https://admin-cyan-one-44...    │
 │  :3000 (local)                  :3001 (local)                   │
 └────────────────┬────────────────────────────┬───────────────────┘
                  │ REST API                   │ REST API
@@ -252,7 +252,7 @@ npm run dev
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `NEXT_PUBLIC_API_URL` | **Yes** | API base URL — `http://localhost:4000` |
-| `NEXT_PUBLIC_SITE_URL` | No | Public store URL for SEO — `https://proofcrest.com` |
+| `NEXT_PUBLIC_SITE_URL` | No | Public store URL for SEO — `https://thesrinidhiboutique.com` |
 | `NEXT_PUBLIC_WHATSAPP_NUMBER` | No | WhatsApp click-to-chat — `+919876543210` |
 | `NEXT_PUBLIC_INSTAGRAM_URL` | No | Instagram profile URL |
 | `NEXT_PUBLIC_FACEBOOK_URL` | No | Facebook page URL |

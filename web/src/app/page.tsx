@@ -13,6 +13,7 @@ import { HotCollections } from '@/components/HotCollections';
 import { ShopByCollection } from '@/components/ShopByCollection';
 import RecentlyViewed from '@/components/RecentlyViewed';
 import FlashSaleBanner from '@/components/FlashSaleBanner';
+import { InstagramFeed } from '@/components/InstagramFeed';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -497,22 +498,8 @@ export default async function HomePage() {
 
       <NewsletterSignup />
 
-      {/* Instagram Social Proof */}
-      <section className="bg-[#1a1a2e] py-14 text-center">
-        <p className="text-[#c5a55a] uppercase tracking-[0.3em] text-xs mb-2 font-medium">
-          Follow Our Story
-        </p>
-        <h2 className="font-serif text-3xl text-white mb-4 font-bold">@srinidhiboutique</h2>
-        <p className="text-white/50 text-sm mb-6">Tag us in your photos to be featured</p>
-        <a
-          href="https://instagram.com/srinidhiboutique"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block bg-white/10 backdrop-blur-sm border border-white/20 text-[#c5a55a] px-8 py-3 rounded-full text-xs tracking-widest hover:bg-white/20 transition-all"
-        >
-          FOLLOW ON INSTAGRAM
-        </a>
-      </section>
+      {/* Instagram Feed */}
+      <InstagramFeed />
     </div>
   );
 }

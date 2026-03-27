@@ -25,6 +25,7 @@ import {
   FiList,
   FiLayers,
   FiNavigation,
+  FiInstagram,
 } from 'react-icons/fi';
 
 interface NavItem {
@@ -51,6 +52,7 @@ const NAV: NavItem[] = [
       { href: '/admin/store/collections', label: 'Collections', icon: FiLayers },
       { href: '/admin/store/occasions', label: 'Occasions', icon: FiStar },
       { href: '/admin/store/navigation', label: 'Navigation', icon: FiNavigation },
+      { href: '/admin/store/instagram', label: 'Instagram Feed', icon: FiInstagram },
     ],
   },
   { href: '/admin/customers', label: 'Customers', icon: FiUsers },

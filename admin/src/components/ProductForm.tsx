@@ -33,6 +33,7 @@ export function ProductForm({ product }: ProductFormProps) {
     onOffer: product?.onOffer || false,
     offerPercent: product?.offerPercent ? String(product.offerPercent) : '',
     active: product?.active ?? true,
+    reelUrl: product?.reelUrl || '',
   });
 
   const [submitting, setSubmitting] = useState(false);
@@ -70,6 +71,7 @@ export function ProductForm({ product }: ProductFormProps) {
         onOffer: form.onOffer,
         offerPercent: form.offerPercent ? Number(form.offerPercent) : undefined,
         active: form.active,
+        reelUrl: form.reelUrl || undefined,
       };
 
       if (isEdit && product) {
@@ -289,6 +291,16 @@ export function ProductForm({ product }: ProductFormProps) {
             className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-rose-gold"
             placeholder="e.g. Pure Kanjivaram Silk"
           />
+        </div>
+        <div>
+          <label className="block text-base font-semibold mb-2">Instagram Reel URL <span className="text-gray-400 font-normal text-sm">(optional)</span></label>
+          <input
+            value={form.reelUrl}
+            onChange={(e) => setForm({ ...form, reelUrl: e.target.value })}
+            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-rose-gold"
+            placeholder="https://www.instagram.com/reel/..."
+          />
+          <p className="text-xs text-gray-400 mt-1">If set, an embedded Instagram reel will appear on the product page.</p>
         </div>
         <div className="grid grid-cols-2 gap-4">
           {[

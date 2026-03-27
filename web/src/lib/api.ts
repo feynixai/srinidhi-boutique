@@ -30,6 +30,7 @@ export interface Product {
   offerPercent?: number;
   active: boolean;
   createdAt: string;
+  reelUrl?: string;
 }
 
 export interface Category {

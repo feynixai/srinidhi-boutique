@@ -161,6 +161,73 @@ function EMICalculator({ price }: { price: number }) {
   );
 }
 
+function InstagramReelEmbed({ reelUrl }: { reelUrl: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [embedHtml, setEmbedHtml] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    if (!reelUrl) return;
+    setLoading(true);
+    setError(false);
+    fetch(`https://api.instagram.com/oembed?url=${encodeURIComponent(reelUrl)}&maxwidth=400&hidecaption=1`)
+      .then((r) => {
+        if (!r.ok) throw new Error('oEmbed failed');
+        return r.json();
+      })
+      .then((data) => {
+        setEmbedHtml(data.html);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError(true);
+        setLoading(false);
+      });
+  }, [reelUrl]);
+
+  // Load Instagram embed.js after HTML is set
+  useEffect(() => {
+    if (!embedHtml) return;
+    // Give DOM time to render the embed HTML, then load or re-process embed.js
+    const timer = setTimeout(() => {
+      const existingScript = document.getElementById('instagram-embed-js');
+      if (existingScript) {
+        // If already loaded, trigger processEmbeds
+        if ((window as unknown as Record<string, unknown>).instgrm) {
+          (window as unknown as { instgrm: { Embeds: { process: () => void } } }).instgrm.Embeds.process();
+        }
+      } else {
+        const script = document.createElement('script');
+        script.id = 'instagram-embed-js';
+        script.src = 'https://www.instagram.com/embed.js';
+        script.async = true;
+        document.body.appendChild(script);
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [embedHtml]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-10">
+        <div className="w-6 h-6 border-2 border-[#c5a55a] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (error || !embedHtml) return null;
+
+  return (
+    <div ref={containerRef} className="flex justify-center">
+      <div
+        dangerouslySetInnerHTML={{ __html: embedHtml }}
+        className="w-full max-w-[400px]"
+      />
+    </div>
+  );
+}
+
 export default function ProductPage({ params }: { params: { slug: string } }) {
   const { slug } = params;
   const [selectedSize, setSelectedSize] = useState<string>('');
@@ -793,6 +860,17 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
           )}
         </div>
       </div>
+
+      {/* Instagram Reel Embed */}
+      {product.reelUrl && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-12">
+          <div className="text-center mb-6">
+            <p className="text-[#c5a55a] uppercase tracking-[0.2em] text-xs font-semibold mb-2">See It In Action</p>
+            <h2 className="font-bold text-2xl text-[#1a1a2e] tracking-tight">Instagram Reel</h2>
+          </div>
+          <InstagramReelEmbed reelUrl={product.reelUrl} />
+        </div>
+      )}
 
       {/* Customers Also Bought */}
       {alsoBought && alsoBought.length > 0 && (

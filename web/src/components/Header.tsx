@@ -157,7 +157,7 @@ export function Header() {
         }`}
       >
         <div className={`max-w-7xl mx-auto transition-all duration-300 ${scrolled ? 'px-2 sm:px-3 md:px-5' : 'px-2 sm:px-4 md:px-6'}`}>
-          <div className={`flex items-center justify-between transition-all duration-300 ${scrolled ? 'h-11 md:h-14' : 'h-12 sm:h-14 md:h-[72px]'}`}>
+          <div className={`flex items-center justify-between transition-all duration-300 ${scrolled ? 'h-12 md:h-14' : 'h-14 sm:h-16 md:h-[72px]'}`}>
             {/* Mobile menu button */}
             <button
               className="md:hidden p-1.5 text-[#1a1a2e] rounded-full hover:bg-white/60 transition-colors"
@@ -169,7 +169,7 @@ export function Header() {
 
             {/* Logo */}
             <Link href="/" className="flex-1 md:flex-none text-center md:text-left min-w-0">
-              <span className={`font-serif font-bold text-[#1a1a1a] tracking-wide transition-all duration-300 whitespace-nowrap ${scrolled ? 'text-[15px] sm:text-lg md:text-xl' : 'text-lg sm:text-2xl md:text-3xl'}`}>
+              <span className={`font-serif font-bold text-[#1a1a1a] tracking-wide transition-all duration-300 whitespace-nowrap ${scrolled ? 'text-base sm:text-lg md:text-xl' : 'text-xl sm:text-2xl md:text-3xl'}`}>
                 Srinidhi <span className="text-[#9a7b4f] font-bold">Boutique</span>
               </span>
             </Link>

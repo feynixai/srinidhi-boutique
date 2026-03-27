@@ -148,7 +148,7 @@ export function Header() {
 
   return (
     <>
-      <div className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'px-4 sm:px-6 pt-1.5' : 'px-3 sm:px-4 pt-2'}`}>
+      <div className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'px-2 sm:px-4 md:px-6 pt-1' : 'px-2 sm:px-3 md:px-4 pt-1.5 sm:pt-2'}`}>
       <header
         className={`transition-all duration-300 ${
           scrolled
@@ -156,20 +156,20 @@ export function Header() {
             : 'bg-white/60 backdrop-blur-lg border border-white/30 rounded-2xl'
         }`}
       >
-        <div className={`max-w-7xl mx-auto transition-all duration-300 ${scrolled ? 'px-3 sm:px-5' : 'px-4 sm:px-6'}`}>
-          <div className={`flex items-center justify-between transition-all duration-300 ${scrolled ? 'h-12 md:h-14' : 'h-16 md:h-[72px]'}`}>
+        <div className={`max-w-7xl mx-auto transition-all duration-300 ${scrolled ? 'px-2 sm:px-3 md:px-5' : 'px-2 sm:px-4 md:px-6'}`}>
+          <div className={`flex items-center justify-between transition-all duration-300 ${scrolled ? 'h-11 md:h-14' : 'h-12 sm:h-14 md:h-[72px]'}`}>
             {/* Mobile menu button */}
             <button
-              className="md:hidden p-2 text-[#1a1a2e] rounded-full hover:bg-white/60 transition-colors"
+              className="md:hidden p-1.5 text-[#1a1a2e] rounded-full hover:bg-white/60 transition-colors"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label="Toggle menu"
             >
-              {mobileOpen ? <FiX size={22} /> : <FiMenu size={22} />}
+              {mobileOpen ? <FiX size={20} /> : <FiMenu size={20} />}
             </button>
 
             {/* Logo */}
-            <Link href="/" className="flex-1 md:flex-none text-center md:text-left">
-              <span className={`font-serif font-bold text-[#1a1a1a] tracking-wide transition-all duration-300 ${scrolled ? 'text-lg md:text-xl' : 'text-2xl md:text-3xl'}`}>
+            <Link href="/" className="flex-1 md:flex-none text-center md:text-left min-w-0">
+              <span className={`font-serif font-bold text-[#1a1a1a] tracking-wide transition-all duration-300 whitespace-nowrap ${scrolled ? 'text-[15px] sm:text-lg md:text-xl' : 'text-lg sm:text-2xl md:text-3xl'}`}>
                 Srinidhi <span className="text-[#9a7b4f] font-bold">Boutique</span>
               </span>
             </Link>
@@ -244,7 +244,7 @@ export function Header() {
             </nav>
 
             {/* Action icons */}
-            <div className={`flex items-center transition-all duration-300 ${scrolled ? 'space-x-0' : 'space-x-1'}`}>
+            <div className={`flex items-center transition-all duration-300 ${scrolled ? 'space-x-0' : 'space-x-0 sm:space-x-1'}`}>
               {/* Language toggle */}
               <button
                 onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
@@ -257,17 +257,17 @@ export function Header() {
               </button>
               <Link
                 href="/search"
-                className="p-2 text-[#1a1a2e]/70 hover:text-[#1a1a2e] hover:bg-white/60 rounded-full transition-all"
+                className="p-1.5 sm:p-2 text-[#1a1a2e]/70 hover:text-[#1a1a2e] hover:bg-white/60 rounded-full transition-all"
                 aria-label={t.search}
               >
-                <FiSearch size={20} />
+                <FiSearch size={18} className="sm:w-5 sm:h-5" />
               </Link>
               <Link
                 href="/wishlist"
-                className="relative p-2 text-[#1a1a2e]/70 hover:text-[#1a1a2e] hover:bg-white/60 rounded-full transition-all"
+                className="relative p-1.5 sm:p-2 text-[#1a1a2e]/70 hover:text-[#1a1a2e] hover:bg-white/60 rounded-full transition-all"
                 aria-label="Wishlist"
               >
-                <FiHeart size={20} />
+                <FiHeart size={18} className="sm:w-5 sm:h-5" />
                 {wishlistCount > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 bg-[#c5a55a] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-semibold">
                     {wishlistCount > 9 ? '9+' : wishlistCount}
@@ -276,10 +276,10 @@ export function Header() {
               </Link>
               <button
                 onClick={toggleCart}
-                className="p-2 text-[#1a1a2e]/70 hover:text-[#1a1a2e] hover:bg-white/60 rounded-full transition-all relative"
+                className="p-1.5 sm:p-2 text-[#1a1a2e]/70 hover:text-[#1a1a2e] hover:bg-white/60 rounded-full transition-all relative"
                 aria-label="Cart"
               >
-                <FiShoppingBag size={20} />
+                <FiShoppingBag size={18} className="sm:w-5 sm:h-5" />
                 {itemCount > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 bg-[#1a1a2e] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-semibold">
                     {itemCount > 9 ? '9+' : itemCount}

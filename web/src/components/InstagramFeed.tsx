@@ -11,12 +11,12 @@ interface InstagramPost {
 }
 
 const DEFAULT_POSTS: InstagramPost[] = [
-  { id: 1, imageUrl: 'https://picsum.photos/seed/ig1/400/400', caption: 'New collection just dropped ✨', postUrl: 'https://instagram.com/srinidhiboutique', type: 'photo' },
-  { id: 2, imageUrl: 'https://picsum.photos/seed/ig2/400/400', caption: 'Festival season ready 🌸', postUrl: 'https://instagram.com/srinidhiboutique', type: 'reel' },
-  { id: 3, imageUrl: 'https://picsum.photos/seed/ig3/400/400', caption: 'Kanjivaram silk sarees 💫', postUrl: 'https://instagram.com/srinidhiboutique', type: 'photo' },
-  { id: 4, imageUrl: 'https://picsum.photos/seed/ig4/400/400', caption: 'Bridal lehenga lookbook 👰', postUrl: 'https://instagram.com/srinidhiboutique', type: 'photo' },
-  { id: 5, imageUrl: 'https://picsum.photos/seed/ig5/400/400', caption: 'Chikankari kurti vibes 🌿', postUrl: 'https://instagram.com/srinidhiboutique', type: 'reel' },
-  { id: 6, imageUrl: 'https://picsum.photos/seed/ig6/400/400', caption: 'Office-to-party outfits 🎉', postUrl: 'https://instagram.com/srinidhiboutique', type: 'photo' },
+  { id: 1, imageUrl: 'https://picsum.photos/seed/ig1/400/400', caption: 'New collection just dropped ✨', postUrl: 'https://instagram.com/srinidhi_boutique_by_suji', type: 'photo' },
+  { id: 2, imageUrl: 'https://picsum.photos/seed/ig2/400/400', caption: 'Festival season ready 🌸', postUrl: 'https://instagram.com/srinidhi_boutique_by_suji', type: 'reel' },
+  { id: 3, imageUrl: 'https://picsum.photos/seed/ig3/400/400', caption: 'Kanjivaram silk sarees 💫', postUrl: 'https://instagram.com/srinidhi_boutique_by_suji', type: 'photo' },
+  { id: 4, imageUrl: 'https://picsum.photos/seed/ig4/400/400', caption: 'Bridal lehenga lookbook 👰', postUrl: 'https://instagram.com/srinidhi_boutique_by_suji', type: 'photo' },
+  { id: 5, imageUrl: 'https://picsum.photos/seed/ig5/400/400', caption: 'Chikankari kurti vibes 🌿', postUrl: 'https://instagram.com/srinidhi_boutique_by_suji', type: 'reel' },
+  { id: 6, imageUrl: 'https://picsum.photos/seed/ig6/400/400', caption: 'Office-to-party outfits 🎉', postUrl: 'https://instagram.com/srinidhi_boutique_by_suji', type: 'photo' },
 ];
 
 // Instagram logo SVG (simplified)
@@ -38,7 +38,7 @@ function ReelIcon({ size = 14 }: { size?: number }) {
 
 export function InstagramFeed() {
   const [posts, setPosts] = useState<InstagramPost[]>([]);
-  const [handle, setHandle] = useState('srinidhiboutique');
+  const [handle, setHandle] = useState('srinidhi_boutique_by_suji');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

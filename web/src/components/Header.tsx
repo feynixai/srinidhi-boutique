@@ -8,7 +8,7 @@ import { useWishlistStore } from '@/lib/wishlist-store';
 import { getCart } from '@/lib/api';
 import { useLanguage } from '@/lib/language-context';
 
-const megaMenu = [
+const DEFAULT_MEGA_MENU = [
   {
     label: 'Sarees',
     href: '/category/sarees',
@@ -117,6 +117,7 @@ export function Header() {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [navItems, setNavItems] = useState(DEFAULT_MEGA_MENU);
   const { sessionId, itemCount, setItemCount, toggleCart } = useCartStore();
   const wishlistCount = useWishlistStore((s) => s.items.length);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -127,6 +128,13 @@ export function Header() {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('sb-navigation') || 'null');
+      if (stored) setNavItems(stored);
+    } catch {}
   }, []);
 
   useEffect(() => {
@@ -176,7 +184,7 @@ export function Header() {
 
             {/* Desktop Mega Menu */}
             <nav className={`hidden md:flex items-center mx-8 transition-all duration-300 ${scrolled ? 'space-x-4' : 'space-x-6'}`} ref={menuRef}>
-              {megaMenu.map((item) => (
+              {navItems.map((item) => (
                 <div
                   key={item.label}
                   className="relative"
@@ -322,7 +330,7 @@ export function Header() {
 
             {/* Scrollable menu */}
             <div className="flex-1 overflow-y-auto px-5 py-3">
-              {megaMenu.map((item) => (
+              {navItems.map((item) => (
                 <div key={item.label}>
                   {item.columns.length > 0 ? (
                     <>

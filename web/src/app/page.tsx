@@ -1,27 +1,29 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { FiTruck, FiRefreshCw, FiLock, FiDollarSign, FiMessageCircle, FiPackage, FiCreditCard, FiPhone, FiFeather, FiFlag, FiHeart } from 'react-icons/fi';
-import { getFeaturedProducts, getBestSellers, getOffers, getCategories } from '@/lib/api';
+import { getFeaturedProducts, getBestSellers, getOffers } from '@/lib/api';
 import { ProductCard } from '@/components/ProductCard';
 import { HeroCarousel } from '@/components/HeroCarousel';
 import { NewsletterSignup } from '@/components/NewsletterSignup';
 import { FadeInSection } from '@/components/FadeInSection';
 import { CountdownTimer } from '@/components/CountdownTimer';
 import { ShopByOccasion } from '@/components/ShopByOccasion';
+import { ShopByCategory } from '@/components/ShopByCategory';
+import { HotCollections } from '@/components/HotCollections';
+import { ShopByCollection } from '@/components/ShopByCollection';
 import RecentlyViewed from '@/components/RecentlyViewed';
 import FlashSaleBanner from '@/components/FlashSaleBanner';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 async function getData() {
-  const [featured, bestSellers, offers, categories, flashSalesRes] = await Promise.all([
+  const [featured, bestSellers, offers, flashSalesRes] = await Promise.all([
     getFeaturedProducts().catch(() => []),
     getBestSellers().catch(() => []),
     getOffers().catch(() => []),
-    getCategories().catch(() => []),
     fetch(`${API_URL}/api/flash-sales/active`, { next: { revalidate: 60 } }).then((r) => r.json()).catch(() => ({ sales: [] })),
   ]);
-  return { featured, bestSellers, offers, categories, activeSale: flashSalesRes.sales?.[0] || null };
+  return { featured, bestSellers, offers, activeSale: flashSalesRes.sales?.[0] || null };
 }
 
 // Flash sale ends at midnight today
@@ -32,7 +34,7 @@ function getFlashSaleEnd(): Date {
 }
 
 export default async function HomePage() {
-  const { featured, bestSellers, offers, categories, activeSale } = await getData();
+  const { featured, bestSellers, offers, activeSale } = await getData();
   const flashSaleEnd = getFlashSaleEnd();
 
   const orgJsonLd = {
@@ -131,47 +133,9 @@ export default async function HomePage() {
       </div>
 
       {/* Category Grid */}
-      {categories.length > 0 && (
-        <FadeInSection>
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
-            <div className="text-center mb-10">
-              <h2 className="section-heading">Shop by Category</h2>
-              <div className="divider-gold mx-auto" />
-              <p className="text-[#1a1a2e]/70 text-base mt-2 tracking-wide">
-                Curated for every occasion
-              </p>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-              {categories.slice(0, 6).map((cat, i) => (
-                <Link
-                  key={cat.id}
-                  href={`/category/${cat.slug}`}
-                  className={`group relative overflow-hidden rounded-3xl bg-gray-100 shadow-card hover:-translate-y-1 hover:shadow-card-hover transition-all duration-300 ${
-                    i === 0 ? 'aspect-[4/5] md:aspect-square' : 'aspect-square'
-                  }`}
-                >
-                  {cat.image && (
-                    <Image
-                      src={cat.image}
-                      alt={cat.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-700"
-                      sizes="(max-width: 640px) 50vw, 33vw"
-                    />
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e]/70 via-[#1a1a2e]/10 to-transparent group-hover:from-[#1a1a2e]/80 transition-all duration-300" />
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <h3 className="text-white font-serif text-xl group-hover:text-[#c5a55a] transition-colors">
-                      {cat.name}
-                    </h3>
-                    <p className="text-white/90 text-xs mt-0.5 tracking-wide">Explore →</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </section>
-        </FadeInSection>
-      )}
+      <FadeInSection>
+        <ShopByCategory />
+      </FadeInSection>
 
       {/* Shop by Occasion */}
       <FadeInSection delay={100}>
@@ -180,46 +144,12 @@ export default async function HomePage() {
 
       {/* Hot Collections */}
       <FadeInSection delay={150}>
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
-          <div className="text-center mb-10">
-            <h2 className="section-heading">Hot Collections</h2>
-            <div className="divider-gold mx-auto" />
-            <p className="text-[#1a1a2e]/70 text-base mt-2 tracking-wide">
-              Shop by mood, season &amp; occasion
-            </p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {[
-              { name: 'Wedding Season', href: '/shop?occasion=wedding', image: 'https://picsum.photos/seed/hot-wedding/600/400', sub: 'Sarees · Lehengas · Kurtis' },
-              { name: 'Festive Favorites', href: '/shop?occasion=festival', image: 'https://picsum.photos/seed/hot-festival/600/400', sub: 'Diwali · Navratri · Onam' },
-              { name: 'Under ₹2,000', href: '/shop?maxPrice=2000', image: 'https://picsum.photos/seed/hot-budget/600/400', sub: 'Great Picks, Great Prices' },
-              { name: 'New Arrivals', href: '/shop?sort=newest', image: 'https://picsum.photos/seed/hot-new/600/400', sub: 'Just In This Season' },
-              { name: 'Office Ready', href: '/shop?occasion=office', image: 'https://picsum.photos/seed/hot-office/600/400', sub: 'Elegant · Professional · Comfortable' },
-              { name: 'Party Glam', href: '/shop?occasion=party', image: 'https://picsum.photos/seed/hot-party/600/400', sub: 'Shine at Every Celebration' },
-            ].map((col) => (
-              <Link
-                key={col.name}
-                href={col.href}
-                className="group relative overflow-hidden rounded-3xl aspect-[4/3] bg-gray-200 shadow-card hover:-translate-y-1 hover:shadow-card-hover transition-all duration-300"
-              >
-                <Image
-                  src={col.image}
-                  alt={col.name}
-                  fill
-                  className="object-cover group-hover:scale-110 transition-transform duration-700"
-                  sizes="(max-width: 640px) 50vw, 33vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a2e]/80 via-[#1a1a2e]/20 to-transparent group-hover:from-[#1a1a2e]/90 transition-all duration-300" />
-                <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-3">
-                    <h3 className="text-white font-bold text-base leading-tight group-hover:text-[#c5a55a] transition-colors">{col.name}</h3>
-                    <p className="text-white/80 text-xs mt-0.5 tracking-wide">{col.sub}</p>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
+        <HotCollections />
+      </FadeInSection>
+
+      {/* Shop by Collection */}
+      <FadeInSection delay={100}>
+        <ShopByCollection />
       </FadeInSection>
 
       {/* Festival Collection Banner */}

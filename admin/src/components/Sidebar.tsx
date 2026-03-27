@@ -21,6 +21,10 @@ import {
   FiStar,
   FiChevronDown,
   FiChevronRight,
+  FiZap,
+  FiList,
+  FiLayers,
+  FiNavigation,
 } from 'react-icons/fi';
 
 interface NavItem {
@@ -42,7 +46,11 @@ const NAV: NavItem[] = [
     icon: FiImage,
     children: [
       { href: '/admin/store/hero', label: 'Hero Slides', icon: FiImage },
+      { href: '/admin/store/hot-collections', label: 'Hot Collections', icon: FiZap },
+      { href: '/admin/store/categories', label: 'Categories', icon: FiList },
+      { href: '/admin/store/collections', label: 'Collections', icon: FiLayers },
       { href: '/admin/store/occasions', label: 'Occasions', icon: FiStar },
+      { href: '/admin/store/navigation', label: 'Navigation', icon: FiNavigation },
     ],
   },
   { href: '/admin/customers', label: 'Customers', icon: FiUsers },
